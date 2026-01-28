@@ -395,9 +395,14 @@ export const useDeletePortfolio = () => {
       return true;
     },
     onSuccess: (_, portfolioId) => {
-      // Invalidate both the portfolio list and the specific portfolio
+      // Invalidate all related portfolio queries
       queryClient.invalidateQueries({ queryKey: ["portfolios"] });
       queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
     },
   });
 };
@@ -484,12 +489,15 @@ export const useUpdatePortfolio = () => {
       return data;
     },
     onSuccess: (data, variables) => {
-      // Invalidate and refetch the portfolio query
-      queryClient.invalidateQueries({
-        queryKey: ["portfolio", variables.portfolioId],
-      });
-      // Also invalidate the portfolios list
+      const portfolioId = variables.portfolioId;
+      // Invalidate and refetch all related portfolio queries
       queryClient.invalidateQueries({ queryKey: ["portfolios"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
     },
   });
 };
@@ -510,7 +518,15 @@ export const useUpdatePortfolioHoldings = () => {
       return data;
     },
     onSuccess: (_, { portfolioId }) => {
+      // Invalidate and refetch all related portfolio queries
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
       queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+
       toast({
         title: "Holding updated",
         description: "Your portfolio holding has been updated.",
@@ -559,7 +575,15 @@ export const useDeletePortfolioHolding = () => {
       return { success: true };
     },
     onSuccess: (_, { portfolioId }) => {
+      // Invalidate and refetch all related portfolio queries
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
       queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+
       toast({
         title: "Holding removed",
         description: "The holding has been removed from your portfolio.",

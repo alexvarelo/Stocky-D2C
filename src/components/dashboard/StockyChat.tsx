@@ -7,13 +7,11 @@ import {
     SheetDescription
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import {
     Send,
-    User,
     Sparkles,
     Loader2,
     MessageSquare,
@@ -37,7 +35,7 @@ interface Message {
 
 interface StockyChatProps {
     open: boolean;
-    onOpenChange: (open: boolean) => void;
+    onOpenChange: (_open: boolean) => void;
 }
 
 const PREDEFINED_PROMPTS = [
@@ -50,10 +48,10 @@ const PREDEFINED_PROMPTS = [
 function ToolResponse({ content, toolName }: { content: string; toolName?: string }) {
     const [isExpanded, setIsExpanded] = React.useState(false);
 
-    let jsonContent: any = null;
+    let jsonContent: unknown = null;
     try {
         jsonContent = JSON.parse(content);
-    } catch (e) {
+    } catch {
         jsonContent = content;
     }
 
@@ -101,21 +99,8 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
     const [conversationId, setConversationId] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Load existing conversation if it exists
-    useEffect(() => {
-        if (open && user && !conversationId) {
-            loadLastConversation();
-        }
-    }, [open, user]);
-
-    // Auto-scroll to bottom
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [messages, isLoading]);
-
-    const loadLastConversation = async () => {
+    // Wrap loadLastConversation in useCallback to satisfy useEffect dependencies
+    const loadLastConversation = React.useCallback(async () => {
         if (!user) return;
 
         try {
@@ -141,18 +126,35 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                 if (msgsError) throw msgsError;
 
                 if (msgs) {
-                    setMessages(msgs.map(m => ({
-                        id: m.id,
-                        role: m.role as "user" | "assistant" | "tool",
-                        content: m.content || "",
-                        tool_name: (m.tool_calls as any)?.[0]?.function?.name || undefined
-                    })));
+                    setMessages(msgs.map(m => {
+                        const toolCalls = m.tool_calls as Array<{ function?: { name?: string } }> | null;
+                        return {
+                            id: m.id,
+                            role: m.role as "user" | "assistant" | "tool",
+                            content: m.content || "",
+                            tool_name: toolCalls?.[0]?.function?.name || undefined
+                        };
+                    }));
                 }
             }
         } catch (err) {
             console.error("Error loading chat history:", err);
         }
-    };
+    }, [user]);
+
+    // Load existing conversation if it exists
+    useEffect(() => {
+        if (open && user && !conversationId) {
+            loadLastConversation();
+        }
+    }, [open, user, conversationId, loadLastConversation]);
+
+    // Auto-scroll to bottom
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages, isLoading]);
 
     const handleSend = async (text: string = input) => {
         if (!text.trim() || !user || isLoading) return;
@@ -301,14 +303,14 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                                     <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-headings:tracking-tight prose-p:text-gray-700 prose-p:leading-[1.7] prose-li:text-gray-700 prose-strong:text-foreground prose-strong:font-bold prose-code:text-foreground">
                                                         <ReactMarkdown
                                                             components={{
-                                                                h1: ({ node, ...props }) => <h1 className="text-2xl font-bold mt-8 mb-4" {...props} />,
-                                                                h2: ({ node, ...props }) => <h2 className="text-xl font-bold mt-6 mb-3" {...props} />,
-                                                                h3: ({ node, ...props }) => <h3 className="text-lg font-bold mt-5 mb-2" {...props} />,
-                                                                p: ({ node, ...props }) => <p className="mb-4 text-[17px]" {...props} />,
-                                                                ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-6 space-y-2" {...props} />,
-                                                                ol: ({ node, ...props }) => <ol className="list-decimal pl-6 mb-6 space-y-2" {...props} />,
-                                                                li: ({ node, ...props }) => <li className="text-[17px]" {...props} />,
-                                                                code: ({ node, inline, ...props }: any) =>
+                                                                h1: ({ ...props }) => <h1 className="text-2xl font-bold mt-8 mb-4" {...props} />,
+                                                                h2: ({ ...props }) => <h2 className="text-xl font-bold mt-6 mb-3" {...props} />,
+                                                                h3: ({ ...props }) => <h3 className="text-lg font-bold mt-5 mb-2" {...props} />,
+                                                                p: ({ ...props }) => <p className="mb-4 text-[17px]" {...props} />,
+                                                                ul: ({ ...props }) => <ul className="list-disc pl-6 mb-6 space-y-2" {...props} />,
+                                                                ol: ({ ...props }) => <ol className="list-decimal pl-6 mb-6 space-y-2" {...props} />,
+                                                                li: ({ ...props }) => <li className="text-[17px]" {...props} />,
+                                                                code: ({ inline, ...props }: { inline?: boolean; children?: React.ReactNode }) =>
                                                                     inline ? (
                                                                         <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
                                                                     ) : (
@@ -316,9 +318,9 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                                                             <code {...props} />
                                                                         </pre>
                                                                     ),
-                                                                blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-primary/20 pl-4 italic my-6 text-muted-foreground" {...props} />,
-                                                                hr: ({ node, ...props }) => <hr className="my-8 border-border/50" {...props} />,
-                                                                a: ({ node, ...props }) => <a className="text-blue-600 hover:text-blue-800 underline transition-colors" {...props} />,
+                                                                blockquote: ({ ...props }) => <blockquote className="border-l-4 border-primary/20 pl-4 italic my-6 text-muted-foreground" {...props} />,
+                                                                hr: ({ ...props }) => <hr className="my-8 border-border/50" {...props} />,
+                                                                a: ({ ...props }) => <a className="text-blue-600 hover:text-blue-800 underline transition-colors" {...props} />,
                                                             }}
                                                         >
                                                             {message.content}

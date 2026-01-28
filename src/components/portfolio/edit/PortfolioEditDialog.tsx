@@ -98,8 +98,16 @@ export const PortfolioEditDialog = ({
         }
       });
 
-      // Invalidate the portfolio query to refetch data
-      await queryClient.invalidateQueries({ queryKey: ['portfolio', portfolio.id] });
+      // Invalidate all related portfolio queries
+      const portfolioId = portfolio.id;
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolioTransactions", portfolioId] });
 
       // Update local state with the actual data from the server
       const updatedPortfolio = queryClient.getQueryData(['portfolio', portfolio.id]) as Portfolio | undefined;
@@ -152,8 +160,16 @@ export const PortfolioEditDialog = ({
         }
       }
 
-      // Invalidate the portfolio query to refetch data
-      await queryClient.invalidateQueries({ queryKey: ['portfolio', portfolio.id] });
+      // Invalidate all related portfolio queries
+      const portfolioId = portfolio.id;
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolioTransactions", portfolioId] });
 
       // Update local state with the new holdings
       const updatedPortfolio = queryClient.getQueryData(['portfolio', portfolio.id]) as Portfolio | undefined;
@@ -190,8 +206,16 @@ export const PortfolioEditDialog = ({
         }
       });
 
-      // Invalidate the portfolio query to refetch data
-      await queryClient.invalidateQueries({ queryKey: ['portfolio', portfolio.id] });
+      // Invalidate all related portfolio queries
+      const portfolioId = portfolio.id;
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolioTransactions", portfolioId] });
 
       // Update local state with the actual data from the server
       const updatedPortfolio = queryClient.getQueryData(['portfolio', portfolio.id]) as Portfolio | undefined;
@@ -224,8 +248,16 @@ export const PortfolioEditDialog = ({
         ticker
       });
 
-      // Invalidate the portfolio query to refetch data
-      await queryClient.invalidateQueries({ queryKey: ['portfolio', portfolio.id] });
+      // Invalidate all related portfolio queries
+      const portfolioId = portfolio.id;
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolioTransactions", portfolioId] });
 
       // Update local state with the actual data from the server
       const updatedPortfolio = queryClient.getQueryData(['portfolio', portfolio.id]) as Portfolio | undefined;

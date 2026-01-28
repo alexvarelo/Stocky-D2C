@@ -180,6 +180,7 @@ export const CreatePortfolioWizard = ({
         title: "Portfolio Created",
         description: "Your portfolio has been created successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
       queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
       onOpenChange(false);
       resetWizard();
@@ -357,144 +358,144 @@ export const CreatePortfolioWizard = ({
                 {/* Only show ticker/company fields if an instrument is selected */}
                 {(holdingForm.getValues("ticker") ||
                   holdingForm.getValues("company_name")) && (
-                  <Form {...holdingForm}>
-                    <form
-                      onSubmit={holdingForm.handleSubmit(addHolding)}
-                      className="space-y-4"
-                    >
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={holdingForm.control}
-                          name="ticker"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Ticker</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={
-                                    holdingForm.getValues("ticker") || "AAPL"
-                                  }
-                                  {...field}
-                                  readOnly
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={holdingForm.control}
-                          name="company_name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Company Name</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={
-                                    holdingForm.getValues("company_name") ||
-                                    "Apple Inc."
-                                  }
-                                  {...field}
-                                  readOnly
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={holdingForm.control}
-                          name="quantity"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Quantity</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  step="0.000001"
-                                  placeholder="10"
-                                  {...field}
-                                  onFocus={e => {
-                                    if (field.value === 0) {
-                                      e.target.value = '';
-                                      field.onChange('');
-                                    }
-                                  }}
-                                  onChange={e =>
-                                    field.onChange(
-                                      parseFloat(e.target.value) || 0
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={holdingForm.control}
-                          name="average_price"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Average Price ($)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  placeholder="150.00"
-                                  {...field}
-                                  onFocus={e => {
-                                    if (field.value === 0) {
-                                      e.target.value = '';
-                                      field.onChange('');
-                                    }
-                                  }}
-                                  onChange={e =>
-                                    field.onChange(
-                                      parseFloat(e.target.value) || 0
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <FormField
-                        control={holdingForm.control}
-                        name="notes"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Notes (Optional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Investment notes..."
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        className="w-full"
+                    <Form {...holdingForm}>
+                      <form
+                        onSubmit={holdingForm.handleSubmit(addHolding)}
+                        className="space-y-4"
                       >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Holding
-                      </Button>
-                    </form>
-                  </Form>
-                )}
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={holdingForm.control}
+                            name="ticker"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Ticker</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={
+                                      holdingForm.getValues("ticker") || "AAPL"
+                                    }
+                                    {...field}
+                                    readOnly
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={holdingForm.control}
+                            name="company_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Company Name</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={
+                                      holdingForm.getValues("company_name") ||
+                                      "Apple Inc."
+                                    }
+                                    {...field}
+                                    readOnly
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={holdingForm.control}
+                            name="quantity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Quantity</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    step="0.000001"
+                                    placeholder="10"
+                                    {...field}
+                                    onFocus={e => {
+                                      if (field.value === 0) {
+                                        e.target.value = '';
+                                        field.onChange('');
+                                      }
+                                    }}
+                                    onChange={e =>
+                                      field.onChange(
+                                        parseFloat(e.target.value) || 0
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={holdingForm.control}
+                            name="average_price"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Average Price ($)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="150.00"
+                                    {...field}
+                                    onFocus={e => {
+                                      if (field.value === 0) {
+                                        e.target.value = '';
+                                        field.onChange('');
+                                      }
+                                    }}
+                                    onChange={e =>
+                                      field.onChange(
+                                        parseFloat(e.target.value) || 0
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={holdingForm.control}
+                          name="notes"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Notes (Optional)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Investment notes..."
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          className="w-full"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Holding
+                        </Button>
+                      </form>
+                    </Form>
+                  )}
               </CardContent>
             </Card>
 

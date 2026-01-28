@@ -37,9 +37,17 @@ export const useCreateTransaction = () => {
       return result;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['portfolio', variables.portfolio_id] });
-      queryClient.invalidateQueries({ queryKey: ['transactions', variables.portfolio_id] });
-      
+      const portfolioId = variables.portfolio_id;
+      // Invalidate all related portfolio queries
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-basic", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["stored-portfolio-value", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-prices", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-performance", portfolioId] });
+      queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolioTransactions", portfolioId] });
+
       toast({
         title: 'Success',
         description: 'Transaction added successfully',

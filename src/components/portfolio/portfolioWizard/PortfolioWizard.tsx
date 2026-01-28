@@ -44,6 +44,7 @@ export function PortfolioWizard({
         title: "Portfolio Created",
         description: "AI has successfully created your portfolio.",
       });
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
       queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
       onOpenChange(false);
       resetWizard();
@@ -91,6 +92,7 @@ export function PortfolioWizard({
         title: "Portfolio Created",
         description: "Your portfolio has been created successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["portfolios"] });
       queryClient.invalidateQueries({ queryKey: ["portfolios-detailed"] });
       onOpenChange(false);
       resetWizard();
