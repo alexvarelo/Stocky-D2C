@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 import { ChartMode, ChartDataPoint } from './types';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 interface ChartVisualizerProps {
     data: ChartDataPoint[];
@@ -166,11 +167,17 @@ export const ChartVisualizer = ({
                         <div className="flex items-center justify-center gap-4 mt-4 pt-2 border-t border-border/50">
                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/50 border border-border">
                                 <div className={`w-2.5 h-2.5 rounded-full ${isPositive ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                <span className="text-xs font-medium">{ticker}</span>
+                                <span className="text-xs font-medium inline-flex items-center gap-1.5">
+                                    <CompanyLogo ticker={ticker} size={14} />
+                                    {ticker}
+                                </span>
                             </div>
                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
                                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">{comparisonTicker}</span>
+                                <span className="text-xs font-medium text-amber-600 dark:text-amber-400 inline-flex items-center gap-1.5">
+                                    <CompanyLogo ticker={comparisonTicker} size={14} className="border-amber-500/20" />
+                                    {comparisonTicker}
+                                </span>
                             </div>
                         </div>
                     )}

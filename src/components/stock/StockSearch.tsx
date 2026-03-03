@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Instrument } from '@/api/stock/types';
 import { useSearchInstrumentsApiV1SearchGet } from '@/api/search/search';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 interface StockSearchProps {
   onSelect: (stock: { symbol: string; name: string }) => void;
@@ -94,10 +95,15 @@ export const StockSearch = ({
                   className="w-full text-left px-4 py-2 hover:bg-accent hover:text-accent-foreground"
                   onClick={() => handleSelect(stock)}
                 >
-                  <div className="font-medium">{stock.symbol}</div>
-                  <div className="text-sm text-muted-foreground truncate">
-                    {stock.name}
-                    {stock.exchange && ` • ${stock.exchange}`}
+                  <div className="flex items-center gap-2">
+                    <CompanyLogo ticker={stock.symbol} companyName={stock.name} size={22} />
+                    <div className="min-w-0">
+                      <div className="font-medium">{stock.symbol}</div>
+                      <div className="text-sm text-muted-foreground truncate">
+                        {stock.name}
+                        {stock.exchange && ` • ${stock.exchange}`}
+                      </div>
+                    </div>
                   </div>
                 </button>
               </li>

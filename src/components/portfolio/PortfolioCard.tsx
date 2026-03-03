@@ -16,6 +16,7 @@ import { usePortfolioFollows } from '@/api/portfolio/usePortfolioFollows';
 import { usePortfolio } from '@/api/portfolio/portfolio';
 import { formatCurrency } from '@/lib/formatters';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 export interface Holding {
   ticker: string;
@@ -306,6 +307,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 {holdings.slice(0, 3).map((holding, index) => (
                   <div key={`${holding.ticker}-${index}`} className="flex justify-between items-center text-sm group/holding">
                     <div className="flex items-center gap-2">
+                      <CompanyLogo ticker={holding.ticker} size={18} />
                       <span className="font-medium bg-muted/30 px-1.5 py-0.5 rounded text-xs group-hover/holding:bg-muted/60 transition-colors">
                         {holding.ticker}
                       </span>

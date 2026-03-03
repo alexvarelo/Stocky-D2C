@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface TransactionsCardProps {
   transactions: Transaction[];
@@ -158,8 +159,9 @@ export function TransactionsCard({
                   <TableCell className="py-4">
                     <Link
                       to={`/instrument/${transaction.ticker}`}
-                      className="font-semibold text-sm hover:text-primary transition-colors"
+                      className="font-semibold text-sm hover:text-primary transition-colors flex items-center gap-2"
                     >
+                      <CompanyLogo ticker={transaction.ticker} size={22} />
                       {transaction.ticker}
                     </Link>
                   </TableCell>

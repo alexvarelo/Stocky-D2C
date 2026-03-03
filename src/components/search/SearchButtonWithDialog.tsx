@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { useWatchlists } from '@/api/watchlist/useWatchlists';
 import { useRecentPortfolios } from '@/hooks/useRecentPortfolios';
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 /**
  * SearchButtonWithDialog
@@ -98,8 +99,6 @@ export function SearchButtonWithDialog() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  console.log(searchResults);
-
   return (
     <>
       {/* Desktop/Tablet: full search button */}
@@ -163,16 +162,19 @@ export function SearchButtonWithDialog() {
                         onSelect={() => handleSelectResult('instrument', result.ticker)}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <div className="flex-1 min-w-0 pr-2">
-                            <p className="text-sm font-medium truncate">
-                              {result.name} <span className="text-muted-foreground">({result.ticker})</span>
-                            </p>
-                            {result.exchange && (
-                              <p className="text-xs text-muted-foreground truncate">
-                                {result.exchange}
-                                {result.country && ` • ${result.country}`}
+                          <div className="flex-1 min-w-0 pr-2 flex items-center gap-2">
+                            <CompanyLogo ticker={result.ticker} companyName={result.name} size={24} />
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium truncate">
+                                {result.name} <span className="text-muted-foreground">({result.ticker})</span>
                               </p>
-                            )}
+                              {result.exchange && (
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {result.exchange}
+                                  {result.country && ` • ${result.country}`}
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <div className="flex-shrink-0">
                             <AddToWatchlist
@@ -234,18 +236,21 @@ export function SearchButtonWithDialog() {
                         <div key={stock.symbol} className="relative group">
                           <div className="flex items-center justify-between w-full px-2">
                             <div
-                              className="flex-1 min-w-0 pr-2 py-2 cursor-pointer"
+                              className="flex-1 min-w-0 pr-2 py-2 cursor-pointer flex items-center gap-2"
                               onClick={() => handleSelectResult('instrument', stock.symbol)}
                             >
-                              <p className="text-sm font-medium truncate">
-                                {stock.name} <span className="text-muted-foreground">({stock.symbol})</span>
-                              </p>
-                              {stock.exchange && (
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {stock.exchange}
-                                  {stock.country && ` • ${stock.country}`}
+                              <CompanyLogo ticker={stock.symbol} companyName={stock.name} size={24} />
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium truncate">
+                                  {stock.name} <span className="text-muted-foreground">({stock.symbol})</span>
                                 </p>
-                              )}
+                                {stock.exchange && (
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {stock.exchange}
+                                    {stock.country && ` • ${stock.country}`}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                             <div className="flex-shrink-0">
                               <AddToWatchlist

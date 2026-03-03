@@ -20,14 +20,12 @@ import {
 } from "@/components/dashboard/DashboardSkeleton";
 import { HoldingsDonutChart } from "@/components/charts/HoldingsDonutChart";
 import { ActivityCalendar } from "@/components/profile/ActivityCalendar";
-import { StockyChat } from "@/components/dashboard/StockyChat";
 
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
 import { DashboardStatsGrid } from "@/components/dashboard/stats/DashboardStatsGrid";
 
 const Dashboard = () => {
   const [commandOpen, setCommandOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -95,18 +93,6 @@ const Dashboard = () => {
             Your financial overview and market insights
           </p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsChatOpen(true)}
-          className="relative group overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
-        >
-          <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-          <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r px-6 py-2 text-sm font-medium text-white backdrop-blur-3xl transition-all hover:opacity-90 gap-2">
-            Ask Stocky
-            <Sparkles className="h-3 w-3 text-yellow-200" />
-          </span>
-        </motion.button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
@@ -160,7 +146,6 @@ const Dashboard = () => {
       </div>
 
       <UserOnboardingWizard />
-      <StockyChat open={isChatOpen} onOpenChange={setIsChatOpen} />
     </motion.div>
   );
 };

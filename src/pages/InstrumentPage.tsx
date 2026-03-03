@@ -13,12 +13,11 @@ import { Button } from "@/components/ui/button";
 import {
   ExternalLink,
   BarChart2,
-  Calculator, MessageCircle,
+  Calculator,
   MessageSquare,
   Star,
   Plus
 } from "lucide-react";
-import { StockyChatDrawer } from "@/components/chat/StockyChatDrawer";
 import { useGetStockInfoApiV1StockTickerGet } from "@/api/stock/stock";
 import type { StockInfo, CompanyInfo } from "@/api/financialDataApi.schemas";
 import { PriceChart } from "@/components/charts/price-chart/PriceChart";
@@ -28,6 +27,7 @@ import { InstrumentPostsCarousel } from "@/components/instruments/InstrumentPost
 import { InvestmentSimulator } from "@/components/instruments/InvestmentSimulator";
 import { TransactionDrawer } from "@/components/transactions/TransactionDrawer";
 import { InstrumentNewsSentimentCard } from "@/components/instruments/InstrumentNewsSentimentCard";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 // Formatter components
 import {
@@ -67,7 +67,6 @@ interface AdditionalData {
 
 export function InstrumentPage() {
   const { ticker } = useParams<{ ticker: string }>();
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const {
     data: response,
@@ -147,19 +146,20 @@ export function InstrumentPage() {
   // The StockyChatDrawer is always rendered but controlled by isChatOpen
   return (
     <div className="space-y-6">
-      <StockyChatDrawer
-        ticker={ticker || ""}
-        isOpen={isChatOpen}
-        onOpenChange={setIsChatOpen}
-        portfolios={userPortfolios}
-      />
       {/* Header Section */}
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold break-words">
-              {stockInfo.company_info?.name || ticker} ({stockInfo.symbol})
-            </h1>
+            <div className="flex items-center gap-3">
+              <CompanyLogo
+                ticker={stockInfo.symbol}
+                companyName={stockInfo.company_info?.name}
+                size={40}
+              />
+              <h1 className="text-2xl sm:text-3xl font-bold break-words">
+                {stockInfo.company_info?.name || ticker} ({stockInfo.symbol})
+              </h1>
+            </div>
           </div>
           <div className="flex flex-col items-start sm:items-end gap-2">
             {additionalData.website && (
@@ -189,15 +189,6 @@ export function InstrumentPage() {
                   <span className="truncate">New Transaction</span>
                 </Button>
               </TransactionDrawer>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 text-sm text-muted-foreground hover:text-foreground justify-start sm:justify-center w-full sm:w-auto"
-                onClick={() => setIsChatOpen(true)}
-              >
-                <MessageCircle className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">Ask Stocky</span>
-              </Button>
             </div>
           </div>
         </div>

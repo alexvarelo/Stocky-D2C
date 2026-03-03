@@ -66,6 +66,7 @@ Stocky is a comprehensive stock portfolio management platform that combines port
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    VITE_API_BASE_URL=your_api_base_url
+   VITE_LOGO_DEV_TOKEN=your_logo_dev_token
    # Make sure to update any API endpoints that might still reference 'stockfolio' to 'stocky'
    ```
 

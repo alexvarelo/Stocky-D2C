@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 const getTrophyIcon = (rank: number) => {
     switch (rank) {
@@ -195,9 +196,11 @@ export const PortfolioLeaderboard: React.FC = () => {
                                                 Top Holding ({portfolios[0].top_holding_allocation ? `${portfolios[0].top_holding_allocation.toFixed(0)}%` : '0%'})
                                             </p>
                                             <div className="flex items-center justify-center gap-2">
-                                                <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                                                    {portfolios[0].top_holding_ticker ? portfolios[0].top_holding_ticker[0] : '?'}
-                                                </div>
+                                                <CompanyLogo
+                                                    ticker={portfolios[0].top_holding_ticker || ''}
+                                                    size={32}
+                                                    className="shadow-md"
+                                                />
                                                 <div className="text-left">
                                                     <p className="font-bold text-sm text-slate-900 dark:text-slate-50 leading-none">
                                                         {portfolios[0].top_holding_ticker || 'No holdings'}

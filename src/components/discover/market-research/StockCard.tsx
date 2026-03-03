@@ -5,6 +5,7 @@ import { formatCurrency } from "@/lib/formatters";
 import { SearchResult } from "@/api/financialDataApi.schemas";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 // Mock data for sparklines
 const generateSparklineData = (isPositive: boolean) => {
@@ -28,7 +29,6 @@ export function StockCard({ stock, type }: StockCardProps) {
     const isPositive = (stock.regular_market_change_percent ?? 0) >= 0;
     const sparklineData = generateSparklineData(isPositive);
     const colorClass = isPositive ? "text-green-500" : "text-red-500";
-    const bgClass = isPositive ? "bg-green-500/10" : "bg-red-500/10";
 
     if (type === "featured") {
         return (
@@ -38,9 +38,7 @@ export function StockCard({ stock, type }: StockCardProps) {
             >
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                        <div className={cn("h-10 w-10 rounded-full flex items-center justify-center font-bold text-lg", bgClass, colorClass)}>
-                            {stock.symbol?.slice(0, 1)}
-                        </div>
+                        <CompanyLogo ticker={stock.symbol} companyName={stock.name} size={40} />
                         <div>
                             <h3 className="font-bold text-lg">{stock.symbol}</h3>
                             <p className="text-sm text-muted-foreground line-clamp-1">{stock.name}</p>
@@ -91,9 +89,7 @@ export function StockCard({ stock, type }: StockCardProps) {
             className="flex items-center justify-between p-4 rounded-2xl hover:bg-accent/50 transition-colors cursor-pointer group"
         >
             <div className="flex items-center gap-4">
-                <div className={cn("h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm", bgClass, colorClass)}>
-                    {stock.symbol?.slice(0, 2)}
-                </div>
+                <CompanyLogo ticker={stock.symbol} companyName={stock.name} size={40} />
                 <div>
                     <h4 className="font-bold">{stock.symbol}</h4>
                     <p className="text-xs text-muted-foreground line-clamp-1 max-w-[120px]">{stock.name}</p>

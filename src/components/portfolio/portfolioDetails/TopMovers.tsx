@@ -4,6 +4,7 @@ import { PortfolioHolding } from "@/api/portfolio/portfolio";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface TopMoversProps {
     holdings: PortfolioHolding[];
@@ -26,6 +27,7 @@ export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProp
                     {[...Array(5)].map((_, i) => (
                         <div key={i} className="flex items-center justify-between py-1">
                             <div className="flex items-center gap-3">
+                                <Skeleton className="h-6 w-6 rounded-full" />
                                 <Skeleton className="h-6 w-12 rounded" />
                                 <Skeleton className="h-4 w-16" />
                             </div>
@@ -64,14 +66,17 @@ export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProp
                     return (
                         <div key={holding.ticker} className="flex items-center justify-between group py-1">
                             <div className="flex items-center gap-3">
-                                <Link
-                                    to={`/instrument/${holding.ticker}`}
-                                    className="font-medium bg-muted/50 px-2 py-1 rounded text-sm group-hover:bg-primary/10 group-hover:text-primary transition-colors"
-                                >
-                                    {holding.ticker}
-                                </Link>
-                                <div className="text-xs text-muted-foreground">
-                                    {formatCurrency(holding.current_price || 0)}
+                                <CompanyLogo ticker={holding.ticker} size={24} />
+                                <div>
+                                    <Link
+                                        to={`/instrument/${holding.ticker}`}
+                                        className="font-medium bg-muted/50 px-2 py-1 rounded text-sm group-hover:bg-primary/10 group-hover:text-primary transition-colors"
+                                    >
+                                        {holding.ticker}
+                                    </Link>
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                        {formatCurrency(holding.current_price || 0)}
+                                    </div>
                                 </div>
                             </div>
                             <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' :

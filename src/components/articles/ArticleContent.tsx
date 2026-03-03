@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Article } from "@/api/articles/useArticles";
 import { TypingAnimation } from "../ui/typing-animation";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface ArticleContentProps {
   article: Article;
@@ -115,8 +116,9 @@ export function ArticleContent({ article }: ArticleContentProps) {
                 <Badge
                   key={ticker}
                   variant="outline"
-                  className="cursor-pointer hover:bg-primary/10"
+                  className="cursor-pointer hover:bg-primary/10 inline-flex items-center gap-1"
                 >
+                  <CompanyLogo ticker={ticker} size={14} />
                   ${ticker}
                 </Badge>
               ))}

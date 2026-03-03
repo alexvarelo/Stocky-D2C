@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import type { PortfolioHolding } from '@/api/portfolio/portfolio';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 type Holding = PortfolioHolding;
 
@@ -65,7 +66,12 @@ export const HoldingsList = ({
         <TableBody>
           {holdings.map((holding) => (
             <TableRow key={holding.ticker}>
-              <TableCell className="font-medium">{holding.ticker}</TableCell>
+              <TableCell className="font-medium">
+                <div className="flex items-center gap-2">
+                  <CompanyLogo ticker={holding.ticker} size={20} />
+                  <span>{holding.ticker}</span>
+                </div>
+              </TableCell>
               
               {editingId === holding.ticker ? (
                 <>

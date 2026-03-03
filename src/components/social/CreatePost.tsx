@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 type FormValues = {
   content: string;
@@ -164,7 +165,8 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
             <Label className="text-sm font-medium">Link to instrument (optional)</Label>
             {watch('ticker') ? (
               <div className="flex items-center gap-2">
-                <div className="px-3 py-1.5 text-sm rounded-md bg-accent flex items-center">
+                <div className="px-3 py-1.5 text-sm rounded-md bg-accent flex items-center gap-1.5">
+                  <CompanyLogo ticker={watch('ticker') || ''} size={18} />
                   {watch('ticker')}
                   <button
                     type="button"
@@ -203,9 +205,12 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
                         className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                         onClick={() => handleSelectInstrument(result.ticker)}
                       >
-                        <div>
-                          <div className="font-medium">{result.ticker}</div>
-                          <div className="text-xs text-muted-foreground">{result.name}</div>
+                        <div className="flex items-center gap-2">
+                          <CompanyLogo ticker={result.ticker} companyName={result.name} size={20} />
+                          <div className="min-w-0">
+                            <div className="font-medium">{result.ticker}</div>
+                            <div className="text-xs text-muted-foreground truncate">{result.name}</div>
+                          </div>
                         </div>
                       </div>
                     ))}

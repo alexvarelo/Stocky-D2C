@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface StepHoldingsProps {
   holdings: Holding[];
@@ -119,11 +120,14 @@ export function StepHoldings({
                     className="flex items-center justify-between p-2 hover:bg-muted rounded cursor-pointer"
                     onClick={() => selectInstrument(result)}
                   >
-                    <div>
-                      <span className="font-medium">{result.symbol}</span>
-                      <span className="text-sm text-muted-foreground ml-2">
-                        {result.name}
-                      </span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <CompanyLogo ticker={result.symbol} companyName={result.name} size={22} />
+                      <div className="min-w-0">
+                        <span className="font-medium">{result.symbol}</span>
+                        <span className="text-sm text-muted-foreground ml-2">
+                          {result.name}
+                        </span>
+                      </div>
                     </div>
                     <Badge variant="outline">{result.exchange}</Badge>
                   </div>
@@ -278,6 +282,7 @@ export function StepHoldings({
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
+                      <CompanyLogo ticker={holding.ticker} companyName={holding.company_name} size={22} />
                       <span className="font-medium">{holding.ticker}</span>
                       <span className="text-sm text-muted-foreground">
                         {holding.company_name}

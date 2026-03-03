@@ -3,6 +3,7 @@ import { Marquee } from "@/components/magicui/marquee";
 import { Post } from "@/types/social";
 import { useInfinitePosts } from "@/hooks/useInfinitePosts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface InstrumentPostsCarouselProps {
   ticker: string;
@@ -44,7 +45,8 @@ const PostCard = ({
         <p className="text-sm line-clamp-2">{post.content}</p>
         {post.ticker && (
           <div className="mt-2">
-            <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+            <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full inline-flex items-center gap-1">
+              <CompanyLogo ticker={post.ticker} size={14} className="border-primary/20" />
               {post.ticker}
             </span>
           </div>

@@ -38,6 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StockSearch } from "@/components/stock/StockSearch";
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
 import { useAuth } from "@/lib/auth";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 const transactionSchema = z.object({
   portfolio_id: z.string().uuid().optional(),
@@ -261,15 +262,22 @@ export function TransactionForm({
                   </div>
                 ) : priceData?.data ? (
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold">
-                        {selectedInstrument.symbol}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedInstrument.name}
-                        {selectedInstrument.exchange &&
-                          ` • ${selectedInstrument.exchange}`}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <CompanyLogo
+                        ticker={selectedInstrument.symbol}
+                        companyName={selectedInstrument.name}
+                        size={32}
+                      />
+                      <div>
+                        <h3 className="text-lg font-semibold">
+                          {selectedInstrument.symbol}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedInstrument.name}
+                          {selectedInstrument.exchange &&
+                            ` • ${selectedInstrument.exchange}`}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-semibold">
@@ -415,7 +423,13 @@ export function TransactionForm({
                               {watchTransactionType === "BUY" || instrumentHolding ? (
                                 <div className="p-3 border rounded-md bg-muted/20">
                                   <div className="flex items-center justify-between">
-                                    <div>
+                                    <div className="flex items-center gap-3">
+                                      <CompanyLogo
+                                        ticker={instrumentTicker}
+                                        companyName={instrumentName}
+                                        size={24}
+                                      />
+                                      <div>
                                       <p className="font-medium">{instrumentName} ({instrumentTicker})</p>
                                       <p className="text-sm text-muted-foreground">
                                         {watchTransactionType === "BUY"
@@ -423,6 +437,7 @@ export function TransactionForm({
                                           : "Selected instrument for selling"
                                         }
                                       </p>
+                                      </div>
                                     </div>
                                     {watchTransactionType === "SELL" && instrumentHolding && (
                                       <div className="text-right">

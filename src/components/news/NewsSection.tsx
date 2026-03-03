@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { NewsArticle } from "@/api/financialDataApi.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink } from "lucide-react";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 // Helper function to get the thumbnail URL
 const getThumbnailUrl = (thumbnail: NewsArticle['thumbnail']): string | null => {
@@ -140,8 +141,9 @@ export function NewsSection({ news, ticker, companyName, isLoading = false }: Ne
                             {article.related_tickers.map((ticker, i) => (
                               <span 
                                 key={i} 
-                                className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground"
+                                className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground inline-flex items-center gap-1"
                               >
+                                <CompanyLogo ticker={ticker} size={14} />
                                 {ticker}
                               </span>
                             ))}

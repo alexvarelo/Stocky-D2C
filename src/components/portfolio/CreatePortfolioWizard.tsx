@@ -32,6 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Search, X, ArrowLeft, ArrowRight } from "lucide-react";
 import { useSearchInstrumentsApiV1SearchGet } from "@/api/search/search";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 const portfolioSchema = z.object({
   name: z.string().min(1, "Portfolio name is required"),
@@ -94,8 +95,6 @@ export const CreatePortfolioWizard = ({
         },
       }
     );
-
-  console.log("instrumentsFromSearch", instrumentsFromSearch);
 
   const portfolioForm = useForm<z.infer<typeof portfolioSchema>>({
     resolver: zodResolver(portfolioSchema),
@@ -339,13 +338,16 @@ export const CreatePortfolioWizard = ({
                             className="flex items-center justify-between p-2 hover:bg-muted rounded cursor-pointer"
                             onClick={() => selectInstrument(result)}
                           >
-                            <div>
-                              <span className="font-medium">
-                                {result.symbol}
-                              </span>
-                              <span className="text-sm text-muted-foreground ml-2">
-                                {result.name}
-                              </span>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <CompanyLogo ticker={result.symbol} companyName={result.name} size={22} />
+                              <div className="min-w-0">
+                                <span className="font-medium">
+                                  {result.symbol}
+                                </span>
+                                <span className="text-sm text-muted-foreground ml-2">
+                                  {result.name}
+                                </span>
+                              </div>
                             </div>
                             <Badge variant="outline">{result.exchange}</Badge>
                           </div>
@@ -514,6 +516,7 @@ export const CreatePortfolioWizard = ({
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
+                            <CompanyLogo ticker={holding.ticker} companyName={holding.company_name} size={22} />
                             <span className="font-medium">
                               {holding.ticker}
                             </span>

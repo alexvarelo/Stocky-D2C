@@ -23,6 +23,7 @@ import {
 } from "@/api/portfolio/portfolio";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 // Format currency utility function
 const formatCurrency = (value: number): string => {
@@ -185,6 +186,7 @@ export const PortfolioPostCard = ({ portfolioId }: PortfolioPostCardProps) => {
                   >
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
+                        <CompanyLogo ticker={holding.ticker} size={18} />
                         <span className="font-medium">{holding.ticker}</span>
                       </div>
                       <div className="flex items-center gap-1">

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { StockSearch } from '@/components/stock/StockSearch';
 import { TimeRange, ChartMode } from './types';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 interface ChartControlsProps {
     ticker: string;
@@ -41,9 +42,11 @@ export const ChartControls = ({
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
                     <CardTitle className="text-lg flex items-center gap-2">
+                        <CompanyLogo ticker={ticker} size={24} />
                         {ticker}
                         {comparisonTicker && (
-                            <span className="text-muted-foreground text-base font-normal">
+                            <span className="text-muted-foreground text-base font-normal inline-flex items-center gap-2">
+                                <CompanyLogo ticker={comparisonTicker} size={20} />
                                 vs {comparisonTicker}
                             </span>
                         )}
@@ -100,7 +103,10 @@ export const ChartControls = ({
                         <div className="w-full sm:w-64 flex items-center gap-2">
                             {comparisonTicker ? (
                                 <div className="flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-md text-sm w-full justify-between">
-                                    <span className="font-medium">{comparisonTicker}</span>
+                                    <span className="font-medium inline-flex items-center gap-2">
+                                        <CompanyLogo ticker={comparisonTicker} size={18} />
+                                        {comparisonTicker}
+                                    </span>
                                     <Button
                                         variant="ghost"
                                         size="icon"

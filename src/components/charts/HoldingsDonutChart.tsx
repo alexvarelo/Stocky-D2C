@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/formatters';
 import { PortfolioHolding } from '@/types/portfolio';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 const COLORS = [
   '#4F46E5', '#7C3AED', '#DB2777', '#E11D48', '#F59E0B',
@@ -190,6 +191,7 @@ export const HoldingsDonutChart = () => {
                     className="w-4 h-4 rounded-sm flex-shrink-0" 
                     style={{ backgroundColor: color }}
                   />
+                  <CompanyLogo ticker={entry.name} size={16} />
                   <span className="font-medium text-gray-900 truncate">{entry.name}</span>
                   <span className="text-gray-500 ml-auto">{percentage}%</span>
                 </div>

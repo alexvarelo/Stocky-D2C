@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetStockPriceApiV1StockTickerPriceGet } from "@/api/stock/stock";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface InstrumentPostCardProps {
   ticker: string;
@@ -52,6 +53,7 @@ export const InstrumentPostCard = ({ ticker }: InstrumentPostCardProps) => {
         <CardHeader className="p-4 pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
+              <CompanyLogo ticker={ticker} size={22} />
               <CardTitle className="text-base font-medium">
                 {ticker.toUpperCase()}
               </CardTitle>

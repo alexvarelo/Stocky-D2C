@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
 
 interface PortfolioHoldingsProps {
   holdings: PortfolioHolding[];
@@ -151,6 +152,7 @@ export const PortfolioHoldings = ({
                         to={`/instrument/${holding.ticker}`}
                         className="flex items-center gap-3 group/link"
                       >
+                        <CompanyLogo ticker={holding.ticker} size={30} />
                         <div className="flex flex-col">
                           <span className="font-semibold text-sm group-hover/link:text-primary transition-colors">
                             {holding.ticker}

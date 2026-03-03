@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/components/ui/use-toast';
 import { StockSearch } from '@/components/stock/StockSearch';
 import type { PortfolioHolding } from '@/api/portfolio/portfolio';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 export type NewHolding = Omit<PortfolioHolding, 'id' | 'created_at' | 'updated_at'>;
 
@@ -79,8 +80,13 @@ const totalInvested = parseFloat(quantity) * parseFloat(averagePrice);
           />
           {selectedStock && (
             <div className="mt-2 p-2 bg-muted/50 rounded-md">
-              <div className="font-medium">{selectedStock.symbol}</div>
-              <div className="text-sm text-muted-foreground">{selectedStock.name}</div>
+              <div className="flex items-center gap-2">
+                <CompanyLogo ticker={selectedStock.symbol} companyName={selectedStock.name} size={20} />
+                <div>
+                  <div className="font-medium">{selectedStock.symbol}</div>
+                  <div className="text-sm text-muted-foreground">{selectedStock.name}</div>
+                </div>
+              </div>
             </div>
           )}
         </div>

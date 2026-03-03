@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { AddToWatchlist } from '@/components/watchlist/AddToWatchlist';
 import { EditWatchlistDialog } from '@/components/watchlist/EditWatchlistDialog';
 import { Button } from '@/components/ui/button';
+import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
 export default function WatchlistDetail() {
   const { id } = useParams<{ id: string }>();
@@ -109,16 +110,19 @@ export default function WatchlistDetail() {
                 <div className="space-y-1">
                   {searchResults.map((instrument) => (
                     <div key={instrument.ticker} className="flex items-center justify-between p-2 hover:bg-accent rounded">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium truncate">
-                          {instrument.name} <span className="text-muted-foreground">({instrument.ticker})</span>
-                        </div>
-                        {instrument.exchange && (
-                          <div className="text-xs text-muted-foreground truncate">
-                            {instrument.exchange}
-                            {instrument.country && ` • ${instrument.country}`}
+                      <div className="flex flex-1 min-w-0 items-center gap-2">
+                        <CompanyLogo ticker={instrument.ticker} companyName={instrument.name} size={24} />
+                        <div className="min-w-0">
+                          <div className="font-medium truncate">
+                            {instrument.name} <span className="text-muted-foreground">({instrument.ticker})</span>
                           </div>
-                        )}
+                          {instrument.exchange && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              {instrument.exchange}
+                              {instrument.country && ` • ${instrument.country}`}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="flex-shrink-0 ml-2">
                         <AddToWatchlist 
@@ -190,8 +194,9 @@ export default function WatchlistDetail() {
                     <TableCell className="font-medium">
                       <Link 
                         to={`/instrument/${item.ticker}`}
-                        className="hover:underline flex items-center group"
+                        className="hover:underline flex items-center group gap-2"
                       >
+                        <CompanyLogo ticker={item.ticker} companyName={item.name} size={22} />
                         {item.ticker}
                         <ArrowUpRight className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </Link>
