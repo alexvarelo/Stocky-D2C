@@ -5,14 +5,14 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
 
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
-      className="h-9 w-9"
+      className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10"
       aria-label="Toggle theme"
     >
       <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

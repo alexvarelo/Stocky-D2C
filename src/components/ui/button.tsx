@@ -5,30 +5,37 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-success text-success-foreground hover:bg-success/90",
-        danger: "bg-danger text-danger-foreground hover:bg-danger/90",
-        warning: "bg-warning text-warning-foreground hover:bg-warning/90",
-        gradient: "bg-gradient-primary text-primary-foreground hover:opacity-90",
-        financial: "bg-gradient-hero text-primary-foreground hover:opacity-90 shadow-lg",
+        /* button-primary: white pill on dark canvas — the brand's loudest CTA */
+        default: "bg-white text-[#191c1f] hover:bg-[#c9c9cd] active:bg-[#c9c9cd]",
+        /* button-dark: black pill on light canvas */
+        dark: "bg-[#000000] text-white hover:bg-[#191c1f]",
+        /* button-soft: surface-soft pill — tertiary action */
+        secondary: "bg-[#f4f4f4] text-[#191c1f] hover:bg-[#e2e2e7]",
+        /* button-outline on light */
+        outline: "border border-[#191c1f] bg-white text-[#191c1f] hover:bg-[#f4f4f4]",
+        /* button-outline on dark */
+        "outline-dark": "border border-white bg-transparent text-white hover:bg-white/10",
+        ghost: "hover:bg-white/10 text-current",
+        link: "text-[#376cd5] underline-offset-4 hover:underline p-0 h-auto rounded-none",
+        success: "bg-[#00a87e] text-white hover:opacity-90",
+        danger: "bg-[#e23b4a] text-white hover:opacity-90",
+        warning: "bg-[#ec7e00] text-white hover:opacity-90",
+        /* cobalt violet — reserved for featured/brand stamp only */
+        brand: "bg-[#494fdf] text-white hover:bg-[#4f55f1] active:bg-[#3a40c4]",
+        /* kept for compat */
+        destructive: "bg-[#e23b4a] text-white hover:opacity-90",
+        gradient: "bg-[#494fdf] text-white hover:opacity-90",
+        financial: "bg-[#494fdf] text-white hover:opacity-90",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        xl: "h-14 rounded-lg px-10 text-base",
+        default: "h-12 px-7 py-3.5 text-base",
+        sm: "h-9 px-4 text-sm",
+        lg: "h-12 px-7 text-base",
+        xl: "h-14 px-10 text-lg",
         icon: "h-10 w-10",
       },
     },
@@ -76,4 +83,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button"
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Button, buttonVariants }

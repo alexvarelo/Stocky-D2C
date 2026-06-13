@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { SearchButtonWithDialog } from '@/components/search/SearchButtonWithDialog';
 import { NavLinks } from './NavLinks';
-import { MobileNav } from './MobileNav';
 import { useAuth } from '@/lib/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -11,8 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogOut, User, Settings } from 'lucide-react';
@@ -42,8 +38,8 @@ export const Navbar = () => {
   ];
 
   return (
-    <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30">
-      <div className="flex h-14 items-center px-4 gap-4">
+    <header className="bg-[#000000] sticky top-0 z-30 border-b border-white/[0.08]">
+      <div className="flex h-16 items-center px-4 gap-4 max-w-[2000px] mx-auto">
         {/* User Profile Picture - Clickable */}
         <div className="flex items-center gap-2">
           {userProfile?.id ? (
@@ -86,7 +82,7 @@ export const Navbar = () => {
           {/* Settings Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-white/70 hover:text-white hover:bg-white/10">
                 <Settings className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>

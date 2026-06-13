@@ -16,7 +16,6 @@ import {
     Loader2,
     MessageSquare,
     ChevronRight,
-    History,
     ChevronDown,
     ChevronUp,
     Terminal,
@@ -28,6 +27,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import stockyLogo from "@/assets/stocky.png";
+import { StockCard } from "@/components/chat/visuals/StockCard";
+import { StockChart } from "@/components/chat/visuals/StockChart";
 
 interface Message {
     id: string;
@@ -190,6 +191,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
         if (open && user && !conversationId) {
             loadLastConversation();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, user, loadLastConversation]);
 
     // Auto-scroll to bottom
@@ -418,17 +420,53 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                                                         ul: ({ ...props }) => <ul className="list-disc pl-6 mb-6 space-y-2" {...props} />,
                                                                         ol: ({ ...props }) => <ol className="list-decimal pl-6 mb-6 space-y-2" {...props} />,
                                                                         li: ({ ...props }) => <li className="text-[17px]" {...props} />,
-                                                                        code: ({ inline, ...props }: { inline?: boolean; children?: React.ReactNode }) =>
-                                                                            inline ? (
-                                                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                                                                        code: ({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) => {
+                                                                            const match = /language-(\w+)/.exec(className || '');
+
+                                                                            if (!inline && match && match[1] === 'stock-card') {
+                                                                                try {
+                                                                                    const data = JSON.parse(String(children).replace(/\n$/, ''));
+                                                                                    return <StockCard {...data} />;
+                                                                                } catch (e) {
+                                                                                    console.error('Failed to parse stock card data', e);
+                                                                                }
+                                                                            }
+
+                                                                            if (!inline && match && match[1] === 'stock-chart') {
+                                                                                try {
+                                                                                    const data = JSON.parse(String(children).replace(/\n$/, ''));
+                                                                                    return <StockChart {...data} />;
+                                                                                } catch (e) {
+                                                                                    console.error('Failed to parse stock chart data', e);
+                                                                                }
+                                                                            }
+
+                                                                            return inline ? (
+                                                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                                                                                    {children}
+                                                                                </code>
                                                                             ) : (
                                                                                 <pre className="bg-slate-900 text-slate-100 p-6 rounded-2xl overflow-x-auto my-6 overflow-wrap-anywhere whitespace-pre-wrap font-mono text-sm leading-relaxed border border-slate-800 shadow-sm">
-                                                                                    <code {...props} />
+                                                                                    <code className={className} {...props}>
+                                                                                        {children}
+                                                                                    </code>
                                                                                 </pre>
-                                                                            ),
+                                                                            );
+                                                                        },
                                                                         blockquote: ({ ...props }) => <blockquote className="border-l-4 border-primary/20 pl-4 italic my-6 text-muted-foreground" {...props} />,
                                                                         hr: ({ ...props }) => <hr className="my-8 border-border/50" {...props} />,
                                                                         a: ({ ...props }) => <a className="text-blue-600 hover:text-blue-800 underline transition-colors" {...props} />,
+                                                                        table: ({ ...props }) => (
+                                                                            <div className="w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 my-6 shadow-sm">
+                                                                                <div className="overflow-x-auto">
+                                                                                    <table className="w-full text-sm text-left text-slate-600 dark:text-slate-300" {...props} />
+                                                                                </div>
+                                                                            </div>
+                                                                        ),
+                                                                        thead: ({ ...props }) => <thead className="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-800/50" {...props} />,
+                                                                        tbody: ({ ...props }) => <tbody className="divide-y divide-slate-200 dark:divide-slate-800" {...props} />,
+                                                                        th: ({ ...props }) => <th className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap" {...props} />,
+                                                                        td: ({ ...props }) => <td className="px-4 py-3" {...props} />,
                                                                     }}
                                                                 >
                                                                     {message.content}

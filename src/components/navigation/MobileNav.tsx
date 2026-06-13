@@ -33,8 +33,8 @@ export const MobileNav = ({ isOpen, links, currentPath, onClose }: MobileNavProp
 
   return (
     <div className="md:hidden mobile-menu-container">
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40" onClick={onClose} />
-      <div className="fixed top-14 right-0 w-64 h-[calc(100vh-3.5rem)] bg-background border-l z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
+      <div className="fixed top-16 right-0 w-64 h-[calc(100vh-4rem)] bg-[#0a0a0a] border-l border-white/[0.08] z-50 overflow-y-auto">
         <div className="p-4 space-y-2">
           <nav className="flex flex-col space-y-1 pt-2">
             <NavLinks 

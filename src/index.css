@@ -2,254 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stockfolio Design System - Professional Financial Platform */
+/* Revolut Design System — Stockfolio */
 
 :root {
-  /* Color Schemes */
-  --blue-50: 214 94% 98%;
-  --blue-100: 214 96% 95%;
-  --blue-200: 214 96% 90%;
-  --blue-300: 214 96% 80%;
-  --blue-400: 214 96% 70%;
-  --blue-500: 214 84% 56%;
-  --blue-600: 214 84% 45%;
-  --blue-700: 214 84% 35%;
-  --blue-800: 214 84% 25%;
-  --blue-900: 214 84% 15%;
-  --blue-950: 214 84% 10%;
-  --blue-foreground: 0 0% 100%;
+  /* Financial semantic colors (preserved for chart/data use) */
+  --success: 158 100% 33%;       /* #00a87e accent-teal */
+  --success-foreground: 0 0% 100%;
+  --success-light: 158 100% 10%;
 
-  --emerald-50: 142 76% 96%;
-  --emerald-100: 142 76% 90%;
-  --emerald-200: 142 76% 80%;
-  --emerald-300: 142 76% 70%;
-  --emerald-400: 142 76% 60%;
-  --emerald-500: 142 76% 36%;
-  --emerald-600: 142 76% 30%;
-  --emerald-700: 142 76% 24%;
-  --emerald-800: 142 76% 18%;
-  --emerald-900: 142 76% 12%;
-  --emerald-950: 142 76% 6%;
-  --emerald-foreground: 0 0% 100%;
+  --danger: 352 73% 56%;         /* #e23b4a accent-danger */
+  --danger-foreground: 0 0% 100%;
+  --danger-light: 352 73% 12%;
 
-  --rose-50: 0 84% 96%;
-  --rose-100: 0 84% 90%;
-  --rose-200: 0 84% 80%;
-  --rose-300: 0 84% 70%;
-  --rose-400: 0 84% 60%;
-  --rose-500: 0 84% 56%;
-  --rose-600: 0 84% 45%;
-  --rose-700: 0 84% 35%;
-  --rose-800: 0 84% 25%;
-  --rose-900: 0 84% 15%;
-  --rose-950: 0 84% 10%;
-  --rose-foreground: 0 0% 100%;
-
-  --violet-50: 256 96% 98%;
-  --violet-100: 256 96% 95%;
-  --violet-200: 256 96% 90%;
-  --violet-300: 256 96% 80%;
-  --violet-400: 256 96% 70%;
-  --violet-500: 256 84% 58%;
-  --violet-600: 256 84% 48%;
-  --violet-700: 256 84% 38%;
-  --violet-800: 256 84% 28%;
-  --violet-900: 256 84% 18%;
-  --violet-950: 256 84% 10%;
-  --violet-foreground: 0 0% 100%;
-
-  --orange-50: 38 92% 96%;
-  --orange-100: 38 92% 90%;
-  --orange-200: 38 92% 80%;
-  --orange-300: 38 92% 70%;
-  --orange-400: 38 92% 60%;
-  --orange-500: 38 92% 50%;
-  --orange-600: 38 92% 40%;
-  --orange-700: 38 92% 30%;
-  --orange-800: 38 92% 20%;
-  --orange-900: 38 92% 10%;
-  --orange-950: 38 92% 5%;
-  --orange-foreground: 0 0% 100%;
+  --warning: 33 100% 46%;        /* #ec7e00 accent-warning */
+  --warning-foreground: 0 0% 100%;
+  --warning-light: 33 100% 10%;
 }
 
 @layer base {
+  /* ── LIGHT MODE ── white catalogue canvas */
   :root {
-    /* Core Brand Colors - Financial Theme */
-    --background: 250 50% 98%;
-    --foreground: 215 25% 15%;
+    --background: 0 0% 100%;              /* canvas-light #ffffff */
+    --foreground: 210 9% 11%;             /* ink #191c1f */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card: 0 0% 100%;                    /* surface-card #ffffff */
+    --card-foreground: 210 9% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 210 9% 11%;
 
-    /* Primary - Professional Blue */
-    /* Default theme (blue) */
-    --primary: var(--blue-500);
-    --primary-foreground: var(--blue-foreground);
-    --primary-hover: 214 84% 50%;
-    
-    /* Set default color scheme */
-    --color-scheme: default;
+    --primary: 237 64% 58%;               /* cobalt violet #494fdf */
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Subtle Gray */
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 0 0% 96%;               /* surface-soft #f4f4f4 */
+    --secondary-foreground: 210 9% 11%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 15% 40%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 210 6% 35%;      /* mute #505a63 */
 
-    --accent: 210 20% 96%;
-    --accent-foreground: 215 25% 15%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 210 9% 11%;
 
-    /* Financial Colors */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --success-light: 142 76% 96%;
-
-    --danger: 0 84% 56%;
-    --danger-foreground: 0 0% 100%;
-    --danger-light: 0 84% 96%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --warning-light: 38 92% 96%;
-
-    --destructive: 0 84% 56%;
+    --destructive: 352 73% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 214 84% 56%;
+    --border: 240 4% 89%;                /* hairline-light #e2e2e7 */
+    --input: 240 4% 89%;
+    --ring: 237 64% 58%;
 
-    --radius: 0.75rem;
+    --radius: 1.25rem;                   /* 20px — rounded.lg for cards */
 
-    /* Sidebar */
-    --sidebar-background: 215 25% 15%;
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 214 84% 56%;
+    /* Sidebar — always dark canvas */
+    --sidebar-background: 0 0% 0%;       /* canvas-dark #000000 */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 237 64% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 20% 20%;
-    --sidebar-accent-foreground: 210 20% 85%;
-    --sidebar-border: 215 20% 25%;
-    --sidebar-ring: 214 84% 56%;
+    --sidebar-accent: 220 7% 10%;        /* surface-elevated #16181a */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 7% 14%;
+    --sidebar-ring: 237 64% 58%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(214 84% 56%), hsl(214 84% 50%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 30%));
-    --gradient-danger: linear-gradient(135deg, hsl(0 84% 56%), hsl(0 84% 50%));
-    --gradient-hero: linear-gradient(135deg, hsl(214 84% 56%) 0%, hsl(214 84% 50%) 50%, hsl(215 25% 15%) 100%);
+    /* Shadows — Revolut uses none; only kept for popover/dropdown */
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px 0 rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px 0 rgba(0,0,0,0.10);
+    --shadow-xl: 0 16px 40px 0 rgba(0,0,0,0.12);
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(214 84% 56% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(214 84% 56% / 0.1), 0 2px 4px -1px hsl(214 84% 56% / 0.06);
-    --shadow-lg: 0 10px 15px -3px hsl(214 84% 56% / 0.1), 0 4px 6px -2px hsl(214 84% 56% / 0.05);
-    --shadow-xl: 0 20px 25px -5px hsl(214 84% 56% / 0.1), 0 10px 10px -5px hsl(214 84% 56% / 0.04);
-
-    /* Animation */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Apply theme classes */
-  .theme-blue {
-    --primary: var(--blue-500);
-    --primary-foreground: var(--blue-foreground);
-    --primary-hover: 214 84% 50%;
-    --ring: var(--blue-500);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--blue-500)), hsl(var(--blue-600)));
-  }
-
-  .theme-emerald {
-    --primary: var(--emerald-500);
-    --primary-foreground: var(--emerald-foreground);
-    --primary-hover: 142 76% 30%;
-    --ring: var(--emerald-500);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--emerald-500)), hsl(var(--emerald-600)));
-  }
-
-  .theme-rose {
-    --primary: var(--rose-500);
-    --primary-foreground: var(--rose-foreground);
-    --primary-hover: 0 84% 50%;
-    --ring: var(--rose-500);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--rose-500)), hsl(var(--rose-600)));
-  }
-
-  .theme-violet {
-    --primary: var(--violet-500);
-    --primary-foreground: var(--violet-foreground);
-    --primary-hover: 256 84% 48%;
-    --ring: var(--violet-500);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--violet-500)), hsl(var(--violet-600)));
-  }
-
-  .theme-orange {
-    --primary: var(--orange-500);
-    --primary-foreground: var(--orange-foreground);
-    --primary-hover: 38 92% 40%;
-    --ring: var(--orange-500);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--orange-500)), hsl(var(--orange-600)));
-  }
-
+  /* ── DARK MODE ── near-black storytelling canvas */
   .dark {
-    --background: 215 25% 8%;
-    --foreground: 210 20% 90%;
+    --background: 0 0% 0%;               /* canvas-dark #000000 */
+    --foreground: 0 0% 100%;             /* on-dark #ffffff */
 
-    --card: 215 25% 12%;
-    --card-foreground: 210 20% 90%;
+    --card: 220 7% 10%;                  /* surface-elevated #16181a */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 215 25% 12%;
-    --popover-foreground: 210 20% 90%;
+    --popover: 220 7% 10%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: var(--blue-500);
-    --primary-foreground: var(--blue-foreground);
-    --primary-hover: 214 84% 60%;
+    --primary: 237 64% 58%;              /* cobalt violet #494fdf */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 20% 15%;
-    --secondary-foreground: 210 20% 85%;
+    --secondary: 220 7% 10%;
+    --secondary-foreground: 0 0% 72%;   /* on-dark-mute */
 
-    --muted: 215 20% 15%;
-    --muted-foreground: 215 15% 60%;
+    --muted: 220 7% 10%;
+    --muted-foreground: 0 0% 72%;       /* rgba(255,255,255,0.72) */
 
-    --accent: 215 20% 15%;
-    --accent-foreground: 210 20% 85%;
+    --accent: 220 7% 10%;
+    --accent-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --success-light: 142 76% 15%;
-
-    --danger: 0 84% 56%;
-    --danger-foreground: 0 0% 100%;
-    --danger-light: 0 84% 15%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --warning-light: 38 92% 15%;
-
-    --destructive: 0 84% 56%;
+    --destructive: 352 73% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 20%;
-    --input: 215 20% 20%;
-    --ring: 214 84% 56%;
+    --border: 220 7% 14%;               /* hairline-dark ~rgba(255,255,255,0.12) */
+    --input: 220 7% 14%;
+    --ring: 237 64% 58%;
 
-    --sidebar-background: 215 25% 5%;
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 214 84% 56%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 237 64% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 20% 10%;
-    --sidebar-accent-foreground: 210 20% 85%;
-    --sidebar-border: 215 20% 15%;
-    --sidebar-ring: 214 84% 56%;
+    --sidebar-accent: 220 7% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 7% 14%;
+    --sidebar-ring: 237 64% 58%;
 
-    /* Dark mode gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(214 84% 56%) 0%, hsl(214 84% 50%) 50%, hsl(215 25% 5%) 100%);
-  }
-  .theme {
-    --animate-marquee: marquee var(--duration) infinite linear;
-    --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-    --animate-blink-cursor: blink-cursor 1.2s step-end infinite;
+    --success-light: 158 100% 8%;
+    --danger-light: 352 73% 10%;
+    --warning-light: 33 100% 8%;
   }
 }
 
@@ -258,81 +121,77 @@
     @apply border-border;
   }
 
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: 0.24px;
   }
 
-  /* Financial utility classes */
-  .text-success {
-    color: hsl(var(--success));
+  /* Display headings — weight 500, tight tracking (Aeonik Pro substitute: Inter) */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    letter-spacing: -0.32px;
+    line-height: 1.19;
   }
 
-  .text-danger {
-    color: hsl(var(--danger));
-  }
-
-  .text-warning {
-    color: hsl(var(--warning));
-  }
-
-  .bg-success {
-    background-color: hsl(var(--success));
-  }
-
-  .bg-danger {
-    background-color: hsl(var(--danger));
-  }
-
-  .bg-warning {
-    background-color: hsl(var(--warning));
-  }
-
-  .bg-success-light {
-    background-color: hsl(var(--success-light));
-  }
-
-  .bg-danger-light {
-    background-color: hsl(var(--danger-light));
-  }
-
-  .bg-warning-light {
-    background-color: hsl(var(--warning-light));
-  }
+  h1 { font-size: 2rem; letter-spacing: -0.48px; line-height: 1.0; }
+  h2 { font-size: 1.5rem; letter-spacing: -0.32px; }
+  h3 { font-size: 1.25rem; letter-spacing: 0; line-height: 1.4; }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* ── Revolut Utility Classes ── */
+@layer utilities {
+  /* Financial data colors */
+  .text-success { color: hsl(var(--success)); }
+  .text-danger  { color: hsl(var(--danger)); }
+  .text-warning { color: hsl(var(--warning)); }
 
-  body {
-    @apply bg-background text-foreground;
-  }
+  .bg-success      { background-color: hsl(var(--success)); }
+  .bg-danger       { background-color: hsl(var(--danger)); }
+  .bg-warning      { background-color: hsl(var(--warning)); }
+  .bg-success-light { background-color: hsl(var(--success-light)); }
+  .bg-danger-light  { background-color: hsl(var(--danger-light)); }
+  .bg-warning-light { background-color: hsl(var(--warning-light)); }
+
+  /* Revolut surface layers */
+  .bg-canvas-dark     { background-color: #000000; }
+  .bg-canvas-light    { background-color: #ffffff; }
+  .bg-surface-soft    { background-color: #f4f4f4; }
+  .bg-surface-deep    { background-color: #0a0a0a; }
+  .bg-surface-elevated { background-color: #16181a; }
+
+  /* On-dark text */
+  .text-on-dark      { color: #ffffff; }
+  .text-on-dark-mute { color: rgba(255, 255, 255, 0.72); }
+  .text-stone        { color: #8d969e; }
+  .text-mute-rev     { color: #505a63; }
+
+  /* Revolut brand */
+  .text-brand        { color: #494fdf; }
+  .bg-brand          { background-color: #494fdf; }
+
+  /* Hairlines */
+  .border-hairline-light { border-color: #e2e2e7; }
+  .border-hairline-dark  { border-color: rgba(255, 255, 255, 0.12); }
 }
 
 @theme inline {
   @keyframes marquee {
-  from {
-    transform: translateX(0);
-    }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-    }
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-100% - var(--gap))); }
   }
   @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
-    }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
-    }
+    from { transform: translateY(0); }
+    to   { transform: translateY(calc(-100% - var(--gap))); }
   }
   @keyframes blink-cursor {
-  0%, 49% {
-    opacity: 1;
-    }
-  50%, 100% {
-    opacity: 0;
-    }
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
   }
 }

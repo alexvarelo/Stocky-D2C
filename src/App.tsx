@@ -4,7 +4,7 @@ import PostNotifications from "./components/notifications/PostNotifications";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Dashboard from "./pages/Dashboard";
 import Portfolios from "./pages/Portfolios";
@@ -95,16 +95,16 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           }}
           className="absolute inset-0 rounded-full bg-primary/20 group-hover:hidden"
         />
-        <div className="relative h-full w-full rounded-full bg-gradient-to-br from-[#E2CBFF] via-[#393BB2] to-[#E2CBFF] p-[2px] shadow-2xl overflow-hidden shadow-primary/20">
-          <div className="absolute inset-0 animate-[spin_4s_linear_infinite] opacity-0 group-hover:opacity-100 bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)] transition-opacity" />
-          <div className="relative h-full w-full rounded-full bg-white dark:bg-slate-950 flex items-center justify-center p-2.5 md:p-3 shadow-inner">
+        <div className="relative h-full w-full rounded-full bg-gradient-to-br from-[#4f55f1] via-[#494fdf] to-[#3a40c4] p-[2px] overflow-hidden">
+          <div className="absolute inset-0 animate-[spin_4s_linear_infinite] opacity-0 group-hover:opacity-100 bg-[conic-gradient(from_90deg_at_50%_50%,#4f55f1_0%,#3a40c4_50%,#4f55f1_100%)] transition-opacity" />
+          <div className="relative h-full w-full rounded-full bg-[#000000] flex items-center justify-center p-2.5 md:p-3">
             <img src={stockyLogo} alt="Stocky" className="w-full h-full object-contain" />
           </div>
         </div>
 
         {/* Hover Label */}
         <div className="absolute -top-12 right-0 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl shadow-xl border border-border/50 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none">
-          <span className="text-xs font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2 whitespace-nowrap">
+          <span className="text-xs font-semibold text-[#191c1f] flex items-center gap-2 whitespace-nowrap">
             Ask Stocky <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
           </span>
         </div>
