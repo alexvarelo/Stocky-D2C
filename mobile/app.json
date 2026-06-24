@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Stocky Tickets",
+    "slug": "stocky-ticket-printer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#1A1A2E"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.stocky.tickets",
+      "infoPlist": {
+        "NSPhotoLibraryAddUsageDescription": "Save portfolio receipts to your photo library"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1A1A2E"
+      },
+      "package": "com.stocky.tickets"
+    },
+    "plugins": []
+  }
+}
