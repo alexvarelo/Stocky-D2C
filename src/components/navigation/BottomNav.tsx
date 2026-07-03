@@ -28,7 +28,7 @@ export function BottomNav() {
     };
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#000000] border-t border-white/[0.08]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-t border-border">
             <div className="flex items-center justify-around h-16 px-2 pb-safe">
                 {navItems.map((item) => {
                     const Icon = item.icon;
@@ -39,21 +39,16 @@ export function BottomNav() {
                             key={item.path}
                             onClick={() => navigate(item.path)}
                             className={cn(
-                                'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[64px]',
+                                'flex flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-xl transition-colors min-w-[64px]',
                                 active
-                                    ? 'text-primary'
+                                    ? 'bg-muted text-foreground'
                                     : 'text-muted-foreground hover:text-foreground'
                             )}
                         >
-                            <div className="relative">
-                                <Icon className={cn('h-5 w-5', active && 'scale-110')} />
-                                {active && (
-                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
-                                )}
-                            </div>
+                            <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} />
                             <span className={cn(
-                                'text-[10px] font-medium',
-                                active && 'font-semibold'
+                                'text-[10px]',
+                                active ? 'font-semibold' : 'font-medium'
                             )}>
                                 {item.label}
                             </span>

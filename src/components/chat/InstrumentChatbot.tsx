@@ -162,7 +162,8 @@ export function InstrumentChatbot({ ticker, isOpen, portfolios }: InstrumentChat
                             />
                           ),
                           code: ({ className, children, ...props }) => {
-                            const match = /language-(\w+)/.exec(className || '');
+                            // [\w-] so hyphenated languages like stock-chart match
+                            const match = /language-([\w-]+)/.exec(className || '');
 
                             if (match && match[1] === 'stock-card') {
                               try {

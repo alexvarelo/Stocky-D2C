@@ -1,10 +1,11 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { InstrumentChatbot } from "./InstrumentChatbot";
+import { StockyLogo } from "@/components/brand/StockyLogo";
 
 interface StockyChatDrawerProps {
   ticker: string;
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   portfolios: Array<{ id: string; name: string }>;
 }
 
@@ -19,12 +20,8 @@ export const StockyChatDrawer = ({
       <DrawerContent className="h-[80vh] max-h-[800px]">
         <div className="mx-auto w-full max-w-6xl flex flex-col h-full">
           <DrawerHeader className="flex flex-col items-center">
-            <div className="w-12 h-12 mb-2">
-              <img 
-                src="/stocky_blue_background.png" 
-                alt="Stocky Logo" 
-                className="w-full h-full object-contain"
-              />
+            <div className="mb-2">
+              <StockyLogo variant="ink" size={48} />
             </div>
             <DrawerTitle className="text-center text-lg">
               {ticker} Assistant

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
-import stockyLogo from '@/assets/stocky.png';
+import { StockyLogo } from '@/components/brand/StockyLogo';
 import { TrendingUp, Shield, Globe, ArrowRight, Loader2 } from 'lucide-react';
 
 const Auth = () => {
@@ -70,7 +70,7 @@ const Auth = () => {
 
         <div className="relative z-10 flex flex-col justify-between p-16 w-full h-full">
           <div className="flex items-center gap-3">
-            <img src={stockyLogo} alt="Stocky" className="h-10 w-10 rounded-xl" />
+            <StockyLogo variant="paper" size={40} animated />
             <span className="text-xl font-semibold tracking-tight">Stocky</span>
           </div>
 
@@ -108,7 +108,7 @@ const Auth = () => {
         <div className="w-full max-w-md space-y-10">
           {/* Mobile Logo */}
           <div className="lg:hidden flex flex-col items-center mb-8 space-y-4">
-            <img src={stockyLogo} alt="Stocky" className="h-24 w-24 rounded-2xl shadow-xl" />
+            <StockyLogo variant="ink" size={96} animated className="drop-shadow-xl" />
             <h2 className="text-3xl font-bold">Stocky</h2>
           </div>
 
