@@ -1,13 +1,13 @@
 import { useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
-import stockyLogo from '@/assets/stocky.png';
-import { TrendingUp, Shield, Globe, ArrowRight, Check, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { StockyLogo } from '@/components/brand/StockyLogo';
+import { TrendingUp, Shield, Globe, ArrowRight, Loader2 } from 'lucide-react';
 
 const Auth = () => {
   const { user, loading, signIn, signUp } = useAuth();
@@ -61,48 +61,44 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen w-full flex bg-background overflow-hidden">
-      {/* Left Panel - Branding (Desktop) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-950 text-white overflow-hidden">
-        {/* Abstract Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-blue-600/20 blur-[120px]" />
-          <div className="absolute top-[40%] -right-[10%] w-[60%] h-[60%] rounded-full bg-purple-600/20 blur-[120px]" />
+      {/* Left Panel - Branding (Desktop) — Revolut dark canvas */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-[#000000] text-white overflow-hidden">
+        {/* Subtle cobalt ambient glow */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-[#494fdf]/15 blur-[140px]" />
         </div>
 
         <div className="relative z-10 flex flex-col justify-between p-16 w-full h-full">
-          <div className="flex items-center gap-4">
-            <img src={stockyLogo} alt="Stocky" className="h-16 w-16 rounded-xl shadow-lg" />
-            <span className="text-3xl font-bold tracking-tight">Stocky</span>
+          <div className="flex items-center gap-3">
+            <StockyLogo variant="paper" size={40} animated />
+            <span className="text-xl font-semibold tracking-tight">Stocky</span>
           </div>
 
-          <div className="space-y-12 max-w-lg">
+          <div className="space-y-10 max-w-lg">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight mb-6">
-                The future of <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                  social investing
-                </span>
+              <h1 className="text-[56px] font-medium leading-[1.0] tracking-[-0.8px] mb-6">
+                The future of<br />social investing
               </h1>
-              <p className="text-lg text-zinc-400 leading-relaxed">
+              <p className="text-lg text-white/70 leading-relaxed font-normal" style={{ letterSpacing: '-0.09px' }}>
                 Join a global community of investors. Track portfolios, share insights, and grow your wealth with professional-grade tools.
               </p>
             </motion.div>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               <FeatureRow icon={TrendingUp} title="Advanced Analytics" description="Real-time tracking and performance metrics" delay={0.2} />
               <FeatureRow icon={Globe} title="Global Markets" description="Access to international exchanges and assets" delay={0.3} />
               <FeatureRow icon={Shield} title="Bank-Grade Security" description="Your data and assets are protected 24/7" delay={0.4} />
             </div>
           </div>
 
-          <div className="flex items-center gap-6 text-sm text-zinc-500">
-            <span>© 2024 Stocky Inc.</span>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Terms of Service</a>
+          <div className="flex items-center gap-6 text-sm text-white/30">
+            <span>© {new Date().getFullYear()} Stocky Inc.</span>
+            <a href="#" className="hover:text-white/60 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-white/60 transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>
@@ -112,7 +108,7 @@ const Auth = () => {
         <div className="w-full max-w-md space-y-10">
           {/* Mobile Logo */}
           <div className="lg:hidden flex flex-col items-center mb-8 space-y-4">
-            <img src={stockyLogo} alt="Stocky" className="h-24 w-24 rounded-2xl shadow-xl" />
+            <StockyLogo variant="ink" size={96} animated className="drop-shadow-xl" />
             <h2 className="text-3xl font-bold">Stocky</h2>
           </div>
 
@@ -253,7 +249,7 @@ const Auth = () => {
   );
 };
 
-const FeatureRow = ({ icon: Icon, title, description, delay }: { icon: any, title: string, description: string, delay: number }) => (
+const FeatureRow = ({ icon: Icon, title, description, delay }: { icon: React.ElementType, title: string, description: string, delay: number }) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}

@@ -1,16 +1,12 @@
 import { Mail, Database, BarChart3, Code } from 'lucide-react';
-import stockyLogo from '@/assets/stocky.png';
+import { StockyLogo } from '@/components/brand/StockyLogo';
 
 export const Footer = () => {
     return (
-        <footer className="w-full border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-8 mt-auto">
-            <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
+        <footer className="w-full border-t border-border bg-background py-8 mt-auto text-muted-foreground">
+            <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-6 text-sm">
                 <div className="flex items-center gap-3">
-                    <img
-                        src={stockyLogo}
-                        alt="Stocky"
-                        className="h-8 w-8 grayscale opacity-70 hover:opacity-100 transition-opacity"
-                    />
+                    <StockyLogo variant="mark" size={26} className="text-foreground" />
                     <span className="font-semibold text-foreground">Stocky</span>
                 </div>
 

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 // Generate color shades based on a base color
 const generateColorScale = (baseColor: string) => ({
@@ -112,10 +113,19 @@ export default {
 			transitionProperty: {
 				'smooth': 'var(--transition-smooth)'
 			},
+			fontFamily: {
+				sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+				display: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				none: '0px',
+				sm: '8px',
+				DEFAULT: '12px',
+				md: '12px',
+				lg: '20px',
+				xl: '28px',
+				'2xl': '28px',
+				full: '9999px',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -151,5 +161,5 @@ export default {
 			},
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

@@ -23,10 +23,10 @@ export const NavLinks = ({ links, currentPath, className = '' }: NavLinksProps) 
           <Link
             key={link.href}
             to={link.href}
-            className={`px-3 py-2 text-sm font-semibold rounded-md transition-colors ${
+            className={`px-3 py-2 text-sm font-semibold rounded-full transition-colors ${
               isActive
-                ? 'bg-accent text-accent-foreground'
-                : 'hover:bg-accent/50'
+                ? 'text-white bg-white/10'
+                : 'text-white/70 hover:text-white hover:bg-white/8'
             } ${className}`}
           >
             {link.label}
