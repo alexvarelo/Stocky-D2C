@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, MoreHorizontal, TrendingUp, TrendingDown, Edit, Trash2, Sparkles, UserPlus, UserMinus } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, TrendingUp, TrendingDown, Edit, Trash2, Sparkles, UserPlus, UserMinus, Download } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,6 +27,7 @@ interface PortfolioHeroProps {
     onEdit: () => void;
     onDelete: () => void;
     onAISummary: () => void;
+    onExport?: () => void;
     isOwner: boolean;
     isFollowing?: boolean;
     onToggleFollow?: () => void;
@@ -36,7 +36,6 @@ interface PortfolioHeroProps {
 }
 
 export const PortfolioHero = ({
-    portfolioId,
     name,
     description,
     isPublic,
@@ -51,6 +50,7 @@ export const PortfolioHero = ({
     onEdit,
     onDelete,
     onAISummary,
+    onExport,
     isOwner,
     isFollowing = false,
     onToggleFollow,
@@ -176,6 +176,12 @@ export const PortfolioHero = ({
                                         <Edit className="mr-2 h-4 w-4" />
                                         Edit Portfolio
                                     </DropdownMenuItem>
+                                    {onExport && (
+                                        <DropdownMenuItem onClick={() => { setDropdownOpen(false); onExport(); }}>
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Export Receipt
+                                        </DropdownMenuItem>
+                                    )}
                                     <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
                                         <Trash2 className="mr-2 h-4 w-4" />
                                         Delete

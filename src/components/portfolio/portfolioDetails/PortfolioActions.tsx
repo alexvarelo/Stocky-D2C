@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,8 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TransactionDrawer } from "@/components/transactions";
-import { Plus, Edit, Share2, BarChart2, Users, MoreVertical, Heart, HeartOff } from "lucide-react";
+import { Plus, Edit, Share2, BarChart2, Users, MoreVertical, Heart, HeartOff, Download } from "lucide-react";
 import { usePortfolioFollows } from "@/api/portfolio/usePortfolioFollows";
+import { PortfolioHolding } from "@/api/portfolio/portfolio";
 
 interface PortfolioActionsProps {
   portfolioId: string;
@@ -21,7 +20,8 @@ interface PortfolioActionsProps {
   onEdit: () => void;
   onDelete: () => void;
   onAISummary: () => void;
-  holdings: any[];
+  onExport: () => void;
+  holdings: PortfolioHolding[];
 }
 
 export const PortfolioActions = ({
@@ -32,9 +32,9 @@ export const PortfolioActions = ({
   onEdit,
   onDelete,
   onAISummary,
+  onExport,
   holdings = [],
 }: PortfolioActionsProps) => {
-  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { 
@@ -52,7 +52,7 @@ export const PortfolioActions = ({
           ? "You've unfollowed this portfolio" 
           : "You're now following this portfolio",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update follow status. Please try again.",
@@ -108,6 +108,11 @@ export const PortfolioActions = ({
             <DropdownMenuItem onClick={onEdit}>
               <Edit className="mr-2 h-4 w-4" />
               <span>Edit Portfolio</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={onExport}>
+              <Download className="mr-2 h-4 w-4" />
+              <span>Export as Receipt</span>
             </DropdownMenuItem>
 
             <DropdownMenuItem>

@@ -25,6 +25,7 @@ import { AllocationChart } from "@/components/portfolio/portfolioDetails/Allocat
 import { TopMovers } from "@/components/portfolio/portfolioDetails/TopMovers";
 import { KeyMetrics } from "@/components/portfolio/portfolioDetails/KeyMetrics";
 import { PortfolioAwards } from "@/components/portfolio/portfolioDetails/PortfolioAwards";
+import { ExportPortfolioDialog } from "@/components/portfolio/portfolioDetails/ExportPortfolioDialog";
 
 // Add custom animation keyframes for the spinning gradient
 const style = document.createElement('style');
@@ -47,6 +48,7 @@ export const PortfolioDetail = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [aiSummaryOpen, setAISummaryOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   // Load portfolio data
   const {
@@ -89,7 +91,7 @@ export const PortfolioDetail = () => {
           ? `You unfollowed ${portfolio.name}`
           : `You are now following ${portfolio.name}`,
       });
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to update follow status. Please try again.',
@@ -108,7 +110,7 @@ export const PortfolioDetail = () => {
         description: "Your portfolio has been successfully deleted.",
       });
       navigate("/portfolios");
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete portfolio. Please try again.",
@@ -168,6 +170,7 @@ export const PortfolioDetail = () => {
         onEdit={() => setIsEditDialogOpen(true)}
         onDelete={() => setIsDeleteDialogOpen(true)}
         onAISummary={() => setAISummaryOpen(true)}
+        onExport={() => setIsExportDialogOpen(true)}
         isOwner={isOwner}
         isFollowing={isFollowing}
         onToggleFollow={handleToggleFollow}
@@ -255,6 +258,21 @@ export const PortfolioDetail = () => {
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         portfolio={portfolio}
+      />
+
+      <ExportPortfolioDialog
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        portfolioName={portfolio.name}
+        portfolioDescription={portfolio.description}
+        holdings={portfolio.holdings || []}
+        totalValue={totalValue}
+        totalInvested={totalInvested}
+        totalReturn={totalReturn}
+        returnPercentage={returnPercentage}
+        todayChange={portfolio.today_change}
+        todayChangePercent={portfolio.today_change_percent}
+        createdAt={portfolio.created_at}
       />
     </PortfolioLayout>
   );
