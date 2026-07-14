@@ -416,6 +416,44 @@ export type Database = {
           },
         ]
       }
+      portfolio_value_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          portfolio_id: string
+          snapshot_date: string
+          total_cost: number | null
+          total_return_percentage: number | null
+          total_value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          portfolio_id: string
+          snapshot_date: string
+          total_cost?: number | null
+          total_return_percentage?: number | null
+          total_value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          portfolio_id?: string
+          snapshot_date?: string
+          total_cost?: number | null
+          total_return_percentage?: number | null
+          total_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_value_history_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolio_values: {
         Row: {
           portfolio_id: string

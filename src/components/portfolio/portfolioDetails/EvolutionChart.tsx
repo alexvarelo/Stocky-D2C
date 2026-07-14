@@ -2,19 +2,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortfolioPerformanceChart } from "../PortfolioPerformanceChart";
 import { usePortfolioPerformance } from "@/api/portfolio/usePortfolioPerformance";
+import { usePortfolioValueHistory } from "@/api/portfolio/usePortfolioValueHistory";
 import type { PortfolioHolding } from "@/api/portfolio/portfolio";
 
 
 interface EvolutionChartProps {
   holdings: PortfolioHolding[];
+  portfolioId?: string;
   className?: string;
   isLoading?: boolean;
 }
 
-export const EvolutionChart = ({ holdings, className = "", isLoading: isParentLoading }: EvolutionChartProps) => {
-  const { data: performanceData, isLoading: isChartLoading } = usePortfolioPerformance(holdings);
+// Snapshots accumulate one per day, so a young portfolio doesn't have enough
+// points to draw a meaningful line yet — fall back to the legacy calculation.
+const MIN_HISTORY_POINTS = 5;
 
-  const isLoading = isParentLoading || isChartLoading;
+export const EvolutionChart = ({ holdings, portfolioId, className = "", isLoading: isParentLoading }: EvolutionChartProps) => {
+  const { data: history, isLoading: isHistoryLoading } = usePortfolioValueHistory(portfolioId);
+
+  const hasStoredHistory = !!history && history.length >= MIN_HISTORY_POINTS;
+
+  // Legacy path: fetch 1y of prices per holding and aggregate client-side.
+  // Only used while the portfolio_value_history table has too few snapshots.
+  const { data: calculatedData, isLoading: isChartLoading } = usePortfolioPerformance(
+    isHistoryLoading || hasStoredHistory ? [] : holdings
+  );
+
+  const performanceData = hasStoredHistory
+    ? {
+        dates: history.map(point => point.snapshot_date),
+        values: history.map(point => point.total_value),
+      }
+    : calculatedData;
+
+  const isLoading = isParentLoading || isHistoryLoading || (!hasStoredHistory && isChartLoading);
 
   if (isLoading || !performanceData) {
     return (

@@ -89,7 +89,7 @@ export const PortfolioDetail = () => {
           ? `You unfollowed ${portfolio.name}`
           : `You are now following ${portfolio.name}`,
       });
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to update follow status. Please try again.',
@@ -108,7 +108,7 @@ export const PortfolioDetail = () => {
         description: "Your portfolio has been successfully deleted.",
       });
       navigate("/portfolios");
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete portfolio. Please try again.",
@@ -189,6 +189,7 @@ export const PortfolioDetail = () => {
             {/* Evolution Chart */}
             <EvolutionChart
               holdings={portfolio.holdings || []}
+              portfolioId={portfolioId}
               isLoading={isLoadingPrices}
             />
 
