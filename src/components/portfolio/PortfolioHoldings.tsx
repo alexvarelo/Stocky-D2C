@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { PortfolioHolding } from "@/api/portfolio/portfolio";
 import { Link } from "react-router-dom";
 import {
@@ -19,17 +18,20 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import type { RealtimePrice } from "@/api/stock/useRealtimePrices";
 
 interface PortfolioHoldingsProps {
   holdings: PortfolioHolding[];
   isLoading?: boolean;
   isLoadingPrices?: boolean;
+  livePrices?: Record<string, RealtimePrice>;
 }
 
 export const PortfolioHoldings = ({
   holdings,
   isLoading = false,
-  isLoadingPrices = false
+  isLoadingPrices = false,
+  livePrices = {}
 }: PortfolioHoldingsProps) => {
   if (isLoading) {
     return (
@@ -144,6 +146,7 @@ export const PortfolioHoldings = ({
                 const pnl = marketValue - holding.total_invested;
                 const pnlPercentage = holding.total_invested > 0 ? (pnl / holding.total_invested) * 100 : 0;
                 const allocation = totalValue > 0 ? (marketValue / totalValue) * 100 : 0;
+                const isLive = !!livePrices[holding.ticker.toUpperCase()];
 
                 return (
                   <TableRow key={holding.ticker} className="group hover:bg-muted/30 border-border/50 transition-colors">
@@ -168,7 +171,15 @@ export const PortfolioHoldings = ({
                         <Skeleton className="h-4 w-16 ml-auto" />
                       ) : (
                         <div className="flex flex-col items-end">
-                          <span>{holding.current_price ? formatCurrency(holding.current_price) : "N/A"}</span>
+                          <span className="inline-flex items-center gap-1.5">
+                            {holding.current_price ? formatCurrency(holding.current_price) : "N/A"}
+                            {isLive && (
+                              <span className="relative flex h-1.5 w-1.5" title="Live price">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                              </span>
+                            )}
+                          </span>
                           <span className="text-xs text-muted-foreground">Avg: {formatCurrency(holding.average_price)}</span>
                         </div>
                       )}

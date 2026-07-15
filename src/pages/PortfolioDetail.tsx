@@ -8,9 +8,10 @@ import { PortfolioHoldings } from "@/components/portfolio/PortfolioHoldings";
 import { TransactionsCard } from "@/components/transactions/TransactionsCard";
 import { PortfolioEditDialog } from "@/components/portfolio/edit/PortfolioEditDialog";
 import { DeleteConfirmationDialog } from "@/components/portfolio/delete/DeleteConfirmationDialog";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useRealtimePrices } from "@/api/stock/useRealtimePrices";
 
 // Import from portfolioDetails folder
 import { EvolutionChart } from "@/components/portfolio/portfolioDetails/EvolutionChart";
@@ -63,12 +64,37 @@ export const PortfolioDetail = () => {
   // Follow/unfollow functionality
   const { isFollowing, toggleFollow } = usePortfolioFollows(portfolioId);
 
+  // Real-time prices: subscribe to every held ticker over the market data
+  // API's websocket. Only holdings with an actual live tick get overridden --
+  // everything else keeps showing the last known price, so this is a pure
+  // enhancement (no regression when the market is closed or a ticker is
+  // untradeable in real time).
+  const tickers = useMemo(
+    () => portfolio?.holdings?.map(h => h.ticker) ?? [],
+    [portfolio?.holdings]
+  );
+  const { prices: livePrices } = useRealtimePrices(tickers, !isLoadingPortfolio && tickers.length > 0);
+
+  const holdingsWithLivePrices = useMemo(() => {
+    return portfolio?.holdings?.map(h => {
+      const live = livePrices[h.ticker.toUpperCase()];
+      return live ? { ...h, current_price: live.price } : h;
+    });
+  }, [portfolio?.holdings, livePrices]);
+
+  const hasLiveTick = tickers.some(t => !!livePrices[t.toUpperCase()]);
+
   // Calculate derived values
-  // Use stored values from the hook if available, otherwise calculate from holdings
-  const totalValue = portfolio?.total_value ?? (portfolio?.holdings?.reduce(
-    (sum, h) => sum + ((h.current_price || 0) * h.quantity),
-    0
-  ) || 0);
+  // Once a live tick has arrived for at least one holding, compute the totals
+  // from the live-merged holdings so the page doesn't mix a stale stored
+  // total with fresher per-holding prices. Otherwise fall back to the stored
+  // values (or the static holdings calculation) as before.
+  const totalValue = hasLiveTick
+    ? (holdingsWithLivePrices?.reduce((sum, h) => sum + ((h.current_price || 0) * h.quantity), 0) || 0)
+    : (portfolio?.total_value ?? (portfolio?.holdings?.reduce(
+      (sum, h) => sum + ((h.current_price || 0) * h.quantity),
+      0
+    ) || 0));
 
   const totalInvested = portfolio?.holdings?.reduce(
     (sum, h) => sum + h.total_invested,
@@ -78,7 +104,9 @@ export const PortfolioDetail = () => {
   const totalReturn = totalValue - totalInvested;
 
   // Use stored return percentage if available, otherwise calculate
-  const returnPercentage = portfolio?.total_return_percentage ?? (totalInvested > 0 ? (totalReturn / totalInvested) * 100 : 0);
+  const returnPercentage = hasLiveTick || !portfolio?.total_return_percentage
+    ? (totalInvested > 0 ? (totalReturn / totalInvested) * 100 : 0)
+    : portfolio.total_return_percentage;
 
   const handleToggleFollow = async () => {
     try {
@@ -173,6 +201,7 @@ export const PortfolioDetail = () => {
         onToggleFollow={handleToggleFollow}
         isLoading={isLoadingPortfolio}
         isLoadingPrices={isLoadingPrices}
+        isLive={hasLiveTick}
       />
 
       {/* AI Summary Drawer */}
@@ -188,16 +217,17 @@ export const PortfolioDetail = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Evolution Chart */}
             <EvolutionChart
-              holdings={portfolio.holdings || []}
+              holdings={holdingsWithLivePrices || []}
               portfolioId={portfolioId}
               isLoading={isLoadingPrices}
             />
 
             {/* Holdings List */}
             <PortfolioHoldings
-              holdings={portfolio.holdings || []}
+              holdings={holdingsWithLivePrices || []}
               isLoading={isLoadingPortfolio}
               isLoadingPrices={isLoadingPrices}
+              livePrices={livePrices}
             />
 
             {/* Transactions */}
@@ -211,19 +241,19 @@ export const PortfolioDetail = () => {
           <div className="lg:col-span-1 space-y-8">
             {/* Allocation Chart */}
             <AllocationChart
-              holdings={portfolio.holdings || []}
+              holdings={holdingsWithLivePrices || []}
               isLoading={isLoadingPrices}
             />
 
             {/* Top Movers */}
             <TopMovers
-              holdings={portfolio.holdings || []}
+              holdings={holdingsWithLivePrices || []}
               isLoading={isLoadingPrices}
             />
 
             {/* Key Metrics */}
             <KeyMetrics
-              holdings={portfolio.holdings || []}
+              holdings={holdingsWithLivePrices || []}
               totalInvested={totalInvested}
               isLoading={isLoadingPrices}
             />

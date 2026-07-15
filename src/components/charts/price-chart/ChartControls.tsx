@@ -13,12 +13,13 @@ interface ChartControlsProps {
     priceChange: number;
     percentChange: number;
     isPositive: boolean;
+    isLive?: boolean;
     timeRange: TimeRange;
-    setTimeRange: (range: TimeRange) => void;
+    setTimeRange: (_range: TimeRange) => void;
     chartMode: ChartMode;
-    setChartMode: (mode: ChartMode) => void;
+    setChartMode: (_mode: ChartMode) => void;
     comparisonTicker: string | null;
-    setComparisonTicker: (ticker: string | null) => void;
+    setComparisonTicker: (_ticker: string | null) => void;
     hasData: boolean;
 }
 
@@ -29,6 +30,7 @@ export const ChartControls = ({
     priceChange,
     percentChange,
     isPositive,
+    isLive = false,
     timeRange,
     setTimeRange,
     chartMode,
@@ -61,6 +63,12 @@ export const ChartControls = ({
                                     maximumFractionDigits: 2
                                 }).format(currentPrice)}
                             </span>
+                            {isLive && (
+                                <span className="relative flex h-2 w-2" title="Live price">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                                </span>
+                            )}
                             <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'} flex items-center`}>
                                 {isPositive ? '↑' : '↓'} {Math.abs(percentChange).toFixed(2)}% ({isPositive ? '+' : ''}{priceChange.toFixed(2)})
                             </span>

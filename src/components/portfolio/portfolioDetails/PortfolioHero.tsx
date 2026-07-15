@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, MoreHorizontal, TrendingUp, TrendingDown, Edit, Trash2, Sparkles, UserPlus, UserMinus } from "lucide-react";
 import {
@@ -33,10 +32,11 @@ interface PortfolioHeroProps {
     onToggleFollow?: () => void;
     isLoading?: boolean;
     isLoadingPrices?: boolean;
+    isLive?: boolean;
 }
 
 export const PortfolioHero = ({
-    portfolioId,
+    portfolioId: _portfolioId,
     name,
     description,
     isPublic,
@@ -56,6 +56,7 @@ export const PortfolioHero = ({
     onToggleFollow,
     isLoading = false,
     isLoadingPrices = false,
+    isLive = false,
 }: PortfolioHeroProps) => {
     const isPositive = totalReturn >= 0;
     const isTodayPositive = todayChange >= 0;
@@ -256,6 +257,15 @@ export const PortfolioHero = ({
                                 ) : (
                                     <span className="text-2xl md:text-5xl font-bold tracking-tight">
                                         {formatCurrency(totalValue)}
+                                    </span>
+                                )}
+                                {isLive && !isLoadingPrices && (
+                                    <span
+                                        className="relative flex h-2 w-2 ml-1"
+                                        title="Live price"
+                                    >
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                                     </span>
                                 )}
                             </motion.div>
