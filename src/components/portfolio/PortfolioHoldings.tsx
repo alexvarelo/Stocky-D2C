@@ -19,6 +19,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
 import type { RealtimePrice } from "@/api/stock/useRealtimePrices";
+import { usePriceFlash, priceFlashClass } from "@/hooks/usePriceFlash";
 
 interface PortfolioHoldingsProps {
   holdings: PortfolioHolding[];
@@ -26,6 +27,114 @@ interface PortfolioHoldingsProps {
   isLoadingPrices?: boolean;
   livePrices?: Record<string, RealtimePrice>;
 }
+
+interface HoldingRowProps {
+  holding: PortfolioHolding;
+  marketValue: number;
+  pnl: number;
+  pnlPercentage: number;
+  allocation: number;
+  isLive: boolean;
+  isLoadingPrices: boolean;
+}
+
+const HoldingRow = ({
+  holding,
+  marketValue,
+  pnl,
+  pnlPercentage,
+  allocation,
+  isLive,
+  isLoadingPrices,
+}: HoldingRowProps) => {
+  const flash = usePriceFlash(isLive ? holding.current_price : undefined);
+
+  return (
+    <TableRow className="group hover:bg-muted/30 border-border/50 transition-colors">
+      <TableCell className="pl-6 py-4">
+        <Link
+          to={`/instrument/${holding.ticker}`}
+          className="flex items-center gap-3 group/link"
+        >
+          <CompanyLogo ticker={holding.ticker} size={30} />
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm group-hover/link:text-primary transition-colors">
+              {holding.ticker}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {holding.quantity.toLocaleString()} shares
+            </span>
+          </div>
+        </Link>
+      </TableCell>
+      <TableCell className="text-right font-medium">
+        {isLoadingPrices ? (
+          <Skeleton className="h-4 w-16 ml-auto" />
+        ) : (
+          <div className="flex flex-col items-end">
+            <span className="inline-flex items-center gap-1.5">
+              <span className={`rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
+                {holding.current_price ? formatCurrency(holding.current_price) : "N/A"}
+              </span>
+              {isLive && (
+                <span className="relative flex h-1.5 w-1.5" title="Live price">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                </span>
+              )}
+            </span>
+            <span className="text-xs text-muted-foreground">Avg: {formatCurrency(holding.average_price)}</span>
+          </div>
+        )}
+      </TableCell>
+      <TableCell className="text-right font-semibold">
+        {isLoadingPrices ? (
+          <Skeleton className="h-4 w-20 ml-auto" />
+        ) : (
+          formatCurrency(marketValue)
+        )}
+      </TableCell>
+      <TableCell className="text-right">
+        {isLoadingPrices ? (
+          <Skeleton className="h-4 w-24 ml-auto" />
+        ) : (
+          <div className="flex justify-end">
+            <div
+              className={`flex flex-col items-end ${pnl >= 0
+                ? "text-emerald-500"
+                : "text-red-500"
+                }`}
+            >
+              <span className="font-medium text-sm">
+                {pnl >= 0 ? "+" : ""}{formatCurrency(pnl)}
+              </span>
+              <span className="text-xs opacity-80 bg-current/10 px-1.5 py-0.5 rounded-md mt-0.5">
+                {formatPercentage(pnlPercentage)}
+              </span>
+            </div>
+          </div>
+        )}
+      </TableCell>
+      <TableCell className="pr-6">
+        {isLoadingPrices ? (
+          <Skeleton className="h-4 w-full" />
+        ) : (
+          <div className="flex items-center gap-3 justify-end">
+            <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full"
+                style={{ width: `${Math.min(100, allocation)}%` }}
+              />
+            </div>
+            <span className="text-muted-foreground text-xs w-8 text-right font-medium">
+              {Math.round(allocation)}%
+            </span>
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+};
 
 export const PortfolioHoldings = ({
   holdings,
@@ -149,87 +258,16 @@ export const PortfolioHoldings = ({
                 const isLive = !!livePrices[holding.ticker.toUpperCase()];
 
                 return (
-                  <TableRow key={holding.ticker} className="group hover:bg-muted/30 border-border/50 transition-colors">
-                    <TableCell className="pl-6 py-4">
-                      <Link
-                        to={`/instrument/${holding.ticker}`}
-                        className="flex items-center gap-3 group/link"
-                      >
-                        <CompanyLogo ticker={holding.ticker} size={30} />
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-sm group-hover/link:text-primary transition-colors">
-                            {holding.ticker}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {holding.quantity.toLocaleString()} shares
-                          </span>
-                        </div>
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {isLoadingPrices ? (
-                        <Skeleton className="h-4 w-16 ml-auto" />
-                      ) : (
-                        <div className="flex flex-col items-end">
-                          <span className="inline-flex items-center gap-1.5">
-                            {holding.current_price ? formatCurrency(holding.current_price) : "N/A"}
-                            {isLive && (
-                              <span className="relative flex h-1.5 w-1.5" title="Live price">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-                              </span>
-                            )}
-                          </span>
-                          <span className="text-xs text-muted-foreground">Avg: {formatCurrency(holding.average_price)}</span>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {isLoadingPrices ? (
-                        <Skeleton className="h-4 w-20 ml-auto" />
-                      ) : (
-                        formatCurrency(marketValue)
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {isLoadingPrices ? (
-                        <Skeleton className="h-4 w-24 ml-auto" />
-                      ) : (
-                        <div className="flex justify-end">
-                          <div
-                            className={`flex flex-col items-end ${pnl >= 0
-                              ? "text-emerald-500"
-                              : "text-red-500"
-                              }`}
-                          >
-                            <span className="font-medium text-sm">
-                              {pnl >= 0 ? "+" : ""}{formatCurrency(pnl)}
-                            </span>
-                            <span className="text-xs opacity-80 bg-current/10 px-1.5 py-0.5 rounded-md mt-0.5">
-                              {formatPercentage(pnlPercentage)}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="pr-6">
-                      {isLoadingPrices ? (
-                        <Skeleton className="h-4 w-full" />
-                      ) : (
-                        <div className="flex items-center gap-3 justify-end">
-                          <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary rounded-full"
-                              style={{ width: `${Math.min(100, allocation)}%` }}
-                            />
-                          </div>
-                          <span className="text-muted-foreground text-xs w-8 text-right font-medium">
-                            {Math.round(allocation)}%
-                          </span>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
+                  <HoldingRow
+                    key={holding.ticker}
+                    holding={holding}
+                    marketValue={marketValue}
+                    pnl={pnl}
+                    pnlPercentage={pnlPercentage}
+                    allocation={allocation}
+                    isLive={isLive}
+                    isLoadingPrices={isLoadingPrices}
+                  />
                 );
               })}
             </TableBody>

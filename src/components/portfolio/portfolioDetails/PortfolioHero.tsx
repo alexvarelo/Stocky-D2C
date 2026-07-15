@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { usePriceFlash, priceFlashClass } from "@/hooks/usePriceFlash";
 
 interface PortfolioHeroProps {
     portfolioId: string;
@@ -61,6 +62,7 @@ export const PortfolioHero = ({
     const isPositive = totalReturn >= 0;
     const isTodayPositive = todayChange >= 0;
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const flash = usePriceFlash(isLive ? totalValue : undefined);
 
     const handleEdit = () => {
         setDropdownOpen(false);
@@ -255,7 +257,7 @@ export const PortfolioHero = ({
                                 {isLoadingPrices ? (
                                     <Skeleton className="h-8 w-32 md:h-12 md:w-48" />
                                 ) : (
-                                    <span className="text-2xl md:text-5xl font-bold tracking-tight">
+                                    <span className={`text-2xl md:text-5xl font-bold tracking-tight rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
                                         {formatCurrency(totalValue)}
                                     </span>
                                 )}

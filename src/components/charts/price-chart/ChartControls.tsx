@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { StockSearch } from '@/components/stock/StockSearch';
 import { TimeRange, ChartMode } from './types';
 import { CompanyLogo } from '@/components/stock/CompanyLogo';
+import { usePriceFlash, priceFlashClass } from '@/hooks/usePriceFlash';
 
 interface ChartControlsProps {
     ticker: string;
@@ -39,6 +40,8 @@ export const ChartControls = ({
     setComparisonTicker,
     hasData
 }: ChartControlsProps) => {
+    const flash = usePriceFlash(isLive ? currentPrice : undefined);
+
     return (
         <CardHeader className="flex flex-col gap-2 sm:gap-4 pb-2 sm:pb-4 p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -55,7 +58,7 @@ export const ChartControls = ({
                     </CardTitle>
                     {hasData && (
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-2xl font-bold">
+                            <span className={`text-2xl font-bold rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
                                 {new Intl.NumberFormat('en-US', {
                                     style: 'currency',
                                     currency: currency || 'USD',
