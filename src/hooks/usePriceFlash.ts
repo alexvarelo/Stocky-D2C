@@ -27,8 +27,11 @@ export function usePriceFlash(value: number | undefined, durationMs = 700): Flas
   return flash;
 }
 
+// Uses the theme's semantic success/danger tokens (not the raw emerald/red
+// Tailwind scale) since the Revolut design system no longer defines
+// --emerald-*, which made "up" flashes render as fully transparent.
 export const priceFlashClass = (flash: FlashDirection): string => {
-  if (flash === "up") return "bg-emerald-500/25 text-emerald-500";
-  if (flash === "down") return "bg-red-500/25 text-red-500";
+  if (flash === "up") return "bg-success/25 text-success";
+  if (flash === "down") return "bg-danger/25 text-danger";
   return "bg-transparent";
 };
