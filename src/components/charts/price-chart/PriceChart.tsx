@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { ChartControls } from './ChartControls';
 import { ChartVisualizer } from './ChartVisualizer';
 import { useChartData } from './useChartData';
 import { TimeRange, ChartMode } from './types';
+import { useRealtimePrices } from '@/api/stock/useRealtimePrices';
 
 interface PriceChartProps {
     ticker: string;
@@ -29,15 +30,28 @@ export function PriceChart({ ticker, currency = 'USD' }: PriceChartProps) {
         comparisonTicker
     });
 
+    // Overlay a live tick from the market data API's websocket on top of the
+    // last historical close. Falls back to the static values above until (or
+    // unless) a tick actually arrives for this ticker.
+    const liveTickers = useMemo(() => (ticker ? [ticker] : []), [ticker]);
+    const { prices: livePrices } = useRealtimePrices(liveTickers, !!ticker);
+    const live = ticker ? livePrices[ticker.toUpperCase()] : undefined;
+
+    const effectiveCurrentPrice = live?.price ?? currentPrice;
+    const effectivePriceChange = live?.change ?? priceChange;
+    const effectivePercentChange = live?.changePercent ?? percentChange;
+    const effectiveIsPositive = live ? effectivePercentChange >= 0 : isPositive;
+
     return (
         <Card className="w-full">
             <ChartControls
                 ticker={ticker}
                 currency={currency}
-                currentPrice={currentPrice}
-                priceChange={priceChange}
-                percentChange={percentChange}
-                isPositive={isPositive}
+                currentPrice={effectiveCurrentPrice}
+                priceChange={effectivePriceChange}
+                percentChange={effectivePercentChange}
+                isPositive={effectiveIsPositive}
+                isLive={!!live}
                 timeRange={timeRange}
                 setTimeRange={setTimeRange}
                 chartMode={chartMode}

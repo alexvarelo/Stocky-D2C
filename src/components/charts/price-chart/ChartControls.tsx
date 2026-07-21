@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { StockSearch } from '@/components/stock/StockSearch';
 import { TimeRange, ChartMode } from './types';
 import { CompanyLogo } from '@/components/stock/CompanyLogo';
+import { usePriceFlash, priceFlashClass } from '@/hooks/usePriceFlash';
 
 interface ChartControlsProps {
     ticker: string;
@@ -13,12 +14,13 @@ interface ChartControlsProps {
     priceChange: number;
     percentChange: number;
     isPositive: boolean;
+    isLive?: boolean;
     timeRange: TimeRange;
-    setTimeRange: (range: TimeRange) => void;
+    setTimeRange: (_range: TimeRange) => void;
     chartMode: ChartMode;
-    setChartMode: (mode: ChartMode) => void;
+    setChartMode: (_mode: ChartMode) => void;
     comparisonTicker: string | null;
-    setComparisonTicker: (ticker: string | null) => void;
+    setComparisonTicker: (_ticker: string | null) => void;
     hasData: boolean;
 }
 
@@ -29,6 +31,7 @@ export const ChartControls = ({
     priceChange,
     percentChange,
     isPositive,
+    isLive = false,
     timeRange,
     setTimeRange,
     chartMode,
@@ -37,6 +40,8 @@ export const ChartControls = ({
     setComparisonTicker,
     hasData
 }: ChartControlsProps) => {
+    const flash = usePriceFlash(isLive ? currentPrice : undefined);
+
     return (
         <CardHeader className="flex flex-col gap-2 sm:gap-4 pb-2 sm:pb-4 p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -53,7 +58,7 @@ export const ChartControls = ({
                     </CardTitle>
                     {hasData && (
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-2xl font-bold">
+                            <span className={`text-2xl font-bold rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
                                 {new Intl.NumberFormat('en-US', {
                                     style: 'currency',
                                     currency: currency || 'USD',
@@ -61,6 +66,12 @@ export const ChartControls = ({
                                     maximumFractionDigits: 2
                                 }).format(currentPrice)}
                             </span>
+                            {isLive && (
+                                <span className="relative flex h-2 w-2" title="Live price">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                                </span>
+                            )}
                             <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'} flex items-center`}>
                                 {isPositive ? '↑' : '↓'} {Math.abs(percentChange).toFixed(2)}% ({isPositive ? '+' : ''}{priceChange.toFixed(2)})
                             </span>
