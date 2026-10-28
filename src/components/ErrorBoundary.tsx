@@ -5,7 +5,7 @@ import { AlertCircle } from 'lucide-react';
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onError?: (_error: Error, _errorInfo: ErrorInfo) => void;
 }
 
 interface State {
@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <AlertDescription>
             {this.state.error?.message || 'An unexpected error occurred'}
           </AlertDescription>
-          {process.env.NODE_ENV === 'development' && (
+          {import.meta.env.DEV && (
             <div className="mt-2 text-xs">
               <details>
                 <summary>Error details</summary>

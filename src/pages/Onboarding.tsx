@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +8,8 @@ import { StockyLogo } from '@/components/brand/StockyLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Checkbox } from '@/components/ui/checkbox';
+import { TERMS_VERSION } from '@/pages/legal/legalContent';
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, TrendingUp } from 'lucide-react';
 
 type Step = 'welcome' | 'identity' | 'personalize' | 'done';
@@ -26,7 +28,8 @@ const Onboarding = () => {
     bio: '',
     avatarUrl: '',
   });
-  const [errors, setErrors] = useState<{ username?: string; fullName?: string }>({});
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [errors, setErrors] = useState<{ username?: string; fullName?: string; terms?: string }>({});
 
   // Already onboarded — nothing to do here.
   useEffect(() => {
@@ -61,6 +64,7 @@ const Onboarding = () => {
     const next: typeof errors = {};
     if (fields.username.trim().length < 3) next.username = 'Username must be at least 3 characters';
     if (!fields.fullName.trim()) next.fullName = 'Full name is required';
+    if (!acceptedTerms) next.terms = 'Please accept the Terms and Privacy Policy to continue';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -86,6 +90,8 @@ const Onboarding = () => {
         bio: fields.bio || null,
         website: null,
         avatar_url: fields.avatarUrl || null,
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: TERMS_VERSION,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
@@ -219,22 +225,53 @@ const Onboarding = () => {
                 <div className="space-y-4">
                   <div className="space-y-1.5">
                     <Input
+                      aria-label="Full name"
+                      autoComplete="name"
+                      aria-invalid={!!errors.fullName}
+                      aria-describedby={errors.fullName ? 'onboarding-fullname-error' : undefined}
                       placeholder="Full name"
                       value={fields.fullName}
                       onChange={updateField('fullName')}
                       autoFocus
                       className="h-14 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-[#494fdf] focus:ring-1 focus:ring-[#494fdf]/40"
                     />
-                    {errors.fullName && <p className="text-xs text-[#ff6b7d] ml-1">{errors.fullName}</p>}
+                    {errors.fullName && <p id="onboarding-fullname-error" role="alert" className="text-xs text-[#ff6b7d] ml-1">{errors.fullName}</p>}
                   </div>
                   <div className="space-y-1.5">
                     <Input
+                      aria-label="Username"
+                      autoComplete="username"
+                      aria-invalid={!!errors.username}
+                      aria-describedby={errors.username ? 'onboarding-username-error' : undefined}
                       placeholder="Username"
                       value={fields.username}
                       onChange={updateField('username')}
                       className="h-14 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-[#494fdf] focus:ring-1 focus:ring-[#494fdf]/40"
                     />
-                    {errors.username && <p className="text-xs text-[#ff6b7d] ml-1">{errors.username}</p>}
+                    {errors.username && <p id="onboarding-username-error" role="alert" className="text-xs text-[#ff6b7d] ml-1">{errors.username}</p>}
+                  </div>
+                  <div className="space-y-1.5 pt-2">
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id="accept-terms"
+                        checked={acceptedTerms}
+                        onCheckedChange={(checked) => {
+                          setAcceptedTerms(checked === true);
+                          if (checked) setErrors(prev => ({ ...prev, terms: undefined }));
+                        }}
+                        aria-invalid={!!errors.terms}
+                        aria-describedby={errors.terms ? 'onboarding-terms-error' : undefined}
+                        className="mt-0.5 border-white/40 data-[state=checked]:bg-[#494fdf] data-[state=checked]:border-[#494fdf]"
+                      />
+                      <label htmlFor="accept-terms" className="text-sm text-white/70 leading-relaxed">
+                        I'm 18 or older and I accept the{' '}
+                        <Link to="/legal/terms" target="_blank" className="underline underline-offset-2 hover:text-white">Terms</Link>{' '}
+                        and{' '}
+                        <Link to="/legal/privacy" target="_blank" className="underline underline-offset-2 hover:text-white">Privacy Policy</Link>.
+                        I understand Stockfolio doesn't give investment advice.
+                      </label>
+                    </div>
+                    {errors.terms && <p id="onboarding-terms-error" role="alert" className="text-xs text-[#ff6b7d] ml-1">{errors.terms}</p>}
                   </div>
                 </div>
 
@@ -270,12 +307,15 @@ const Onboarding = () => {
 
                 <div className="space-y-4">
                   <Input
+                    aria-label="Avatar URL (optional)"
+                    type="url"
                     placeholder="Avatar URL (optional)"
                     value={fields.avatarUrl}
                     onChange={updateField('avatarUrl')}
                     className="h-14 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-[#494fdf] focus:ring-1 focus:ring-[#494fdf]/40"
                   />
                   <Input
+                    aria-label="Short bio (optional)"
                     placeholder="Short bio (optional)"
                     value={fields.bio}
                     onChange={updateField('bio')}

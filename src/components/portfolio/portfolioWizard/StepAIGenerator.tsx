@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface StepAIGeneratorProps {
-    onGenerate: (data: GeneratedPortfolioResponse) => void;
+    onGenerate: (_data: GeneratedPortfolioResponse) => void;
     onSkip: () => void;
 }
 
@@ -141,15 +141,19 @@ export function StepAIGenerator({ onGenerate, onSkip }: StepAIGeneratorProps) {
                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
                             </div>
                             <div className="max-w-md space-y-2">
-                                <h3 className="text-2xl font-bold tracking-tight">AI Portfolio Architect</h3>
+                                <h3 className="text-2xl font-bold tracking-tight">Describe your portfolio</h3>
                                 <p className="text-muted-foreground text-lg">
-                                    Describe your ideal portfolio, and I'll build it for you.
+                                    Tell me what you hold, in plain words, and I'll set it up for you.
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    AI-assisted data entry. Stocky records the holdings you name; it doesn't pick investments for you.
                                 </p>
                             </div>
 
                             <div className="w-full max-w-lg space-y-4">
                                 <Textarea
-                                    placeholder="E.g., 'A diversified tech portfolio with high growth potential, focusing on AI and Cloud sectors...'"
+                                    aria-label="Describe your portfolio"
+                                    placeholder="E.g., 'Long term: 12 shares of AAPL at $180, 30 VWCE at €105 and 0.5 BTC'"
                                     className="min-h-[120px] resize-none text-base p-4 bg-muted/30 border-primary/20 focus:border-primary/50 transition-all"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
@@ -293,6 +297,7 @@ export function StepAIGenerator({ onGenerate, onSkip }: StepAIGeneratorProps) {
 
                         <div className="flex gap-2">
                             <Textarea
+                                aria-label="Your reply"
                                 placeholder="Type your reply..."
                                 className="min-h-[50px] max-h-[150px] resize-none"
                                 value={prompt}
@@ -305,6 +310,7 @@ export function StepAIGenerator({ onGenerate, onSkip }: StepAIGeneratorProps) {
                                 onClick={handleChatSubmit}
                                 disabled={!prompt.trim() || isPending}
                                 className="h-auto px-4"
+                                aria-label="Send reply"
                             >
                                 <Send className="h-4 w-4" />
                             </Button>

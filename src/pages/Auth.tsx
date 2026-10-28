@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -155,16 +155,16 @@ const Auth = () => {
             </motion.div>
 
             <div className="space-y-5">
-              <FeatureRow icon={TrendingUp} title="Advanced Analytics" description="Real-time tracking and performance metrics" delay={0.2} />
-              <FeatureRow icon={Globe} title="Global Markets" description="Access to international exchanges and assets" delay={0.3} />
-              <FeatureRow icon={Shield} title="Bank-Grade Security" description="Your data and assets are protected 24/7" delay={0.4} />
+              <FeatureRow icon={TrendingUp} title="Advanced Analytics" description="Performance, allocation and dividends in one place" delay={0.2} />
+              <FeatureRow icon={Globe} title="Global Markets" description="Track stocks and ETFs from US and European exchanges" delay={0.3} />
+              <FeatureRow icon={Shield} title="Private by Default" description="Your portfolios stay private unless you choose to share them" delay={0.4} />
             </div>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-white/30">
-            <span>© {new Date().getFullYear()} Stocky Inc.</span>
-            <a href="#" className="hover:text-white/60 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Terms of Service</a>
+            <span>© {new Date().getFullYear()} Stockfolio</span>
+            <Link to="/legal/privacy" className="hover:text-white/60 transition-colors">Privacy Policy</Link>
+            <Link to="/legal/terms" className="hover:text-white/60 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
@@ -224,7 +224,9 @@ const Auth = () => {
                       <Input
                         type="email"
                         name="email"
-                        placeholder="Email address"
+                        aria-label="Email address"
+                                autoComplete="email"
+                                placeholder="Email address"
                         value={formData.email}
                         onChange={handleInputChange}
                         required
@@ -283,6 +285,8 @@ const Auth = () => {
                               <Input
                                 type="email"
                                 name="email"
+                                aria-label="Email address"
+                                autoComplete="email"
                                 placeholder="Email address"
                                 value={formData.email}
                                 onChange={handleInputChange}
@@ -294,6 +298,8 @@ const Auth = () => {
                               <Input
                                 type="password"
                                 name="password"
+                                aria-label="Password"
+                                autoComplete="current-password"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleInputChange}
@@ -329,6 +335,8 @@ const Auth = () => {
                                 <Input
                                   type="text"
                                   name="fullName"
+                                  aria-label="Full name"
+                                  autoComplete="name"
                                   placeholder="Full Name"
                                   value={formData.fullName}
                                   onChange={handleInputChange}
@@ -340,6 +348,8 @@ const Auth = () => {
                                 <Input
                                   type="text"
                                   name="username"
+                                  aria-label="Username"
+                                  autoComplete="username"
                                   placeholder="Username"
                                   value={formData.username}
                                   onChange={handleInputChange}
@@ -352,6 +362,8 @@ const Auth = () => {
                               <Input
                                 type="email"
                                 name="email"
+                                aria-label="Email address"
+                                autoComplete="email"
                                 placeholder="Email address"
                                 value={formData.email}
                                 onChange={handleInputChange}
@@ -363,6 +375,9 @@ const Auth = () => {
                               <Input
                                 type="password"
                                 name="password"
+                                aria-label="Create a password"
+                                autoComplete="new-password"
+                                aria-describedby="signup-password-hint"
                                 placeholder="Create a password"
                                 value={formData.password}
                                 onChange={handleInputChange}
@@ -370,7 +385,7 @@ const Auth = () => {
                                 aria-invalid={!!formErrors.password}
                                 className={`h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all ${formErrors.password ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : ''}`}
                               />
-                              <p className={`text-xs ml-1 ${formErrors.password ? 'text-destructive' : 'text-muted-foreground'}`}>
+                              <p id="signup-password-hint" className={`text-xs ml-1 ${formErrors.password ? 'text-destructive' : 'text-muted-foreground'}`}>
                                 {formErrors.password || `Must be at least ${MIN_PASSWORD_LENGTH} characters long`}
                               </p>
                             </div>
@@ -378,6 +393,9 @@ const Auth = () => {
                               <Input
                                 type="password"
                                 name="confirmPassword"
+                                aria-label="Confirm password"
+                                autoComplete="new-password"
+                                aria-describedby={formErrors.confirmPassword ? "signup-confirm-error" : undefined}
                                 placeholder="Confirm password"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
@@ -386,7 +404,7 @@ const Auth = () => {
                                 className={`h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all ${formErrors.confirmPassword ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : ''}`}
                               />
                               {formErrors.confirmPassword && (
-                                <p className="text-xs text-destructive ml-1">{formErrors.confirmPassword}</p>
+                                <p id="signup-confirm-error" role="alert" className="text-xs text-destructive ml-1">{formErrors.confirmPassword}</p>
                               )}
                             </div>
                             <Button
@@ -397,6 +415,12 @@ const Auth = () => {
                               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
                               {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
                             </Button>
+                            <p className="text-xs text-center text-muted-foreground">
+                              By creating an account you agree to the{' '}
+                              <Link to="/legal/terms" className="underline underline-offset-2 hover:text-foreground">Terms</Link>{' '}
+                              and{' '}
+                              <Link to="/legal/privacy" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>.
+                            </p>
                           </form>
                         </TabsContent>
                       </motion.div>

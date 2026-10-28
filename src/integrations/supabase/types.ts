@@ -178,6 +178,7 @@ export type Database = {
           content: Json
           created_at: string | null
           id: string
+          is_ai_generated: boolean
           is_premium: boolean | null
           metadata: Json | null
           slug: string
@@ -195,6 +196,7 @@ export type Database = {
           content: Json
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_premium?: boolean | null
           metadata?: Json | null
           slug: string
@@ -212,6 +214,7 @@ export type Database = {
           content?: Json
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_premium?: boolean | null
           metadata?: Json | null
           slug?: string
@@ -291,6 +294,50 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          status: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          status?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          status?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -617,6 +664,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          is_ai_generated: boolean
           is_public: boolean | null
           portfolio_id: string | null
           post_type: string | null
@@ -628,6 +676,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_public?: boolean | null
           portfolio_id?: string | null
           post_type?: string | null
@@ -639,6 +688,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_public?: boolean | null
           portfolio_id?: string | null
           post_type?: string | null
@@ -831,6 +881,8 @@ export type Database = {
           id: string
           is_public: boolean | null
           is_verified: boolean | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string | null
           username: string
           website: string | null
@@ -844,6 +896,8 @@ export type Database = {
           id: string
           is_public?: boolean | null
           is_verified?: boolean | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string | null
           username: string
           website?: string | null
@@ -857,6 +911,8 @@ export type Database = {
           id?: string
           is_public?: boolean | null
           is_verified?: boolean | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string | null
           username?: string
           website?: string | null
@@ -1043,6 +1099,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_ai_generated: boolean
           is_liked_by_me: boolean
           is_public: boolean
           like_count: number
