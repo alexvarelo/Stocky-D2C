@@ -33,6 +33,7 @@ import { StockChart } from "@/components/chat/visuals/StockChart";
 import { VoiceInputButton } from "@/components/chat/VoiceInputButton";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 interface Message {
     id: string;
@@ -118,7 +119,7 @@ function VisualPlaceholder({ label }: { label?: string }) {
 const PREDEFINED_PROMPTS = [
     { label: "Portfolio performance", icon: "chart" },
     { label: "Top holdings breakdown", icon: "target" },
-    { label: "Diversification ideas", icon: "lightbulb" },
+    { label: "Sector and currency exposure", icon: "lightbulb" },
     { label: "Market news summary", icon: "news" },
 ];
 
@@ -144,11 +145,12 @@ function MessageActions({
     if (message.role === "user") return null;
 
     return (
-        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity mt-1">
             <button
                 className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 onClick={handleCopy}
                 title="Copy"
+                aria-label={copied ? "Copied" : "Copy message"}
             >
                 {copied ? (
                     <CheckCircle className="w-3.5 h-3.5 text-success" />
@@ -162,6 +164,7 @@ function MessageActions({
                     onClick={onRegenerate}
                     disabled={isRegenerating}
                     title="Regenerate"
+                    aria-label="Regenerate response"
                 >
                     <RotateCcw className="w-3.5 h-3.5" />
                 </button>
@@ -170,6 +173,7 @@ function MessageActions({
                 className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-danger hover:bg-danger-light transition-colors"
                 onClick={onDelete}
                 title="Delete"
+                aria-label="Delete message"
             >
                 <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -518,6 +522,8 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                         <div className="flex items-center gap-2.5 min-w-0">
                             <button
                                 onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                                aria-label={isHistoryOpen ? "Hide conversation history" : "Show conversation history"}
+                                aria-expanded={isHistoryOpen}
                                 className="h-8 w-8 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                             >
                                 {isHistoryOpen ? <PanelLeftClose className="w-4 h-4" /> : <History className="w-4 h-4" />}
@@ -528,7 +534,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                     Stocky
                                 </SheetTitle>
                                 <SheetDescription className="text-[13px] text-muted-foreground leading-tight">
-                                    Financial Assistant
+                                    AI assistant · not investment advice
                                 </SheetDescription>
                             </div>
                         </div>
@@ -612,6 +618,17 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                                     What do you<br />need?
                                                 </h2>
                                             </div>
+                                            <p className="text-[13px] text-muted-foreground leading-relaxed max-w-md">
+                                                Stocky is an AI. It can explain markets and your portfolio data, but it
+                                                doesn't give personal buy or sell recommendations and can make mistakes.{" "}
+                                                <Link
+                                                    to="/legal/disclaimer"
+                                                    onClick={() => onOpenChange(false)}
+                                                    className="underline underline-offset-2 hover:text-foreground"
+                                                >
+                                                    Learn more
+                                                </Link>
+                                            </p>
                                             <div className="flex flex-wrap gap-2">
                                                 {PREDEFINED_PROMPTS.map((prompt) => (
                                                     <button
@@ -627,7 +644,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                     </div>
                                 ) : (
                                     /* Messages */
-                                    <div className="space-y-4 pb-4">
+                                    <div className="space-y-4 pb-4" role="log" aria-live="polite" aria-busy={isLoading}>
                                         {messages
                                             .filter((m) => m.role !== "tool")
                                             // An assistant message starts as an empty "sending" placeholder
@@ -822,7 +839,9 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                 className="relative"
                             >
                                 <div className="bg-card border border-border rounded-2xl shadow-sm transition-all focus-within:border-ring focus-within:shadow-md">
+                                    <label htmlFor="stocky-input" className="sr-only">Message Stocky</label>
                                     <textarea
+                                        id="stocky-input"
                                         ref={inputRef}
                                         placeholder="Ask for anything..."
                                         value={input}
@@ -845,6 +864,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                         />
                                         <button
                                             type="submit"
+                                            aria-label="Send message"
                                             disabled={isLoading || !input.trim()}
                                             className={cn(
                                                 "h-9 w-9 rounded-xl flex items-center justify-center transition-all",
@@ -862,6 +882,9 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                     </div>
                                 </div>
                             </form>
+                            <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                                AI-generated responses. Not investment advice.
+                            </p>
                         </div>
                     </div>
                 </div>

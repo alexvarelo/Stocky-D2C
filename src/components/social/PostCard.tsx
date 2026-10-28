@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Flag, Sparkles } from 'lucide-react';
 import { PostComments } from './PostComments';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
@@ -12,6 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PortfolioPostCard } from './PortfolioPostCard';
 import { InstrumentPostCard } from './InstrumentPostCard';
 import { Post } from "@/types/social";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ReportContentDialog } from './ReportContentDialog';
 
 type User = {
   id: string;
@@ -36,7 +43,7 @@ export interface PostCardProps {
     ticker?: string;
   };
   onCommentClick?: () => void;
-  onUpdatePost?: (updatedPost: any) => void;
+  onUpdatePost?: (_updatedPost: PostCardProps['post']) => void;
   className?: string;
 }
 
@@ -52,7 +59,8 @@ export const PostCard = ({
   const [isLiked, setIsLiked] = useState(post.has_liked);
   const [likeCount, setLikeCount] = useState(post.likes_count || 0);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<Array<{
+  const [reportOpen, setReportOpen] = useState(false);
+  const [comments] = useState<Array<{
     id: string;
     content: string;
     created_at: string;
@@ -183,17 +191,48 @@ export const PostCard = ({
                     {post.user?.name || 'Anonymous'}
                   </span>
                   <span className="text-muted-foreground text-sm">
-                    {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                    <time dateTime={post.created_at}>
+                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                    </time>
                   </span>
                 </div>
               </div>
             </button>
           </div>
           
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {post.is_ai_generated && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                title="Written by AI. Not investment advice."
+              >
+                <Sparkles className="h-3 w-3" aria-hidden="true" />
+                AI-generated
+              </span>
+            )}
+            {user?.id !== post.user_id && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" aria-label="More options">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setReportOpen(true)}>
+                    <Flag className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Report post
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
+        <ReportContentDialog
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+          targetType="post"
+          targetId={post.id}
+        />
 
         {/* Content */}
         <div className="mt-3 text-foreground">
@@ -214,6 +253,8 @@ export const PostCard = ({
               size="sm" 
               className="flex items-center gap-1 group px-2"
               onClick={handleCommentClick}
+              aria-label={`Comments (${postData.comments_count})`}
+              aria-expanded={showComments}
             >
               <MessageCircle className="h-4 w-4 group-hover:text-blue-500" />
               <span className="text-sm group-hover:text-blue-500">
@@ -226,6 +267,8 @@ export const PostCard = ({
               size="sm" 
               className={`flex items-center gap-1 group px-2 ${isLiked ? 'text-red-500' : ''}`}
               onClick={handleLike}
+              aria-label={isLiked ? `Unlike (${likeCount} likes)` : `Like (${likeCount} likes)`}
+              aria-pressed={!!isLiked}
             >
               <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''} group-hover:text-red-500`} />
               {(!isLiked && likeCount > 0) && (

@@ -1,9 +1,8 @@
-import { AlertTriangle, Lightbulb, Minus, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
+import { AlertTriangle, HelpCircle, PieChart, RefreshCw } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { usePortfolioAISummary } from "@/api/portfolio/usePortfolioAISummary";
 import { StockyLogo } from "@/components/brand/StockyLogo";
 import { useTypewriterRotation } from "@/hooks/useTypewriterRotation";
-import { cn } from "@/lib/utils";
 
 interface AISummaryContentProps {
   portfolioId: string;
@@ -37,28 +36,6 @@ function AISummaryLoading() {
   );
 }
 
-const SENTIMENT_META = {
-  bullish: { label: "Bullish", tone: "success" as const, Icon: TrendingUp },
-  bearish: { label: "Bearish", tone: "danger" as const, Icon: TrendingDown },
-  neutral: { label: "Neutral", tone: "muted" as const, Icon: Minus },
-};
-
-function getSentimentMeta(sentiment: string) {
-  const s = sentiment.toLowerCase();
-  if (s.includes("bull")) return SENTIMENT_META.bullish;
-  if (s.includes("bear")) return SENTIMENT_META.bearish;
-  return {
-    ...SENTIMENT_META.neutral,
-    label: sentiment ? sentiment[0].toUpperCase() + sentiment.slice(1) : "Neutral",
-  };
-}
-
-const toneClasses = {
-  success: { chip: "bg-success-light text-success", text: "text-success" },
-  danger: { chip: "bg-danger-light text-danger", text: "text-danger" },
-  muted: { chip: "bg-muted text-muted-foreground", text: "text-muted-foreground" },
-};
-
 export const AISummaryContent = ({ portfolioId, open }: AISummaryContentProps) => {
   const { data, isLoading, error, refetch, isFetching } = usePortfolioAISummary(portfolioId, open);
 
@@ -88,29 +65,32 @@ export const AISummaryContent = ({ portfolioId, open }: AISummaryContentProps) =
     return <div className="py-16 text-center text-sm text-muted-foreground">No summary available.</div>;
   }
 
-  const { sentiment, justification, risks, recommendations, assumptions } = result;
-  const meta = getSentimentMeta(sentiment);
-  const tone = toneClasses[meta.tone];
+  // Responses cached from the previous summarizer version lack these fields.
+  const overview = result.overview ?? "";
+  const risks = result.risks ?? [];
+  const considerations = result.considerations ?? [];
+  const assumptions = result.assumptions ?? [];
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 px-6 pb-6">
-      {/* Verdict */}
+      {/* Overview */}
       <div className="flex items-start gap-4 rounded-3xl border border-border bg-card p-5">
-        <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl", tone.chip)}>
-          <meta.Icon className="h-5 w-5" />
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+          <PieChart className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className={cn("text-lg font-bold tracking-tight", tone.text)}>{meta.label}</p>
+            <h3 className="text-lg font-bold tracking-tight">Overview</h3>
             <button
               onClick={() => refetch()}
-              className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+              className="shrink-0 rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               title="Regenerate"
+              aria-label="Regenerate summary"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{justification}</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{overview}</p>
         </div>
       </div>
 
@@ -118,7 +98,7 @@ export const AISummaryContent = ({ portfolioId, open }: AISummaryContentProps) =
       {risks.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold tracking-tight">Risks to watch</h3>
+            <h3 className="text-sm font-semibold tracking-tight">Risk exposures</h3>
             <span className="rounded-full bg-danger-light px-2 py-0.5 text-xs font-semibold text-danger">
               {risks.length}
             </span>
@@ -127,7 +107,7 @@ export const AISummaryContent = ({ portfolioId, open }: AISummaryContentProps) =
             {risks.map((risk, idx) => (
               <div key={idx} className="flex gap-3 rounded-2xl border border-border bg-card/50 p-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-danger-light">
-                  <AlertTriangle className="h-4 w-4 text-danger" />
+                  <AlertTriangle className="h-4 w-4 text-danger" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold">{risk.title}</p>
@@ -139,24 +119,24 @@ export const AISummaryContent = ({ portfolioId, open }: AISummaryContentProps) =
         </div>
       )}
 
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
+      {/* Questions to review: neutral prompts, never instructions to trade */}
+      {considerations.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold tracking-tight">Worth considering</h3>
+            <h3 className="text-sm font-semibold tracking-tight">Questions to review</h3>
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-              {recommendations.length}
+              {considerations.length}
             </span>
           </div>
           <div className="space-y-2">
-            {recommendations.map((rec, idx) => (
+            {considerations.map((item, idx) => (
               <div key={idx} className="flex gap-3 rounded-2xl border border-border bg-card/50 p-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                  <Lightbulb className="h-4 w-4 text-primary" />
+                  <HelpCircle className="h-4 w-4 text-primary" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold">{rec.title}</p>
-                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{rec.action}</p>
+                  <p className="text-sm font-semibold">{item.title}</p>
+                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{item.detail}</p>
                 </div>
               </div>
             ))}
@@ -180,6 +160,10 @@ export const AISummaryContent = ({ portfolioId, open }: AISummaryContentProps) =
           </ul>
         </details>
       )}
+
+      <p className="text-center text-xs text-muted-foreground">
+        AI-generated from your holdings. Information only, not investment advice.
+      </p>
     </div>
   );
 };

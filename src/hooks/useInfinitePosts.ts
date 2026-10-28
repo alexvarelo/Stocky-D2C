@@ -1,23 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Post, PostType, User } from '@/types/social';
-
-// Define the raw post type returned by the RPC
-interface RawPost {
-  id: string;
-  user_id: string;
-  portfolio_id: string | null;
-  content: string;
-  post_type: PostType;
-  is_public: boolean;
-  created_at: string;
-  updated_at: string;
-  user_name: string;
-  user_avatar_url: string | null;
-  likes_count: number;
-  comments_count: number;
-  is_liked: boolean;
-}
+import { Post, PostType } from '@/types/social';
 
 interface UseInfinitePostsOptions {
   pageSize?: number;
@@ -55,18 +38,17 @@ const fetchPosts = async ({
 }): Promise<PageData> => {
   const offset = (pageParam - 1) * pageSize;
   
-  // Use type assertion to bypass the RPC function name type check
-  const { data, error, count } = await (supabase.rpc as any)('get_posts_with_details', {
+  const { data, error, count } = await supabase.rpc('get_posts_with_details', {
     p_is_public: restOptions.isPublic ?? true,
     p_limit: pageSize,
     p_offset: offset,
     p_only_following: restOptions.onlyFollowing ?? false,
-    p_portfolio_id: restOptions.portfolioId || null,
-    p_post_type: restOptions.postType || null,
-    p_user_id: restOptions.userId || null,
-    p_author_id: restOptions.authorId || null,
-    p_ticker: restOptions.tickerId || null,
-    p_exclude_user: restOptions.excludeUserId || null,
+    p_portfolio_id: restOptions.portfolioId || undefined,
+    p_post_type: restOptions.postType || undefined,
+    p_user_id: restOptions.userId || undefined,
+    p_author_id: restOptions.authorId || undefined,
+    p_ticker: restOptions.tickerId || undefined,
+    p_exclude_user: restOptions.excludeUserId || undefined,
   });
 
   if (error) {
@@ -79,7 +61,7 @@ const fetchPosts = async ({
     user_id: rawPost.user_id,
     portfolio_id: rawPost.portfolio_id || undefined,
     content: rawPost.content,
-    post_type: rawPost.post_type,
+    post_type: rawPost.post_type as PostType,
     is_public: rawPost.is_public,
     created_at: rawPost.created_at,
     updated_at: rawPost.updated_at,
@@ -89,9 +71,11 @@ const fetchPosts = async ({
       avatar_url: rawPost.avatar_url || undefined,
     },
     likes_count: rawPost.like_count,
-    comments_count: rawPost.comments_count,
+    // The RPC returns comment_count; reading comments_count left every count undefined.
+    comments_count: rawPost.comment_count,
     has_liked: rawPost.is_liked_by_me,
-    ticker: rawPost.ticker
+    ticker: rawPost.ticker,
+    is_ai_generated: rawPost.is_ai_generated ?? false,
   }));
 
   return {

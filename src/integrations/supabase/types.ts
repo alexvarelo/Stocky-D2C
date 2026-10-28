@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "12.2.12"
   }
   public: {
     Tables: {
@@ -178,6 +178,7 @@ export type Database = {
           content: Json
           created_at: string | null
           id: string
+          is_ai_generated: boolean
           is_premium: boolean | null
           metadata: Json | null
           slug: string
@@ -195,6 +196,7 @@ export type Database = {
           content: Json
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_premium?: boolean | null
           metadata?: Json | null
           slug: string
@@ -212,6 +214,7 @@ export type Database = {
           content?: Json
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_premium?: boolean | null
           metadata?: Json | null
           slug?: string
@@ -295,10 +298,55 @@ export type Database = {
           },
         ]
       }
+      content_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          status: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          status?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          status?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       holdings: {
         Row: {
           average_price: number
           created_at: string | null
+          currency: string
           id: string
           notes: string | null
           portfolio_id: string
@@ -310,6 +358,7 @@ export type Database = {
         Insert: {
           average_price: number
           created_at?: string | null
+          currency?: string
           id?: string
           notes?: string | null
           portfolio_id: string
@@ -321,6 +370,7 @@ export type Database = {
         Update: {
           average_price?: number
           created_at?: string | null
+          currency?: string
           id?: string
           notes?: string | null
           portfolio_id?: string
@@ -456,18 +506,21 @@ export type Database = {
       }
       portfolio_values: {
         Row: {
+          currency: string
           portfolio_id: string
           total_return_percentage: number | null
           total_value: number
           updated_at: string | null
         }
         Insert: {
+          currency?: string
           portfolio_id: string
           total_return_percentage?: number | null
           total_value: number
           updated_at?: string | null
         }
         Update: {
+          currency?: string
           portfolio_id?: string
           total_return_percentage?: number | null
           total_value?: number
@@ -617,6 +670,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          is_ai_generated: boolean
           is_public: boolean | null
           portfolio_id: string | null
           post_type: string | null
@@ -628,6 +682,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_public?: boolean | null
           portfolio_id?: string | null
           post_type?: string | null
@@ -639,6 +694,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          is_ai_generated?: boolean
           is_public?: boolean | null
           portfolio_id?: string | null
           post_type?: string | null
@@ -684,6 +740,7 @@ export type Database = {
       transactions: {
         Row: {
           created_at: string | null
+          currency: string
           fees: number | null
           holding_id: string | null
           id: string
@@ -699,6 +756,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          currency?: string
           fees?: number | null
           holding_id?: string | null
           id?: string
@@ -714,6 +772,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          currency?: string
           fees?: number | null
           holding_id?: string | null
           id?: string
@@ -831,6 +890,8 @@ export type Database = {
           id: string
           is_public: boolean | null
           is_verified: boolean | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string | null
           username: string
           website: string | null
@@ -844,6 +905,8 @@ export type Database = {
           id: string
           is_public?: boolean | null
           is_verified?: boolean | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string | null
           username: string
           website?: string | null
@@ -857,6 +920,8 @@ export type Database = {
           id?: string
           is_public?: boolean | null
           is_verified?: boolean | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string | null
           username?: string
           website?: string | null
@@ -954,19 +1019,34 @@ export type Database = {
         Args: { p_post_id: string; p_user_id: string }
         Returns: Json
       }
-      add_transaction: {
-        Args: {
-          fees_param?: number
-          notes_param?: string
-          portfolio_uuid: string
-          price_per_share_param: number
-          quantity_param: number
-          ticker_param: string
-          transaction_date_param: string
-          transaction_type_param: string
-        }
-        Returns: string
-      }
+      add_transaction:
+        | {
+            Args: {
+              fees_param?: number
+              notes_param?: string
+              portfolio_uuid: string
+              price_per_share_param: number
+              quantity_param: number
+              ticker_param: string
+              transaction_date_param: string
+              transaction_type_param: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              currency_param?: string
+              fees_param?: number
+              notes_param?: string
+              portfolio_uuid: string
+              price_per_share_param: number
+              quantity_param: number
+              ticker_param: string
+              transaction_date_param: string
+              transaction_type_param: string
+            }
+            Returns: string
+          }
       calculate_portfolio_value: {
         Args: { portfolio_uuid: string }
         Returns: number
@@ -1043,6 +1123,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_ai_generated: boolean
           is_liked_by_me: boolean
           is_public: boolean
           like_count: number
@@ -1073,12 +1154,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1102,11 +1183,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1127,11 +1208,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1152,11 +1233,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1169,11 +1250,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

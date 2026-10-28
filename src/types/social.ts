@@ -31,6 +31,7 @@ export interface Post {
   comments_count: number;
   has_liked: boolean;
   portfolio?: PortfolioData;
+  is_ai_generated?: boolean;
 }
 
 export interface Comment {

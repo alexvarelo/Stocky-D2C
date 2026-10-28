@@ -137,7 +137,6 @@ export function InstrumentPage() {
     );
   };
 
-  // The StockyChatDrawer is always rendered but controlled by isChatOpen
   return (
     <div className="space-y-6">
       {/* Header Section */}
