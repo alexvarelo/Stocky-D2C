@@ -34,7 +34,6 @@ const UserProfile = lazy(() => import("./pages/UserProfile"));
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const SettingsPage = lazy(() => import("./pages/Settings"));
 const DiscoverPage = lazy(() => import("./pages/Discover"));
-const MarketResearchPage = lazy(() => import("./pages/MarketResearch"));
 const ArticlePage = lazy(() => import("./pages/ArticlePage").then((m) => ({ default: m.ArticlePage })));
 const LegalPage = lazy(() => import("./pages/legal/LegalPage").then((m) => ({ default: m.LegalPage })));
 
@@ -178,7 +177,8 @@ const App = () => (
                     <Route path="/user/:userId" element={<UserProfile />} />
                     <Route path="/accounts/edit" element={<EditProfilePage />} />
                     <Route path="/discover" element={<DiscoverPage />} />
-                    <Route path="/market-research" element={<MarketResearchPage />} />
+                    {/* Old links to the removed Market Research page land on Discovery. */}
+                    <Route path="/market-research" element={<Navigate to="/discover" replace />} />
                     <Route path="/instrument/:ticker" element={<InstrumentPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                   </Route>

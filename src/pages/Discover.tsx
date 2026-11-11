@@ -1,281 +1,77 @@
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Loader2,
-  Search,
-  UserPlus,
-  UserCheck,
-  Users,
-} from "lucide-react";
-import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { lazy, Suspense } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { PortfolioLeaderboard } from "@/components/discover/PortfolioLeaderboard";
+import { cn } from "@/lib/utils";
+import { WorldMarkets } from "@/components/discover/world/WorldMarkets";
 
-type UserProfile = {
-  id: string;
-  username: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  bio: string | null;
-  created_at: string;
-  updated_at: string | null;
-  email: string | null;
-};
+// The community tab pulls in the leaderboard and its tables; load it on demand.
+const CommunityTab = lazy(() =>
+  import("@/components/discover/CommunityTab").then((m) => ({ default: m.CommunityTab }))
+);
+
+const TABS = [
+  { id: "markets", label: "Markets" },
+  { id: "community", label: "Community" },
+] as const;
 
 export default function DiscoverPage() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [followingMap, setFollowingMap] = useState<Record<string, boolean>>({});
-
-  // Debounce search input
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
-
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [searchQuery]);
-
-  // Fetch all users except the current user
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ["discover-users", debouncedSearchQuery],
-    queryFn: async () => {
-      if (!user?.id) return [];
-
-      // Get all users except the current one
-      let query = supabase.from("users").select("*").neq("id", user.id);
-
-      if (debouncedSearchQuery.trim()) {
-        const search = debouncedSearchQuery.toLowerCase();
-        query = query.or(
-          `username.ilike.%${search}%,full_name.ilike.%${search}%`
-        );
-      }
-
-      const { data: usersData, error } = await query;
-      if (error) throw error;
-
-      return (usersData || []) as UserProfile[];
-    },
-    enabled: !!user?.id,
-  });
-
-  // Fetch following status for the current user
-  useEffect(() => {
-    const fetchFollowingStatus = async () => {
-      if (!user?.id) return;
-
-      try {
-        const { data: followingData, error } = await supabase
-          .from("user_follows")
-          .select("following_id")
-          .eq("follower_id", user.id);
-
-        if (error) throw error;
-
-        const newFollowingMap = (followingData || []).reduce<
-          Record<string, boolean>
-        >(
-          (acc, { following_id }) => ({
-            ...acc,
-            [following_id]: true,
-          }),
-          {}
-        );
-
-        setFollowingMap(newFollowingMap);
-      } catch (error) {
-        console.error("Error fetching following status:", error);
-      }
-    };
-
-    fetchFollowingStatus();
-  }, [user?.id, users]);
-
-  const handleFollowToggle = async (userId: string, isFollowing: boolean) => {
-    if (!user?.id) return;
-
-    try {
-      if (isFollowing) {
-        // Unfollow
-        const { error } = await supabase
-          .from("user_follows")
-          .delete()
-          .eq("follower_id", user.id)
-          .eq("following_id", userId);
-
-        if (error) throw error;
-
-        // Update local state optimistically
-        setFollowingMap((prev) => ({
-          ...prev,
-          [userId]: false,
-        }));
-
-        toast.success("Successfully unfollowed user");
-      } else {
-        // Follow
-        const { error } = await supabase.from("user_follows").insert([
-          {
-            follower_id: user.id,
-            following_id: userId,
-          },
-        ]);
-
-        if (error) throw error;
-
-        // Update local state optimistically
-        setFollowingMap((prev) => ({
-          ...prev,
-          [userId]: true,
-        }));
-
-        toast.success("Successfully followed user");
-      }
-
-      // Invalidate and refetch
-      await queryClient.invalidateQueries({ queryKey: ["discover-users"] });
-    } catch (error) {
-      console.error("Error updating follow status:", error);
-      toast.error("Failed to update follow status");
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") === "community" ? "community" : "markets";
 
   return (
     <motion.div
-      className="py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full"
+      className="mx-auto w-full max-w-[1280px] pb-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="space-y-6">
-        {/* Portfolio Leaderboard Section */}
-        <section className="mb-12">
-          <PortfolioLeaderboard />
-        </section>
-
-        {/* Divider */}
-        <div className="border-t my-8" />
-
-        {/* User Discovery Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">Discover Investors</h2>
-          <p className="text-muted-foreground">
-            Find and connect with other investors in the community
-          </p>
-        </div>
-
-        <div className="max-w-md">
-          <form onSubmit={(e) => e.preventDefault()} className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search by name or username..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {users.map((userProfile) => (
-            <Card
-              key={userProfile.id}
-              className="overflow-hidden hover:shadow-md transition-shadow"
+      <div role="tablist" aria-label="Discovery" className="mb-4 inline-flex gap-1 rounded-full bg-secondary p-1">
+        {TABS.map((t) => {
+          const active = t.id === tab;
+          return (
+            <button
+              key={t.id}
+              role="tab"
+              type="button"
+              id={`discover-tab-${t.id}`}
+              aria-selected={active}
+              aria-controls="discover-panel"
+              onClick={() => setParams(t.id === "markets" ? {} : { tab: t.id }, { replace: true })}
+              className={cn(
+                "relative h-11 rounded-full px-5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:h-9",
+                active ? "text-background" : "text-muted-foreground hover:text-foreground"
+              )}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <Link
-                    to={`/user/${userProfile.id}`}
-                    className="flex-shrink-0"
-                  >
-                    <Avatar className="h-12 w-12 hover:opacity-90 transition-opacity">
-                      <AvatarImage
-                        src={userProfile.avatar_url || ""}
-                        alt={userProfile.full_name || "User"}
-                      />
-                      <AvatarFallback>
-                        {userProfile.full_name
-                          ? userProfile.full_name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                          : "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <Link
-                    to={`/user/${userProfile.id}`}
-                    className="flex-1 min-w-0 hover:opacity-90 transition-opacity"
-                  >
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold truncate hover:underline">
-                        {userProfile.full_name || "User"}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      @{userProfile.username || "user"}
-                    </p>
-                    {userProfile.bio && (
-                      <p className="text-sm mt-1 text-muted-foreground line-clamp-2">
-                        {userProfile.bio}
-                      </p>
-                    )}
-                  </Link>
-                  <Button
-                    variant={
-                      followingMap[userProfile.id] ? "outline" : "default"
-                    }
-                    size="sm"
-                    className="ml-auto"
-                    onClick={() =>
-                      handleFollowToggle(
-                        userProfile.id,
-                        !!followingMap[userProfile.id]
-                      )
-                    }
-                  >
-                    {followingMap[userProfile.id] ? (
-                      <UserCheck className="h-4 w-4 mr-2" />
-                    ) : (
-                      <UserPlus className="h-4 w-4 mr-2" />
-                    )}
-                    {followingMap[userProfile.id] ? "Following" : "Follow"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              {active && (
+                <motion.span
+                  layoutId="discover-tab-pill"
+                  className="absolute inset-0 rounded-full bg-foreground"
+                  transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                />
+              )}
+              <span className="relative">{t.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
-        {users.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              {searchQuery
-                ? "No users found matching your search."
-                : "No public users found."}
-            </p>
-          </div>
+      <div id="discover-panel" role="tabpanel" aria-labelledby={`discover-tab-${tab}`}>
+        {tab === "markets" ? (
+          <WorldMarkets />
+        ) : (
+          <Suspense
+            fallback={
+              <div role="status" className="flex min-h-[40vh] items-center justify-center">
+                <span className="sr-only">Loading</span>
+                <span
+                  aria-hidden="true"
+                  className="h-6 w-6 animate-spin rounded-full border-2 border-muted border-t-foreground"
+                />
+              </div>
+            }
+          >
+            <CommunityTab />
+          </Suspense>
         )}
       </div>
     </motion.div>

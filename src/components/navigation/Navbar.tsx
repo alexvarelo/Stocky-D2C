@@ -17,7 +17,6 @@ import {
   LayoutDashboard,
   Briefcase,
   Star,
-  LineChart,
   Compass,
   PanelLeftClose,
   PanelLeftOpen,
@@ -29,7 +28,6 @@ const NAV_LINKS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/portfolios', label: 'Portfolios', icon: Briefcase },
   { href: '/watchlists', label: 'Watchlists', icon: Star },
-  { href: '/market-research', label: 'Market Research', icon: LineChart },
   { href: '/discover', label: 'Discovery', icon: Compass },
 ];
 

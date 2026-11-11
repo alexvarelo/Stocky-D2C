@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Briefcase, Eye, Compass, TrendingUp } from 'lucide-react';
+import { Home, Briefcase, Eye, Compass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -13,7 +13,6 @@ const navItems: NavItem[] = [
     { label: 'Portfolios', icon: Briefcase, path: '/portfolios' },
     { label: 'Watchlists', icon: Eye, path: '/watchlists' },
     { label: 'Discovery', icon: Compass, path: '/discover' },
-    { label: 'Research', icon: TrendingUp, path: '/market-research' },
 ];
 
 export function BottomNav() {

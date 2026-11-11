@@ -1,385 +1,362 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Loader2, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useTopPortfolios } from '@/api/portfolio/useTopPortfolios';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { CompanyLogo } from '@/components/stock/CompanyLogo';
-
-const getTrophyIcon = (rank: number) => {
-    switch (rank) {
-        case 1:
-            return <Trophy className="h-5 w-5 text-yellow-500 fill-yellow-500" />;
-        case 2:
-            return <Trophy className="h-5 w-5 text-gray-400 fill-gray-400" />;
-        case 3:
-            return <Trophy className="h-5 w-5 text-orange-400 fill-orange-400" />;
-        default:
-            return <span className="text-muted-foreground font-medium">#{rank}</span>;
-    }
-};
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTopPortfolios, type TopPortfolio } from "@/api/portfolio/useTopPortfolios";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { cn } from "@/lib/utils";
 
 const ITEMS_PER_PAGE = 10;
 
-export const PortfolioLeaderboard: React.FC = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const { data, isLoading, error } = useTopPortfolios({
-        page: currentPage,
-        limit: ITEMS_PER_PAGE,
-    });
+const SORTS = [
+  { id: "total_return_percentage", label: "Best return" },
+  { id: "total_value", label: "Largest" },
+  { id: "holdings_count", label: "Most holdings" },
+  { id: "created_at", label: "Newest" },
+] as const;
+type SortId = (typeof SORTS)[number]["id"];
 
-    const portfolios = data?.portfolios || [];
-    const totalCount = data?.totalCount || 0;
+const UP = "hsl(var(--success))";
+const DOWN = "hsl(var(--danger))";
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
-    }
+const formatReturn = (value: number) => `${value > 0 ? "+" : value < 0 ? "−" : ""}${Math.abs(value).toFixed(2)}%`;
+const formatValue = (value: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+const initial = (p: TopPortfolio) => (p.user.full_name || p.user.username || "U")[0]?.toUpperCase();
+const authorName = (p: TopPortfolio) => p.user.full_name || p.user.username;
 
-    if (error) {
-        return (
-            <div className="text-center py-12">
-                <p className="text-red-500">Failed to load leaderboard</p>
-            </div>
-        );
-    }
+export function PortfolioLeaderboard() {
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<SortId>("total_return_percentage");
+  const reducedMotion = useReducedMotion();
 
-    if (!portfolios || portfolios.length === 0) {
-        return (
-            <div className="text-center py-12">
-                <Trophy className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No portfolios to display yet</p>
-            </div>
-        );
-    }
+  const { data, isLoading, error, isPlaceholderData } = useTopPortfolios({
+    page,
+    limit: ITEMS_PER_PAGE,
+    sortBy: sort,
+    sortOrder: "desc",
+  });
 
-    // Pagination logic
-    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+  const portfolios = data?.portfolios ?? [];
+  const totalCount = data?.totalCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
 
-    return (
-        <div className="relative min-h-screen">
-            {/* Page-wide Animated Background Blur */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                {/* Light Blue Gradient Orbs */}
-                <motion.div
-                    className="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-gradient-to-br from-blue-400/20 to-cyan-400/20 blur-3xl"
-                    animate={{
-                        x: [0, 50, 0],
-                        y: [0, 30, 0],
-                        scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
-                <motion.div
-                    className="absolute bottom-0 left-1/4 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-400/20 to-blue-400/20 blur-3xl"
-                    animate={{
-                        x: [0, -50, 0],
-                        y: [0, -30, 0],
-                        scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                        duration: 25,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: 2,
-                    }}
-                />
-                <motion.div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-sky-400/15 to-blue-500/15 blur-3xl"
-                    animate={{
-                        scale: [1, 1.15, 1],
-                        rotate: [0, 90, 0],
-                    }}
-                    transition={{
-                        duration: 30,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
-            </div>
+  // The first page opens with a podium; the rest of the list follows below it.
+  const podium = page === 1 ? portfolios.slice(0, 3) : [];
+  const rows = page === 1 ? portfolios.slice(3) : portfolios;
+  const maxReturn = Math.max(1, ...portfolios.map((p) => Math.abs(p.total_return_percentage)));
 
-            {/* Content */}
-            <div className="relative z-10 space-y-12 max-w-7xl mx-auto px-4 py-8">
-                {/* Hero Content - Two Columns */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-                    {/* Left: Text Content */}
-                    <div className="space-y-6 text-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                        >
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4">
-                                Top <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">portfolios</span>
-                            </h1>
-                            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                                Discover the best performing portfolios from our community. Follow their strategies and learn from the best.
-                            </p>
-                        </motion.div>
-                    </div>
-                    {/* Right: Featured Top Portfolio Card */}
-                    {portfolios.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                        >
-                            <Link to={`/portfolio/${portfolios[0].id}`}>
-                                <Card className="relative overflow-hidden hover:shadow-2xl transition-all duration-300 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-2 border-slate-200 dark:border-slate-700 max-w-sm mx-auto">
-                                    {/* Trophy Badge */}
-                                    <div className="absolute top-3 right-3 bg-gradient-to-br from-yellow-400 to-yellow-600 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg z-10">
-                                        <Trophy className="h-3 w-3 fill-white" />
-                                        #1
-                                    </div>
-
-                                    <CardContent className="p-5 pt-6 space-y-3">
-                                        {/* Large Centered Profile Image */}
-                                        <div className="flex flex-col items-center text-center space-y-2">
-                                            <Avatar className="h-20 w-20 border-4 border-slate-200 dark:border-slate-700 shadow-xl">
-                                                <AvatarImage src={portfolios[0].user.avatar_url || ''} />
-                                                <AvatarFallback className="text-2xl font-bold">
-                                                    {portfolios[0].user.full_name?.[0] || 'U'}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <p className="text-lg font-bold text-slate-900 dark:text-slate-50 leading-tight">
-                                                    {portfolios[0].user.full_name || portfolios[0].user.username}
-                                                </p>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    @{portfolios[0].user.username}
-                                                </p>
-                                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mt-1.5 italic">
-                                                    "{portfolios[0].name}"
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Portfolio Value - Centered */}
-                                        <div className="text-center space-y-1 py-2">
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                Portfolio Valuation
-                                            </p>
-                                            <p className="text-3xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
-                                                ${portfolios[0].total_value.toLocaleString()}
-                                            </p>
-                                            <div className="flex items-center justify-center gap-1 pt-0.5">
-                                                <TrendingUp className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
-                                                <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                                                    +{portfolios[0].total_return_percentage.toFixed(2)}%
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Top Holding */}
-                                        <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 text-center uppercase tracking-wider">
-                                                Top Holding ({portfolios[0].top_holding_allocation ? `${portfolios[0].top_holding_allocation.toFixed(0)}%` : '0%'})
-                                            </p>
-                                            <div className="flex items-center justify-center gap-2">
-                                                <CompanyLogo
-                                                    ticker={portfolios[0].top_holding_ticker || ''}
-                                                    size={32}
-                                                    className="shadow-md"
-                                                />
-                                                <div className="text-left">
-                                                    <p className="font-bold text-sm text-slate-900 dark:text-slate-50 leading-none">
-                                                        {portfolios[0].top_holding_ticker || 'No holdings'}
-                                                    </p>
-                                                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                                        {portfolios[0].holdings_count} {portfolios[0].holdings_count === 1 ? 'holding' : 'holdings'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        </motion.div>
-                    )}
-                </div>
-
-                {/* Full Rankings Section */}
-                <div className="space-y-6">
-
-                    {/* Table */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="rounded-xl border bg-white/80 dark:bg-slate-900/80 backdrop-blur-md overflow-hidden shadow-lg max-w-6xl mx-auto"
-                    >
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[60px]">Rank</TableHead>
-                                    <TableHead className="hidden sm:table-cell">Author</TableHead>
-                                    <TableHead>Portfolio</TableHead>
-                                    <TableHead className="hidden lg:table-cell">Description</TableHead>
-                                    <TableHead className="hidden md:table-cell text-right">Holdings</TableHead>
-                                    <TableHead className="hidden sm:table-cell text-right">Valuation</TableHead>
-                                    <TableHead className="text-right">Performance</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {portfolios.map((portfolio, index) => {
-                                    const rank = startIndex + index + 1;
-                                    const isPositive = portfolio.total_return_percentage >= 0;
-
-                                    return (
-                                        <motion.tr
-                                            key={portfolio.id}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.05 }}
-                                            className="group hover:bg-muted/50 transition-colors"
-                                        >
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center justify-center">
-                                                    {getTrophyIcon(rank)}
-                                                </div>
-                                            </TableCell>
-
-                                            <TableCell className="hidden sm:table-cell">
-                                                <Link
-                                                    to={`/user/${portfolio.user_id}`}
-                                                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                                                >
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarImage src={portfolio.user.avatar_url || ''} />
-                                                        <AvatarFallback className="text-xs">
-                                                            {portfolio.user.full_name?.[0] || 'U'}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-medium">
-                                                            {portfolio.user.full_name || portfolio.user.username}
-                                                        </span>
-                                                        <span className="text-xs text-muted-foreground">
-                                                            @{portfolio.user.username}
-                                                        </span>
-                                                    </div>
-                                                </Link>
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <Link
-                                                    to={`/portfolio/${portfolio.id}`}
-                                                    className="hover:underline"
-                                                >
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">{portfolio.name}</span>
-                                                        {/* Show author on mobile only */}
-                                                        <span className="text-xs text-muted-foreground sm:hidden">
-                                                            @{portfolio.user.username}
-                                                        </span>
-                                                    </div>
-                                                </Link>
-                                            </TableCell>
-
-                                            <TableCell className="hidden lg:table-cell max-w-xs">
-                                                <p className="text-sm text-muted-foreground truncate">
-                                                    {portfolio.description || '—'}
-                                                </p>
-                                            </TableCell>
-
-                                            <TableCell className="hidden md:table-cell text-right">
-                                                <span className="text-sm font-medium">
-                                                    {portfolio.holdings_count}
-                                                </span>
-                                            </TableCell>
-
-                                            <TableCell className="hidden sm:table-cell text-right font-medium">
-                                                ${portfolio.total_value.toLocaleString()}
-                                            </TableCell>
-
-                                            <TableCell className="text-right">
-                                                <div
-                                                    className={cn(
-                                                        'flex items-center justify-end gap-1 font-bold',
-                                                        isPositive
-                                                            ? 'text-green-600 dark:text-green-400'
-                                                            : 'text-red-600 dark:text-red-400'
-                                                    )}
-                                                >
-                                                    {isPositive ? (
-                                                        <TrendingUp className="h-4 w-4" />
-                                                    ) : (
-                                                        <TrendingDown className="h-4 w-4" />
-                                                    )}
-                                                    <span className="hidden sm:inline">{isPositive ? '+' : ''}</span>
-                                                    {portfolio.total_return_percentage.toFixed(2)}%
-                                                </div>
-                                            </TableCell>
-                                        </motion.tr>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </motion.div>
-
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">
-                                Showing {startIndex + 1} to {Math.min(endIndex, totalCount)} of {totalCount} portfolios
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                    disabled={currentPage === 1}
-                                >
-                                    <ChevronLeft className="h-4 w-4 mr-1" />
-                                    Previous
-                                </Button>
-                                <div className="flex items-center gap-1">
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                        <Button
-                                            key={page}
-                                            variant={currentPage === page ? 'default' : 'outline'}
-                                            size="sm"
-                                            onClick={() => setCurrentPage(page)}
-                                            className="w-8 h-8 p-0"
-                                        >
-                                            {page}
-                                        </Button>
-                                    ))}
-                                </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                    disabled={currentPage === totalPages}
-                                >
-                                    Next
-                                    <ChevronRight className="h-4 w-4 ml-1" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
+  return (
+    <section aria-labelledby="leaderboard-title">
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="max-w-2xl">
+          <h1
+            id="leaderboard-title"
+            className="text-[40px] font-medium leading-none tracking-[-0.03em] sm:text-[56px]"
+          >
+            Portfolios people share
+          </h1>
+          <p className="mt-4 text-base text-muted-foreground md:text-lg">
+            Public portfolios from the community, ranked. Open one to see what it holds and how it got there.
+          </p>
         </div>
-    );
-};
+
+        <div role="group" aria-label="Rank by" className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+          {SORTS.map((s) => {
+            const active = s.id === sort;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  setSort(s.id);
+                  setPage(1);
+                }}
+                className={cn(
+                  "h-11 shrink-0 rounded-full px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:h-9",
+                  active ? "bg-foreground text-background" : "bg-secondary text-foreground hover:bg-secondary/70"
+                )}
+              >
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={cn("mt-8 transition-opacity", isPlaceholderData && "opacity-60")} aria-busy={isLoading}>
+        {isLoading ? (
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-3">
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-[300px] rounded-[20px]" />
+              ))}
+            </div>
+            <Skeleton className="h-[360px] rounded-[20px]" />
+          </div>
+        ) : error ? (
+          <p className="rounded-[20px] border border-border bg-card p-8 text-center text-muted-foreground">
+            The leaderboard couldn't be loaded. Refresh the page to try again.
+          </p>
+        ) : portfolios.length === 0 ? (
+          <p className="rounded-[20px] border border-border bg-card p-8 text-center text-muted-foreground">
+            No public portfolios yet. Make one of yours public to appear here.
+          </p>
+        ) : (
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`${sort}-${page}`}
+              initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
+            >
+              {podium.length > 0 && (
+                <ol className="grid gap-4 md:grid-cols-3">
+                  {podium.map((p, i) => (
+                    <PodiumCard key={p.id} portfolio={p} rank={i + 1} delay={i * 0.08} />
+                  ))}
+                </ol>
+              )}
+
+              {rows.length > 0 && (
+                <ol className="overflow-hidden rounded-[20px] border border-border bg-card">
+                  {rows.map((p, i) => (
+                    <RankRow
+                      key={p.id}
+                      portfolio={p}
+                      rank={startIndex + (page === 1 ? 3 : 0) + i + 1}
+                      share={Math.abs(p.total_return_percentage) / maxReturn}
+                      index={i}
+                    />
+                  ))}
+                </ol>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <nav aria-label="Leaderboard pages" className="mt-5 flex items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground tabular-nums">
+            {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, totalCount)} of {totalCount}
+          </p>
+          <div className="flex items-center gap-2">
+            <PageButton label="Previous page" disabled={page === 1} onClick={() => setPage((v) => Math.max(1, v - 1))}>
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            </PageButton>
+            <span className="min-w-16 text-center text-sm font-semibold tabular-nums">
+              {page} / {totalPages}
+            </span>
+            <PageButton
+              label="Next page"
+              disabled={page === totalPages}
+              onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </PageButton>
+          </div>
+        </nav>
+      )}
+    </section>
+  );
+}
+
+function PageButton({
+  label,
+  disabled,
+  onClick,
+  children,
+}: {
+  label: string;
+  disabled: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-foreground transition-colors hover:bg-secondary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
+    >
+      {children}
+    </button>
+  );
+}
+
+function PodiumCard({ portfolio: p, rank, delay }: { portfolio: TopPortfolio; rank: number; delay: number }) {
+  const reducedMotion = useReducedMotion();
+  // First place is the page's single cobalt surface; the others stay neutral.
+  const featured = rank === 1;
+  const positive = p.total_return_percentage >= 0;
+  const allocation = Math.min(100, Math.max(0, p.top_holding_allocation ?? 0));
+
+  return (
+    <motion.li
+      initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay }}
+    >
+      <Link
+        to={`/portfolio/${p.id}`}
+        className={cn(
+          "group flex h-full flex-col rounded-[20px] p-6 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:p-8",
+          featured
+            ? "bg-primary text-primary-foreground hover:bg-[#3a40c4]"
+            : "border border-border bg-card hover:border-foreground/40"
+        )}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <span
+            className={cn(
+              "text-[56px] font-medium leading-none tracking-[-0.03em] tabular-nums",
+              !featured && "text-muted-foreground"
+            )}
+            aria-label={`Rank ${rank}`}
+          >
+            {rank}
+          </span>
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={p.user.avatar_url || ""} alt="" />
+            <AvatarFallback className="text-base font-semibold text-foreground">{initial(p)}</AvatarFallback>
+          </Avatar>
+        </div>
+
+        <p className="mt-6 line-clamp-2 text-2xl font-medium leading-[1.2]">{p.name}</p>
+        <p className={cn("mt-1 truncate text-sm", featured ? "text-white/75" : "text-muted-foreground")}>
+          {authorName(p)} · @{p.user.username}
+        </p>
+
+        <div className="mt-6 flex items-end justify-between gap-4 tabular-nums">
+          <div>
+            <p
+              className="text-[32px] font-medium leading-none tracking-[-0.01em]"
+              style={featured ? undefined : { color: positive ? UP : DOWN }}
+            >
+              {formatReturn(p.total_return_percentage)}
+            </p>
+            <p className={cn("mt-1.5 text-[13px]", featured ? "text-white/75" : "text-muted-foreground")}>
+              total return
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-base font-semibold">{formatValue(p.total_value)}</p>
+            <p className={cn("mt-1 text-[13px]", featured ? "text-white/75" : "text-muted-foreground")}>
+              {p.holdings_count} {p.holdings_count === 1 ? "holding" : "holdings"}
+            </p>
+          </div>
+        </div>
+
+        {p.top_holding_ticker && (
+          <div className={cn("mt-auto pt-6")}>
+            <div
+              className={cn("flex items-center gap-3 border-t pt-5", featured ? "border-white/25" : "border-border")}
+            >
+              <CompanyLogo ticker={p.top_holding_ticker} size={32} />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="truncate">
+                    <span className={featured ? "text-white/75" : "text-muted-foreground"}>Largest holding </span>
+                    <span className="font-semibold">{p.top_holding_ticker}</span>
+                  </span>
+                  <span className="font-semibold tabular-nums">{allocation.toFixed(0)}%</span>
+                </div>
+                <div className={cn("mt-2 h-1.5 rounded-full", featured ? "bg-white/25" : "bg-foreground/15")}>
+                  <motion.div
+                    className={cn("h-full rounded-full", featured ? "bg-white" : "bg-foreground")}
+                    initial={reducedMotion ? false : { width: 0 }}
+                    animate={{ width: `${allocation}%` }}
+                    transition={{ duration: 0.8, delay: delay + 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Link>
+    </motion.li>
+  );
+}
+
+function RankRow({
+  portfolio: p,
+  rank,
+  share,
+  index,
+}: {
+  portfolio: TopPortfolio;
+  rank: number;
+  share: number;
+  index: number;
+}) {
+  const reducedMotion = useReducedMotion();
+  const positive = p.total_return_percentage >= 0;
+
+  return (
+    <li className="border-b border-border last:border-b-0">
+      <Link
+        to={`/portfolio/${p.id}`}
+        className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-4 px-5 py-4 transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring md:grid-cols-[2.5rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem_minmax(0,1fr)] md:px-8"
+      >
+        <span className="text-base font-semibold tabular-nums text-muted-foreground">{rank}</span>
+
+        <span className="flex min-w-0 items-center gap-3">
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarImage src={p.user.avatar_url || ""} alt="" />
+            <AvatarFallback className="text-sm font-semibold">{initial(p)}</AvatarFallback>
+          </Avatar>
+          <span className="min-w-0">
+            <span className="block truncate text-base font-semibold">{p.name}</span>
+            <span className="block truncate text-[13px] text-muted-foreground">
+              {authorName(p)} · @{p.user.username}
+            </span>
+          </span>
+        </span>
+
+        <span className="hidden min-w-0 items-center gap-2 text-sm text-muted-foreground md:flex">
+          {p.top_holding_ticker ? (
+            <>
+              <CompanyLogo ticker={p.top_holding_ticker} size={24} />
+              <span className="truncate">
+                <span className="font-semibold text-foreground">{p.top_holding_ticker}</span> · {p.holdings_count}{" "}
+                {p.holdings_count === 1 ? "holding" : "holdings"}
+              </span>
+            </>
+          ) : (
+            <span>No holdings yet</span>
+          )}
+        </span>
+
+        <span className="hidden text-right text-sm font-semibold tabular-nums md:block">
+          {formatValue(p.total_value)}
+        </span>
+
+        <span className="flex items-center justify-end gap-3">
+          <span className="hidden h-1.5 flex-1 rounded-full bg-foreground/10 md:block" aria-hidden="true">
+            <motion.span
+              className="block h-full rounded-full"
+              style={{ background: positive ? UP : DOWN }}
+              initial={reducedMotion ? false : { width: 0 }}
+              animate={{ width: `${Math.max(2, share * 100)}%` }}
+              transition={{ duration: 0.7, delay: 0.1 + index * 0.04, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </span>
+          <span
+            className="w-[5.5rem] shrink-0 text-right text-base font-semibold tabular-nums"
+            style={{ color: positive ? UP : DOWN }}
+          >
+            {formatReturn(p.total_return_percentage)}
+          </span>
+        </span>
+      </Link>
+    </li>
+  );
+}

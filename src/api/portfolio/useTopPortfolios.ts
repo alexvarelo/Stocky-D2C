@@ -46,12 +46,7 @@ export const useTopPortfolios = (options: UseTopPortfoliosOptions = {}) => {
                 p_public_only: true,
             });
 
-            if (error) {
-                console.error('Error fetching portfolio rankings:', error);
-                throw error;
-            }
-
-            console.log('Portfolio rankings data:', data);
+            if (error) throw error;
 
             if (!data || data.length === 0) {
                 return { portfolios: [], totalCount: 0 };
@@ -80,11 +75,10 @@ export const useTopPortfolios = (options: UseTopPortfoliosOptions = {}) => {
                 },
             }));
 
-            console.log('Transformed portfolios:', portfolios);
-            console.log('Total count:', totalCount);
-
             return { portfolios, totalCount };
         },
         staleTime: 1000 * 60 * 5, // 5 minutes
+        // Keep the current list on screen while the next page or sort loads.
+        placeholderData: (previous) => previous,
     });
 };
