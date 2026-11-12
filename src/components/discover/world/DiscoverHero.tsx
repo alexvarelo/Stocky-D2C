@@ -96,7 +96,7 @@ export function DiscoverHero({
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.05 }}
-          className="mt-5 max-w-[16ch] text-[40px] font-medium leading-none tracking-[-0.03em] sm:text-[56px] lg:text-[64px]"
+          className="mt-5 max-w-[16ch] text-[32px] font-bold leading-[1.05] tracking-tight sm:text-[40px] lg:text-[48px]"
         >
           The companies you know, on one planet
         </motion.h1>
@@ -206,7 +206,7 @@ export function DiscoverHero({
                 </div>
                 <div className="mt-4 flex items-end justify-between gap-3">
                   <div className="tabular-nums">
-                    <p className="text-2xl font-medium leading-none tracking-[-0.01em]">
+                    <p className="text-2xl font-bold leading-none tracking-tight">
                       {formatMoney(selected.price, selected.currency)}
                     </p>
                     <p className="mt-1.5 text-sm font-semibold" style={{ color: moveColor(selected.changePercent) }}>

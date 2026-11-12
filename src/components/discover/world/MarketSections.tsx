@@ -55,7 +55,7 @@ export function RegionTiles({ quotes, region, onRegionChange }: RegionTilesProps
             )}
           >
             <p className="text-sm text-muted-foreground">{tile.label}</p>
-            <p className="mt-2 text-[32px] font-medium leading-none tracking-[-0.01em] tabular-nums">
+            <p className="mt-2 text-[32px] font-bold leading-none tracking-tight tabular-nums">
               {formatPercent(tile.average)}
             </p>
             <p className="mt-1 text-[13px] text-muted-foreground">average move today</p>
@@ -294,7 +294,7 @@ export function HouseholdGrid({ quotes, region, isLoading }: HouseholdGridProps)
                   </div>
 
                   <div className="mt-5 flex items-baseline justify-between gap-3 tabular-nums">
-                    <span className="text-xl font-medium">
+                    <span className="text-xl font-semibold tracking-tight">
                       {isLoading && q.price === null ? "…" : formatMoney(q.price, q.currency)}
                     </span>
                     <span className="text-sm font-semibold" style={{ color: moveColor(q.changePercent) }}>

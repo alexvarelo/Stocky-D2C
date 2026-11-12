@@ -101,7 +101,7 @@ function PriceCard({ company }: { company: WorldQuote }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.18 }}
-                className="truncate text-2xl font-medium"
+                className="truncate text-2xl font-bold tracking-tight"
               >
                 {company.name}
               </motion.h2>
@@ -131,7 +131,7 @@ function PriceCard({ company }: { company: WorldQuote }) {
       </div>
 
       <div className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-1 tabular-nums">
-        <span className="text-[40px] font-medium leading-none tracking-[-0.02em]">
+        <span className="text-[40px] font-bold leading-none tracking-tight">
           {formatMoney(company.price, company.currency)}
         </span>
         <span className="text-base font-semibold" style={{ color: moveColor(company.changePercent) }}>
@@ -326,7 +326,7 @@ function StockyRead({ company }: { company: WorldQuote }) {
           >
             <StockyLogo variant="ink" size={36} />
           </motion.div>
-          <h2 className="text-xl font-medium">Stocky's read</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Stocky's read</h2>
         </div>
         <span className="rounded-full bg-primary px-3 py-1 text-[13px] text-primary-foreground">AI-generated</span>
       </div>
