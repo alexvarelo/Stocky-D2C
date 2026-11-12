@@ -16,10 +16,10 @@ function SectionHeading({ title, description }: { title: string; description: st
       transition={{ duration: 0.45 }}
       className="mb-6 max-w-2xl"
     >
-      <h2 className="text-[32px] font-medium leading-[1.19] tracking-[-0.32px] md:text-[40px] md:leading-[1.2] md:tracking-[-0.4px]">
+      <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
         {title}
       </h2>
-      <p className="mt-2 text-base text-muted-foreground md:text-lg">{description}</p>
+      <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
     </motion.div>
   );
 }

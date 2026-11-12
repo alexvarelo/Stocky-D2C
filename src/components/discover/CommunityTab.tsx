@@ -112,11 +112,11 @@ function InvestorDirectory() {
         <div className="max-w-2xl">
           <h2
             id="investors-title"
-            className="text-[32px] font-medium leading-[1.19] tracking-[-0.32px] md:text-[40px] md:leading-[1.2] md:tracking-[-0.4px]"
+            className="text-2xl font-bold tracking-tight sm:text-3xl"
           >
             Find investors to follow
           </h2>
-          <p className="mt-2 text-base text-muted-foreground md:text-lg">
+          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
             Following someone puts their posts and portfolio updates in your feed.
           </p>
         </div>

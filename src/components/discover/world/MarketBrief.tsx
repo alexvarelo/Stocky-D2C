@@ -95,7 +95,7 @@ export function MarketBrief({ quotes }: { quotes: WorldQuote[] }) {
           >
             <StockyLogo variant="ink" size={36} />
           </motion.div>
-          <h3 className="text-xl font-medium">Stocky's market brief</h3>
+          <h3 className="text-xl font-semibold tracking-tight">Stocky's market brief</h3>
           {isAi ? (
             <span className="rounded-full bg-primary px-3 py-1 text-[13px] text-primary-foreground">AI-generated</span>
           ) : (
@@ -116,10 +116,10 @@ export function MarketBrief({ quotes }: { quotes: WorldQuote[] }) {
           </div>
         ) : (
           <div key={isAi ? "ai" : "computed"}>
-            <p className="mt-6 text-2xl font-medium leading-[1.33] md:text-[32px] md:leading-[1.19] md:tracking-[-0.32px]">
+            <p className="mt-6 text-2xl font-bold leading-[1.25] tracking-tight md:text-3xl">
               {brief.headline}
             </p>
-            <p className="mt-4 text-base text-muted-foreground md:text-lg md:leading-[1.56]">
+            <p className="mt-4 text-sm text-muted-foreground sm:text-base md:leading-[1.56]">
               {reducedMotion
                 ? brief.summary
                 : words.map((word, i) => (

@@ -55,11 +55,11 @@ export function PortfolioLeaderboard() {
         <div className="max-w-2xl">
           <h1
             id="leaderboard-title"
-            className="text-[40px] font-medium leading-none tracking-[-0.03em] sm:text-[56px]"
+            className="text-2xl font-bold tracking-tight sm:text-3xl"
           >
             Portfolios people share
           </h1>
-          <p className="mt-4 text-base text-muted-foreground md:text-lg">
+          <p className="mt-4 text-sm text-muted-foreground sm:text-base">
             Public portfolios from the community, ranked. Open one to see what it holds and how it got there.
           </p>
         </div>
@@ -217,7 +217,7 @@ function PodiumCard({ portfolio: p, rank, delay }: { portfolio: TopPortfolio; ra
         <div className="flex items-start justify-between gap-4">
           <span
             className={cn(
-              "text-[56px] font-medium leading-none tracking-[-0.03em] tabular-nums",
+              "text-[48px] font-bold leading-none tracking-tight tabular-nums",
               !featured && "text-muted-foreground"
             )}
             aria-label={`Rank ${rank}`}
@@ -230,7 +230,7 @@ function PodiumCard({ portfolio: p, rank, delay }: { portfolio: TopPortfolio; ra
           </Avatar>
         </div>
 
-        <p className="mt-6 line-clamp-2 text-2xl font-medium leading-[1.2]">{p.name}</p>
+        <p className="mt-6 line-clamp-2 text-xl font-semibold leading-[1.2] tracking-tight">{p.name}</p>
         <p className={cn("mt-1 truncate text-sm", featured ? "text-white/75" : "text-muted-foreground")}>
           {authorName(p)} · @{p.user.username}
         </p>
@@ -238,7 +238,7 @@ function PodiumCard({ portfolio: p, rank, delay }: { portfolio: TopPortfolio; ra
         <div className="mt-6 flex items-end justify-between gap-4 tabular-nums">
           <div>
             <p
-              className="text-[32px] font-medium leading-none tracking-[-0.01em]"
+              className="text-[32px] font-bold leading-none tracking-tight"
               style={featured ? undefined : { color: positive ? UP : DOWN }}
             >
               {formatReturn(p.total_return_percentage)}
