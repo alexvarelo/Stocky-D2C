@@ -145,7 +145,7 @@ function MessageActions({
     if (message.role === "user") return null;
 
     return (
-        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity mt-1">
+        <div className="flex gap-0.5 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-within:opacity-100 transition-opacity mt-1">
             <button
                 className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 onClick={handleCopy}
@@ -181,6 +181,30 @@ function MessageActions({
     );
 }
 
+// iOS Safari doesn't shrink fixed elements when the keyboard opens — it scrolls
+// the visual viewport instead, pushing the header off-screen. Track the visual
+// viewport so the sheet always fits exactly the visible area.
+function useVisualViewportBox(active: boolean) {
+    const [box, setBox] = useState<{ height: number; top: number } | null>(null);
+    useEffect(() => {
+        const vv = window.visualViewport;
+        if (!active || !vv) return;
+        const update = () => {
+            // Only needed on phones; desktop keeps the stylesheet sizing.
+            if (window.innerWidth >= 640) { setBox(null); return; }
+            setBox({ height: vv.height, top: vv.offsetTop });
+        };
+        update();
+        vv.addEventListener("resize", update);
+        vv.addEventListener("scroll", update);
+        return () => {
+            vv.removeEventListener("resize", update);
+            vv.removeEventListener("scroll", update);
+        };
+    }, [active]);
+    return box;
+}
+
 export function StockyChat({ open, onOpenChange }: StockyChatProps) {
     const { user } = useAuth();
     const { resolvedTheme } = useTheme();
@@ -198,6 +222,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const toolDataRef = useRef<VisualToolData>({ charts: {}, quotes: {} });
     const voiceBaseTextRef = useRef("");
+    const viewportBox = useVisualViewportBox(open);
 
     const resizeInput = (value: string) => {
         setInput(value);
@@ -281,7 +306,12 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                     }
                 });
 
-                setMessages(msgs.map(m => {
+                // Tool replies and the assistant's tool-call steps have no text to
+                // show (their data was ingested above) — skip them so history
+                // doesn't render empty bubbles.
+                setMessages(msgs
+                    .filter(m => m.role === "user" || (m.role === "assistant" && m.content?.trim()))
+                    .map(m => {
                     const toolCalls = m.tool_calls as Array<{ function?: { name?: string } }> | null;
                     return {
                         id: m.id,
@@ -514,26 +544,27 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
             <SheetContent
                 side="right"
                 hideCloseButton
-                className="w-full sm:max-w-2xl p-0 flex flex-col bg-background border-l border-border"
+                className="w-full sm:max-w-2xl p-0 flex flex-col bg-background border-l border-border h-[100dvh] overscroll-contain"
+                style={viewportBox ? { height: viewportBox.height, top: viewportBox.top, bottom: "auto" } : undefined}
             >
                 {/* Header */}
-                <SheetHeader className="px-5 py-4 border-b border-border shrink-0 bg-card">
+                <SheetHeader className="text-left px-3 sm:px-5 py-3 sm:py-4 pt-[max(0.75rem,env(safe-area-inset-top))] border-b border-border shrink-0 bg-card">
                     <div className="flex items-center justify-between w-full gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
                             <button
                                 onClick={() => setIsHistoryOpen(!isHistoryOpen)}
                                 aria-label={isHistoryOpen ? "Hide conversation history" : "Show conversation history"}
                                 aria-expanded={isHistoryOpen}
-                                className="h-8 w-8 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                className="h-10 w-10 sm:h-8 sm:w-8 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                             >
                                 {isHistoryOpen ? <PanelLeftClose className="w-4 h-4" /> : <History className="w-4 h-4" />}
                             </button>
-                            <StockyLogo variant={isDark ? "paper" : "ink"} size={32} className="shadow-sm rounded-lg shrink-0" />
+                            <StockyLogo variant={isDark ? "paper" : "ink"} size={32} className="shadow-sm rounded-lg shrink-0 hidden min-[400px]:block" />
                             <div className="min-w-0">
                                 <SheetTitle className="text-[16px] font-semibold text-foreground leading-tight">
                                     Stocky
                                 </SheetTitle>
-                                <SheetDescription className="text-[13px] text-muted-foreground leading-tight">
+                                <SheetDescription className="text-[13px] text-muted-foreground leading-tight truncate">
                                     AI assistant · not investment advice
                                 </SheetDescription>
                             </div>
@@ -541,14 +572,14 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                         <div className="flex items-center gap-1.5 shrink-0">
                             <button
                                 onClick={startNewChat}
-                                className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground bg-muted hover:bg-muted/70 hover:text-foreground transition-colors"
+                                className="h-10 sm:h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground bg-muted hover:bg-muted/70 hover:text-foreground transition-colors"
                             >
                                 <Plus className="w-3.5 h-3.5" />
                                 New
                             </button>
                             <button
                                 onClick={() => onOpenChange(false)}
-                                className="h-8 w-8 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                className="h-10 w-10 sm:h-8 sm:w-8 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                             >
                                 <X className="w-4 h-4" />
                                 <span className="sr-only">Close</span>
@@ -559,6 +590,15 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
 
                 <div className="flex-1 flex overflow-hidden relative">
                     {/* History Sidebar */}
+                    {/* Tap-outside backdrop for the history overlay on phones */}
+                    {isHistoryOpen && (
+                        <button
+                            type="button"
+                            aria-label="Close conversation history"
+                            onClick={() => setIsHistoryOpen(false)}
+                            className="absolute inset-0 z-10 bg-black/30 sm:hidden"
+                        />
+                    )}
                     <AnimatePresence>
                         {isHistoryOpen && (
                             <motion.div
@@ -566,7 +606,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                 animate={{ width: 240, opacity: 1 }}
                                 exit={{ width: 0, opacity: 0 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className="h-full border-r border-border bg-card flex flex-col shrink-0"
+                                className="h-full border-r border-border bg-card flex flex-col shrink-0 overflow-hidden absolute inset-y-0 left-0 z-20 shadow-xl sm:static sm:shadow-none"
                             >
                                 <div className="p-3 flex-1 overflow-y-auto">
                                     <div className="space-y-0.5">
@@ -579,7 +619,10 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                             conversations.map((conv) => (
                                                 <button
                                                     key={conv.id}
-                                                    onClick={() => loadConversation(conv.id)}
+                                                    onClick={() => {
+                                                        loadConversation(conv.id);
+                                                        if (window.innerWidth < 640) setIsHistoryOpen(false);
+                                                    }}
                                                     className={cn(
                                                         "w-full text-left px-2.5 py-2 rounded-xl text-[13px] transition-all",
                                                         conversationId === conv.id
@@ -607,14 +650,14 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
 
                     {/* Chat Area */}
                     <div className="flex-1 flex flex-col min-w-0">
-                        <ScrollArea className="flex-1 overflow-y-auto">
-                            <div className="px-5 py-6">
+                        <ScrollArea className="flex-1 overflow-y-auto overscroll-contain">
+                            <div className="px-4 sm:px-5 py-4 sm:py-6">
                                 {messages.length === 0 ? (
                                     /* Empty State */
-                                    <div className="flex flex-col justify-end min-h-[calc(100vh-280px)]">
+                                    <div className="flex flex-col justify-end min-h-[calc(100dvh-280px)]">
                                         <div className="space-y-6">
             <div>
-                                                <h2 className="text-[32px] font-bold text-foreground leading-tight tracking-tight">
+                                                <h2 className="text-[26px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight">
                                                     What do you<br />need?
                                                 </h2>
                                             </div>
@@ -833,7 +876,7 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                         </ScrollArea>
 
                         {/* Input */}
-                        <div className="p-4 shrink-0">
+                        <div className="px-3 pt-2 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0">
                             <form
                                 onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                                 className="relative"
@@ -853,7 +896,8 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
                                             }
                                         }}
                                         disabled={isLoading}
-                                        className="w-full bg-transparent border-none focus:ring-0 text-[14px] text-foreground placeholder:text-muted-foreground px-4 pt-3.5 pb-12 min-h-[52px] resize-none max-h-[160px] outline-none"
+                                        enterKeyHint="send"
+                                        className="w-full bg-transparent border-none focus:ring-0 text-base sm:text-[14px] text-foreground placeholder:text-muted-foreground px-4 pt-3.5 pb-12 min-h-[52px] resize-none max-h-[160px] outline-none"
                                         rows={1}
                                     />
                                     <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1">
