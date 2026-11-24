@@ -55,7 +55,15 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, isLoading = false, disabled, children, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
+    if (asChild) {
+      // Slot needs exactly one child, so the loading spinner is not rendered here.
+      return (
+        <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
+          {children}
+        </Slot>
+      );
+    }
+    const Comp = "button";
     return (
       <Comp
         className={cn(

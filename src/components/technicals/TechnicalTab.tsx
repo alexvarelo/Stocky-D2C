@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Info } from "lucide-react";
 import {
   Area,
   Bar,
@@ -207,19 +208,27 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
           </div>
           <div className="flex flex-wrap gap-1.5" role="group" aria-label="Chart overlays">
             {OVERLAYS.map((o) => (
-              <button
+              <span
                 key={o.key}
-                type="button"
-                aria-pressed={active[o.key]}
-                onClick={() => toggle(o.key)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors",
+                  "inline-flex items-center gap-1 rounded-full border pr-2 text-xs transition-colors",
                   active[o.key] ? "bg-accent font-medium" : "text-muted-foreground hover:bg-accent/50",
                 )}
               >
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: o.color }} />
-                <Term id={o.termId}>{o.label}</Term>
-              </button>
+                <button
+                  type="button"
+                  aria-pressed={active[o.key]}
+                  onClick={() => toggle(o.key)}
+                  className="inline-flex items-center gap-1.5 rounded-full py-1 pl-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: o.color }} />
+                  {o.label}
+                </button>
+                <Term id={o.termId} className="no-underline">
+                  <span className="sr-only">What is {o.label}?</span>
+                  <Info className="h-3 w-3 opacity-60" aria-hidden />
+                </Term>
+              </span>
             ))}
           </div>
         </CardHeader>
