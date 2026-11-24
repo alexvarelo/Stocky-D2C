@@ -18,8 +18,10 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/navigation/BottomNav";
 
+import { StockyChatProvider, useStockyChat } from "@/contexts/StockyChatContext";
+
 import { motion } from "framer-motion";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 
 // Pages load on demand so the first visit doesn't download every route.
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -29,6 +31,9 @@ const InstrumentPage = lazy(() => import("./pages/InstrumentPage").then((m) => (
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const PortfolioScenarios = lazy(() => import("./pages/PortfolioScenarios"));
+const Learn = lazy(() => import("./pages/Learn"));
+const LearnTrack = lazy(() => import("./pages/LearnTrack"));
+const LearnLesson = lazy(() => import("./pages/LearnLesson"));
 const Strategies = lazy(() => import("./pages/Strategies"));
 const Watchlists = lazy(() => import("./pages/Watchlists"));
 const WatchlistDetail = lazy(() => import("./pages/WatchlistDetail"));
@@ -88,7 +93,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Shared shell for every signed-in page. Rendered once as a layout route, so
 // navigating between pages keeps the navbar and the open chat mounted.
 function MainLayout() {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  return (
+    <StockyChatProvider>
+      <MainLayoutShell />
+    </StockyChatProvider>
+  );
+}
+
+function MainLayoutShell() {
+  const chat = useStockyChat();
+  const isChatOpen = chat?.open ?? false;
+  const setIsChatOpen = (open: boolean) => chat?.setOpen(open);
   const location = useLocation();
 
   return (
@@ -134,7 +149,7 @@ function MainLayout() {
         <StockyLogo variant="ink" size={52} className="block" />
       </motion.button>
 
-      <StockyChat open={isChatOpen} onOpenChange={setIsChatOpen} />
+      <StockyChat open={isChatOpen} onOpenChange={setIsChatOpen} draft={chat?.draft} />
     </div>
   );
 }
@@ -176,6 +191,9 @@ const App = () => (
                     <Route path="/portfolio/:portfolioId" element={<PortfolioDetail />} />
                     <Route path="/portfolio/:portfolioId/scenarios" element={<PortfolioScenarios />} />
                     <Route path="/strategies" element={<Strategies />} />
+                    <Route path="/learn" element={<Learn />} />
+                    <Route path="/learn/:trackId" element={<LearnTrack />} />
+                    <Route path="/learn/:trackId/:lessonId" element={<LearnLesson />} />
                     <Route path="/watchlists" element={<Watchlists />} />
                     <Route path="/watchlist/:id" element={<WatchlistDetail />} />
                     <Route path="/article/:id" element={<ArticlePage />} />

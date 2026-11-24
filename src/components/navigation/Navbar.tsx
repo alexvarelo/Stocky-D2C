@@ -19,6 +19,7 @@ import {
   Star,
   Compass,
   LineChart,
+  GraduationCap,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react';
@@ -31,6 +32,7 @@ const NAV_LINKS = [
   { href: '/watchlists', label: 'Watchlists', icon: Star },
   { href: '/discover', label: 'Discovery', icon: Compass },
   { href: '/strategies', label: 'Strategies', icon: LineChart },
+  { href: '/learn', label: 'Learn', icon: GraduationCap },
 ];
 
 export const Navbar = () => {
@@ -196,6 +198,14 @@ export const Navbar = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate('/learn')}>
+                <GraduationCap className="mr-2 h-4 w-4" />
+                <span>Learn</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/strategies')}>
+                <LineChart className="mr-2 h-4 w-4" />
+                <span>Strategies</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate(`/user/${userProfile.id}`)}>
                 <User className="mr-2 h-4 w-4" />
                 <span>My Profile</span>

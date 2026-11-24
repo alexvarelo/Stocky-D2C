@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ExplainThis } from "@/components/explain/ExplainThis";
 import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { MAX_POSITIONS, invalidTickers, toPositions } from "@/lib/portfolioPositions";
@@ -46,12 +47,22 @@ interface MetricProps {
   reading?: string | null;
   isNull?: boolean;
   tooltip?: string;
+  /** Plain-text metric name for the "Explain this" question. */
+  name: string;
 }
 
-function MetricCard({ label, value, reading, isNull, tooltip }: MetricProps) {
+function MetricCard({ label, value, reading, isNull, tooltip, name }: MetricProps) {
   return (
     <div className="rounded-2xl border border-border/50 bg-card/50 p-3 sm:p-4 flex flex-col gap-1">
-      <div className="text-xs text-muted-foreground" title={tooltip}>{label}</div>
+      <div className="flex items-start justify-between gap-1">
+        <div className="text-xs text-muted-foreground" title={tooltip}>{label}</div>
+        {!isNull && (
+          <ExplainThis
+            className="-mr-1.5 -mt-1.5"
+            context={{ label: `portfolio ${name}`, value }}
+          />
+        )}
+      </div>
       <div className="text-xl font-semibold tabular-nums" title={isNull ? NO_DATA_HINT : undefined}>
         {value}
       </div>
@@ -158,24 +169,28 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <MetricCard
+                name="beta vs the S&P 500"
                 label={<Term id="beta">Beta vs S&amp;P 500</Term>}
                 value={fmtNum(data.beta)}
                 isNull={data.beta == null}
                 reading={describeBeta(data.beta)}
               />
               <MetricCard
+                name="annualised volatility"
                 label={<Term id="volatility">Volatility</Term>}
                 value={fmtPct(data.volatility_annual)}
                 isNull={data.volatility_annual == null}
                 reading={describeVolatility(data.volatility_annual)}
               />
               <MetricCard
+                name="maximum drawdown"
                 label={<Term id="max-drawdown">Max drawdown</Term>}
                 value={fmtPct(data.max_drawdown)}
                 isNull={data.max_drawdown == null}
                 reading={describeDrawdown(data.max_drawdown)}
               />
               <MetricCard
+                name="Sharpe ratio"
                 label={<Term id="sharpe-ratio">Sharpe ratio</Term>}
                 value={fmtNum(data.sharpe_ratio)}
                 isNull={data.sharpe_ratio == null}
@@ -183,23 +198,27 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
                 tooltip="Calculated with a 0% risk-free rate"
               />
               <MetricCard
+                name="annualised return"
                 label={<Term id="annual-return">Annual return</Term>}
                 value={fmtPct(data.annual_return)}
                 isNull={data.annual_return == null}
                 reading={describeReturn(data.annual_return)}
               />
               <MetricCard
+                name="largest position weight"
                 label={<Term id="diversification">Largest position</Term>}
                 value={data.largest_position ? `${data.largest_position.ticker} ${fmtPct(data.largest_position.weight)}` : NO_DATA}
                 reading={data.largest_position ? "Share of portfolio value in the top holding" : null}
                 isNull={!data.largest_position}
               />
               <MetricCard
+                name="concentration (HHI)"
                 label={<Term id="concentration-hhi">Concentration (HHI)</Term>}
                 value={Number.isFinite(data.hhi) ? data.hhi.toFixed(3) : NO_DATA}
                 reading={describeConcentration(data)}
               />
               <MetricCard
+                name="effective number of positions"
                 label={<Term id="effective-positions">Effective positions</Term>}
                 value={data.effective_positions == null ? NO_DATA : data.effective_positions.toFixed(1)}
                 isNull={data.effective_positions == null}

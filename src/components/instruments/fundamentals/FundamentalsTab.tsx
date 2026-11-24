@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Term } from "@/components/glossary/Term";
+import { ExplainThis, type ExplainContext } from "@/components/explain/ExplainThis";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { formatCompact, formatDecimalPercent } from "@/lib/financialFormat";
 
@@ -46,11 +47,20 @@ function periodLabel(end: string, period: Period) {
     : `${d.toLocaleString("en-US", { month: "short", timeZone: "UTC" })} ${String(d.getUTCFullYear()).slice(2)}`;
 }
 
-function ChartCard({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
+function ChartCard({
+  title,
+  children,
+  explain,
+}: {
+  title: React.ReactNode;
+  children: React.ReactNode;
+  explain?: ExplainContext;
+}) {
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
         <CardTitle className="text-base">{title}</CardTitle>
+        {explain && <ExplainThis context={explain} />}
       </CardHeader>
       <CardContent>
         <div className="h-60 w-full">
@@ -102,7 +112,7 @@ const TABLE_ROWS: { key: keyof FinancialItem; label: string; term?: string; fmt:
   { key: "shares_outstanding", label: "Shares outstanding", term: "share-dilution", fmt: "shares" },
 ];
 
-function FundamentalsContent({ data, period }: { data: FinancialsResponse; period: Period }) {
+function FundamentalsContent({ data, period, ticker }: { data: FinancialsResponse; period: Period; ticker: string }) {
   const currency = data.currency ?? undefined;
   const rows: Row[] = data.items.map((item) => ({ label: periodLabel(item.period_end, period), item }));
   const chartData = rows.map(({ label, item }) => ({
@@ -120,6 +130,21 @@ function FundamentalsContent({ data, period }: { data: FinancialsResponse; perio
   const axisMoney = (v: number) => formatCompact(v);
   const pct = (v: unknown) => (typeof v === "number" ? `${v.toFixed(1)}%` : "—");
 
+  const last = data.items[data.items.length - 1];
+  const explainFor = (label: string, ...keys: (keyof FinancialItem)[]): ExplainContext => {
+    const parts = keys.flatMap((k) => {
+      const v = last?.[k] as number | null | undefined;
+      if (v == null) return [];
+      const isMargin = String(k).endsWith("margin");
+      return [`${String(k).replace(/_/g, " ")} ${isMargin ? formatDecimalPercent(v) : formatCompact(v, currency)}`];
+    });
+    return {
+      label,
+      ticker,
+      value: parts.length ? `latest ${period} period: ${parts.join(", ")}` : undefined,
+    };
+  };
+
   const cell = (item: FinancialItem, key: keyof FinancialItem, fmt: Fmt) => {
     const v = item[key] as number | null | undefined;
     if (fmt === "pct") return formatDecimalPercent(v);
@@ -134,7 +159,7 @@ function FundamentalsContent({ data, period }: { data: FinancialsResponse; perio
         {currency ? " (may differ from the quote currency)" : ""}
       </p>
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="Revenue vs Net income">
+        <ChartCard title="Revenue vs Net income" explain={explainFor("revenue versus net income chart", "revenue", "net_income")}>
           <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
             <XAxis dataKey="label" {...axisProps} />
@@ -146,7 +171,7 @@ function FundamentalsContent({ data, period }: { data: FinancialsResponse; perio
           </BarChart>
         </ChartCard>
 
-        <ChartCard title="Margins">
+        <ChartCard title="Margins" explain={explainFor("gross, operating and net margins chart", "net_margin")}>
           <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
             <XAxis dataKey="label" {...axisProps} />
@@ -159,7 +184,7 @@ function FundamentalsContent({ data, period }: { data: FinancialsResponse; perio
           </LineChart>
         </ChartCard>
 
-        <ChartCard title={<Term id="free-cash-flow">Free cash flow</Term>}>
+        <ChartCard title={<Term id="free-cash-flow">Free cash flow</Term>} explain={explainFor("free cash flow chart", "free_cash_flow")}>
           <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
             <XAxis dataKey="label" {...axisProps} />
@@ -174,7 +199,7 @@ function FundamentalsContent({ data, period }: { data: FinancialsResponse; perio
           </BarChart>
         </ChartCard>
 
-        <ChartCard title="Cash vs Total debt">
+        <ChartCard title="Cash vs Total debt" explain={explainFor("cash versus total debt chart", "cash", "total_debt")}>
           <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
             <XAxis dataKey="label" {...axisProps} />
@@ -281,7 +306,7 @@ export default function FundamentalsTab({ ticker }: FundamentalsTabProps) {
           </CardContent>
         </Card>
       ) : (
-        <FundamentalsContent data={financials} period={period} />
+        <FundamentalsContent data={financials} period={period} ticker={ticker} />
       )}
 
       <EducationalDisclaimer />

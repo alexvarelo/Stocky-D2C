@@ -11,6 +11,7 @@ import { ThesisReviewReminder } from "@/components/thesis/ThesisReviewReminder";
 import { ActivityCalendar } from "@/components/profile/ActivityCalendar";
 
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
+import { MarketContextPanel } from "@/components/market/MarketContextPanel";
 import { WealthHero } from "@/components/dashboard/wealth/WealthHero";
 import { PortfolioBreakdownList } from "@/components/dashboard/wealth/PortfolioBreakdownList";
 
@@ -53,6 +54,8 @@ const Dashboard = () => {
 
       {/* Total Wealth */}
       <WealthHero portfolios={portfolios || []} />
+
+      <MarketContextPanel />
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         {/* Main Column - Portfolios & Holdings (9/12) */}
