@@ -37,14 +37,15 @@ export function FanChart({ percentiles, currency, height = 300 }: Props) {
           <XAxis
             dataKey="year"
             type="number"
-            domain={[0, maxYear]}
-            tickFormatter={(v: number) => `${Number.isInteger(v) ? v : v.toFixed(1)}y`}
+            domain={[0, Math.round(maxYear)]}
+            ticks={Array.from({ length: Math.round(maxYear) + 1 }, (_, i) => i)}
+            tickFormatter={(v: number) => `${v}y`}
             tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            width={52}
+            width={64}
             tickFormatter={(v: number) => fmtMoney(v, currency, true)}
             tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
             tickLine={false}
