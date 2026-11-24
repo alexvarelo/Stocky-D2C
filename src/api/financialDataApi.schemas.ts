@@ -102,6 +102,108 @@ export interface CompanyInfo {
   founded?: CompanyInfoFounded;
 }
 
+export type CompareGrowthRevenueGrowthYoy = number | null;
+
+export type CompareGrowthEarningsGrowthYoy = number | null;
+
+export interface CompareGrowth {
+  revenue_growth_yoy?: CompareGrowthRevenueGrowthYoy;
+  earnings_growth_yoy?: CompareGrowthEarningsGrowthYoy;
+}
+
+export type CompareHealthNetDebtToEbitda = number | null;
+
+export type CompareHealthCurrentRatio = number | null;
+
+export type CompareHealthAltmanZ = number | null;
+
+export interface CompareHealth {
+  net_debt_to_ebitda?: CompareHealthNetDebtToEbitda;
+  current_ratio?: CompareHealthCurrentRatio;
+  altman_z?: CompareHealthAltmanZ;
+}
+
+export type CompareMarginsGross = number | null;
+
+export type CompareMarginsOperating = number | null;
+
+export type CompareMarginsNet = number | null;
+
+export interface CompareMargins {
+  gross?: CompareMarginsGross;
+  operating?: CompareMarginsOperating;
+  net?: CompareMarginsNet;
+}
+
+export interface CompareResponse {
+  tickers: string[];
+  base_currency?: string;
+  rows: CompareRow[];
+  missing: string[];
+  disclaimer?: string;
+}
+
+/**
+ * Total price return, decimal
+ */
+export type CompareReturnsR1y = number | null;
+
+export type CompareReturnsR3y = number | null;
+
+export type CompareReturnsR5y = number | null;
+
+export interface CompareReturns {
+  /** Total price return, decimal */
+  r1y?: CompareReturnsR1y;
+  r3y?: CompareReturnsR3y;
+  r5y?: CompareReturnsR5y;
+}
+
+export type CompareRowName = string | null;
+
+export type CompareRowCurrency = string | null;
+
+export type CompareRowPrice = number | null;
+
+export type CompareRowMarketCap = number | null;
+
+export type CompareRowMarketCapUsd = number | null;
+
+export interface CompareRow {
+  ticker: string;
+  name?: CompareRowName;
+  currency?: CompareRowCurrency;
+  price?: CompareRowPrice;
+  market_cap?: CompareRowMarketCap;
+  market_cap_usd?: CompareRowMarketCapUsd;
+  valuation: CompareValuation;
+  growth: CompareGrowth;
+  margins: CompareMargins;
+  health: CompareHealth;
+  returns: CompareReturns;
+}
+
+export type CompareValuationPe = number | null;
+
+export type CompareValuationForwardPe = number | null;
+
+export type CompareValuationPeg = number | null;
+
+export type CompareValuationEvEbitda = number | null;
+
+export type CompareValuationPriceToSales = number | null;
+
+export type CompareValuationPriceToBook = number | null;
+
+export interface CompareValuation {
+  pe?: CompareValuationPe;
+  forward_pe?: CompareValuationForwardPe;
+  peg?: CompareValuationPeg;
+  ev_ebitda?: CompareValuationEvEbitda;
+  price_to_sales?: CompareValuationPriceToSales;
+  price_to_book?: CompareValuationPriceToBook;
+}
+
 export type CorrelationMatrixMatrixItemItem = number | null;
 
 export interface CorrelationMatrix {
@@ -174,6 +276,94 @@ export interface ExcludedTicker {
   reason: ExcludedTickerReason;
 }
 
+export type FinancialItemRevenue = number | null;
+
+export type FinancialItemGrossProfit = number | null;
+
+export type FinancialItemOperatingIncome = number | null;
+
+export type FinancialItemNetIncome = number | null;
+
+/**
+ * Decimal, e.g. 0.42
+ */
+export type FinancialItemGrossMargin = number | null;
+
+export type FinancialItemOperatingMargin = number | null;
+
+export type FinancialItemNetMargin = number | null;
+
+export type FinancialItemOperatingCashFlow = number | null;
+
+export type FinancialItemCapex = number | null;
+
+/**
+ * Operating cash flow minus |capex|
+ */
+export type FinancialItemFreeCashFlow = number | null;
+
+/**
+ * Cash plus short-term investments
+ */
+export type FinancialItemCash = number | null;
+
+export type FinancialItemTotalDebt = number | null;
+
+/**
+ * Total debt minus cash
+ */
+export type FinancialItemNetDebt = number | null;
+
+export type FinancialItemSharesOutstanding = number | null;
+
+export type FinancialItemEbitda = number | null;
+
+export interface FinancialItem {
+  period_end: string;
+  revenue?: FinancialItemRevenue;
+  gross_profit?: FinancialItemGrossProfit;
+  operating_income?: FinancialItemOperatingIncome;
+  net_income?: FinancialItemNetIncome;
+  /** Decimal, e.g. 0.42 */
+  gross_margin?: FinancialItemGrossMargin;
+  operating_margin?: FinancialItemOperatingMargin;
+  net_margin?: FinancialItemNetMargin;
+  operating_cash_flow?: FinancialItemOperatingCashFlow;
+  capex?: FinancialItemCapex;
+  /** Operating cash flow minus |capex| */
+  free_cash_flow?: FinancialItemFreeCashFlow;
+  /** Cash plus short-term investments */
+  cash?: FinancialItemCash;
+  total_debt?: FinancialItemTotalDebt;
+  /** Total debt minus cash */
+  net_debt?: FinancialItemNetDebt;
+  shares_outstanding?: FinancialItemSharesOutstanding;
+  ebitda?: FinancialItemEbitda;
+}
+
+/**
+ * Financial statement currency (may differ from quote currency)
+ */
+export type FinancialsResponseCurrency = string | null;
+
+export type FinancialsResponsePeriod = typeof FinancialsResponsePeriod[keyof typeof FinancialsResponsePeriod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const FinancialsResponsePeriod = {
+  annual: 'annual',
+  quarterly: 'quarterly',
+} as const;
+
+export interface FinancialsResponse {
+  ticker: string;
+  /** Financial statement currency (may differ from quote currency) */
+  currency?: FinancialsResponseCurrency;
+  period: FinancialsResponsePeriod;
+  items: FinancialItem[];
+  disclaimer?: string;
+}
+
 export interface HTTPValidationError {
   detail?: ValidationError[];
 }
@@ -188,6 +378,52 @@ export interface HealthCheck {
   version: string;
   /** Current timestamp */
   timestamp: string;
+}
+
+/**
+ * Number in `unit`; for 'percent' it is percentage points (3.2 = 3.2%)
+ */
+export type HealthMetricValue = number | null;
+
+export type HealthMetricUnit = typeof HealthMetricUnit[keyof typeof HealthMetricUnit];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const HealthMetricUnit = {
+  months: 'months',
+  ratio: 'ratio',
+  percent: 'percent',
+  score: 'score',
+  x: 'x',
+} as const;
+
+export type HealthMetricStatus = typeof HealthMetricStatus[keyof typeof HealthMetricStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const HealthMetricStatus = {
+  good: 'good',
+  warn: 'warn',
+  bad: 'bad',
+  na: 'na',
+} as const;
+
+export interface HealthMetric {
+  key: string;
+  label: string;
+  /** Number in `unit`; for 'percent' it is percentage points (3.2 = 3.2%) */
+  value?: HealthMetricValue;
+  unit: HealthMetricUnit;
+  status: HealthMetricStatus;
+  explanation: string;
+}
+
+export interface HealthResponse {
+  ticker: string;
+  /** Latest financial statement period end used */
+  as_of: string;
+  metrics: HealthMetric[];
+  disclaimer?: string;
 }
 
 /**
@@ -855,6 +1091,116 @@ export interface StockInfo {
   additional_data?: StockInfoAdditionalData;
 }
 
+export type TechnicalLatestClose = number | null;
+
+export type TechnicalLatestRsi14 = number | null;
+
+export type TechnicalLatestMacd = number | null;
+
+export type TechnicalLatestMacdSignal = number | null;
+
+export type TechnicalLatestSma50 = number | null;
+
+export type TechnicalLatestSma200 = number | null;
+
+export type TechnicalLatestAboveSma50 = boolean | null;
+
+export type TechnicalLatestAboveSma200 = boolean | null;
+
+export type TechnicalLatestAvgVolume20 = number | null;
+
+export type TechnicalLatestAvgVolume50 = number | null;
+
+export interface TechnicalLatest {
+  close?: TechnicalLatestClose;
+  rsi14?: TechnicalLatestRsi14;
+  macd?: TechnicalLatestMacd;
+  macd_signal?: TechnicalLatestMacdSignal;
+  sma50?: TechnicalLatestSma50;
+  sma200?: TechnicalLatestSma200;
+  above_sma50?: TechnicalLatestAboveSma50;
+  above_sma200?: TechnicalLatestAboveSma200;
+  golden_cross_recent?: boolean;
+  death_cross_recent?: boolean;
+  avg_volume_20?: TechnicalLatestAvgVolume20;
+  avg_volume_50?: TechnicalLatestAvgVolume50;
+}
+
+export interface TechnicalLevels {
+  support?: number[];
+  resistance?: number[];
+}
+
+export type TechnicalPointOpen = number | null;
+
+export type TechnicalPointHigh = number | null;
+
+export type TechnicalPointLow = number | null;
+
+export type TechnicalPointClose = number | null;
+
+export type TechnicalPointVolume = number | null;
+
+export type TechnicalPointSma20 = number | null;
+
+export type TechnicalPointSma50 = number | null;
+
+export type TechnicalPointSma200 = number | null;
+
+export type TechnicalPointEma12 = number | null;
+
+export type TechnicalPointEma26 = number | null;
+
+export type TechnicalPointRsi14 = number | null;
+
+export type TechnicalPointMacd = number | null;
+
+export type TechnicalPointMacdSignal = number | null;
+
+export type TechnicalPointMacdHist = number | null;
+
+export type TechnicalPointBbUpper = number | null;
+
+export type TechnicalPointBbMiddle = number | null;
+
+export type TechnicalPointBbLower = number | null;
+
+export interface TechnicalPoint {
+  date: string;
+  open?: TechnicalPointOpen;
+  high?: TechnicalPointHigh;
+  low?: TechnicalPointLow;
+  close?: TechnicalPointClose;
+  volume?: TechnicalPointVolume;
+  sma20?: TechnicalPointSma20;
+  sma50?: TechnicalPointSma50;
+  sma200?: TechnicalPointSma200;
+  ema12?: TechnicalPointEma12;
+  ema26?: TechnicalPointEma26;
+  rsi14?: TechnicalPointRsi14;
+  macd?: TechnicalPointMacd;
+  macd_signal?: TechnicalPointMacdSignal;
+  macd_hist?: TechnicalPointMacdHist;
+  bb_upper?: TechnicalPointBbUpper;
+  bb_middle?: TechnicalPointBbMiddle;
+  bb_lower?: TechnicalPointBbLower;
+}
+
+export type TechnicalsResponseCurrency = string | null;
+
+export type TechnicalsResponseAsOf = string | null;
+
+export interface TechnicalsResponse {
+  ticker: string;
+  period: string;
+  currency?: TechnicalsResponseCurrency;
+  as_of?: TechnicalsResponseAsOf;
+  series: TechnicalPoint[];
+  latest: TechnicalLatest;
+  levels: TechnicalLevels;
+  disclaimer?: string;
+}
+
 /**
  * Schema for news related to a specific ticker
  */
@@ -947,4 +1293,39 @@ export type GetHistoricalDataApiV1StockTickerHistoryGetParams = {
  */
 period?: string;
 };
+
+export type GetFinancialsApiV1StockTickerFinancialsGetParams = {
+period?: GetFinancialsApiV1StockTickerFinancialsGetPeriod;
+};
+
+export type GetFinancialsApiV1StockTickerFinancialsGetPeriod = typeof GetFinancialsApiV1StockTickerFinancialsGetPeriod[keyof typeof GetFinancialsApiV1StockTickerFinancialsGetPeriod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetFinancialsApiV1StockTickerFinancialsGetPeriod = {
+  annual: 'annual',
+  quarterly: 'quarterly',
+} as const;
+
+export type CompareApiV1CompareGetParams = {
+/**
+ * Comma separated, 2-6 tickers
+ */
+tickers: string;
+};
+
+export type StockTechnicalsApiV1StockTickerTechnicalsGetParams = {
+period?: StockTechnicalsApiV1StockTickerTechnicalsGetPeriod;
+};
+
+export type StockTechnicalsApiV1StockTickerTechnicalsGetPeriod = typeof StockTechnicalsApiV1StockTickerTechnicalsGetPeriod[keyof typeof StockTechnicalsApiV1StockTickerTechnicalsGetPeriod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StockTechnicalsApiV1StockTickerTechnicalsGetPeriod = {
+  '6mo': '6mo',
+  '1y': '1y',
+  '2y': '2y',
+  '5y': '5y',
+} as const;
 

@@ -1044,6 +1044,272 @@
         ]
       }
     },
+    "/api/v1/stock/{ticker}/financials": {
+      "get": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Financial statements summary",
+        "description": "Last 5 annual or 8 quarterly periods (oldest first). Amounts are in the statement `currency`; margins are decimals. Educational information, not financial advice.",
+        "operationId": "get_financials_api_v1_stock__ticker__financials_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ticker",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
+              "title": "Ticker"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "annual",
+                "quarterly"
+              ],
+              "type": "string",
+              "default": "annual",
+              "title": "Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinancialsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/{ticker}/health": {
+      "get": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Financial health indicators",
+        "description": "Cash runway, dilution, leverage, interest coverage, Altman Z and Piotroski F, each with a status. Educational information, not financial advice.",
+        "operationId": "get_health_api_v1_stock__ticker__health_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ticker",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
+              "title": "Ticker"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/compare": {
+      "get": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Compare 2-6 tickers",
+        "description": "Normalised valuation, growth, margins, health and 1/3/5y price returns (decimals). Educational information, not financial advice.",
+        "operationId": "compare_api_v1_compare_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tickers",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Comma separated, 2-6 tickers",
+              "title": "Tickers"
+            },
+            "description": "Comma separated, 2-6 tickers"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompareResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticker not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/{ticker}/technicals": {
+      "get": {
+        "tags": [
+          "technicals"
+        ],
+        "summary": "Technical indicators",
+        "description": "SMA 20/50/200, EMA 12/26, RSI 14, MACD (12,26,9), Bollinger (20,2), average volume and simple support/resistance. Educational information, not financial advice.",
+        "operationId": "stock_technicals_api_v1_stock__ticker__technicals_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ticker",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
+              "title": "Ticker"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "6mo",
+                "1y",
+                "2y",
+                "5y"
+              ],
+              "type": "string",
+              "default": "1y",
+              "title": "Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechnicalsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health check",
@@ -1251,6 +1517,354 @@
         "title": "CompanyInfo",
         "description": "Schema for company information"
       },
+      "CompareGrowth": {
+        "properties": {
+          "revenue_growth_yoy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Growth Yoy"
+          },
+          "earnings_growth_yoy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Earnings Growth Yoy"
+          }
+        },
+        "type": "object",
+        "title": "CompareGrowth"
+      },
+      "CompareHealth": {
+        "properties": {
+          "net_debt_to_ebitda": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Debt To Ebitda"
+          },
+          "current_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Ratio"
+          },
+          "altman_z": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Altman Z"
+          }
+        },
+        "type": "object",
+        "title": "CompareHealth"
+      },
+      "CompareMargins": {
+        "properties": {
+          "gross": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross"
+          },
+          "operating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operating"
+          },
+          "net": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net"
+          }
+        },
+        "type": "object",
+        "title": "CompareMargins"
+      },
+      "CompareResponse": {
+        "properties": {
+          "tickers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tickers"
+          },
+          "base_currency": {
+            "type": "string",
+            "title": "Base Currency",
+            "default": "USD"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CompareRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "tickers",
+          "rows",
+          "missing"
+        ],
+        "title": "CompareResponse"
+      },
+      "CompareReturns": {
+        "properties": {
+          "r1y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R1Y",
+            "description": "Total price return, decimal"
+          },
+          "r3y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R3Y"
+          },
+          "r5y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R5Y"
+          }
+        },
+        "type": "object",
+        "title": "CompareReturns"
+      },
+      "CompareRow": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "market_cap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Cap"
+          },
+          "market_cap_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Cap Usd"
+          },
+          "valuation": {
+            "$ref": "#/components/schemas/CompareValuation"
+          },
+          "growth": {
+            "$ref": "#/components/schemas/CompareGrowth"
+          },
+          "margins": {
+            "$ref": "#/components/schemas/CompareMargins"
+          },
+          "health": {
+            "$ref": "#/components/schemas/CompareHealth"
+          },
+          "returns": {
+            "$ref": "#/components/schemas/CompareReturns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "valuation",
+          "growth",
+          "margins",
+          "health",
+          "returns"
+        ],
+        "title": "CompareRow"
+      },
+      "CompareValuation": {
+        "properties": {
+          "pe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pe"
+          },
+          "forward_pe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forward Pe"
+          },
+          "peg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peg"
+          },
+          "ev_ebitda": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ev Ebitda"
+          },
+          "price_to_sales": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price To Sales"
+          },
+          "price_to_book": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price To Book"
+          }
+        },
+        "type": "object",
+        "title": "CompareValuation"
+      },
       "CorrelationMatrix": {
         "properties": {
           "tickers": {
@@ -1412,6 +2026,236 @@
         ],
         "title": "ExcludedTicker"
       },
+      "FinancialItem": {
+        "properties": {
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "revenue": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue"
+          },
+          "gross_profit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Profit"
+          },
+          "operating_income": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operating Income"
+          },
+          "net_income": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Income"
+          },
+          "gross_margin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Margin",
+            "description": "Decimal, e.g. 0.42"
+          },
+          "operating_margin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operating Margin"
+          },
+          "net_margin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Margin"
+          },
+          "operating_cash_flow": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operating Cash Flow"
+          },
+          "capex": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capex"
+          },
+          "free_cash_flow": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Cash Flow",
+            "description": "Operating cash flow minus |capex|"
+          },
+          "cash": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash",
+            "description": "Cash plus short-term investments"
+          },
+          "total_debt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Debt"
+          },
+          "net_debt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Debt",
+            "description": "Total debt minus cash"
+          },
+          "shares_outstanding": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shares Outstanding"
+          },
+          "ebitda": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ebitda"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period_end"
+        ],
+        "title": "FinancialItem"
+      },
+      "FinancialsResponse": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency",
+            "description": "Financial statement currency (may differ from quote currency)"
+          },
+          "period": {
+            "type": "string",
+            "enum": [
+              "annual",
+              "quarterly"
+            ],
+            "title": "Period"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FinancialItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "period",
+          "items"
+        ],
+        "title": "FinancialsResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1452,6 +2296,97 @@
         ],
         "title": "HealthCheck",
         "description": "Schema for health check response"
+      },
+      "HealthMetric": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value",
+            "description": "Number in `unit`; for 'percent' it is percentage points (3.2 = 3.2%)"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "months",
+              "ratio",
+              "percent",
+              "score",
+              "x"
+            ],
+            "title": "Unit"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "good",
+              "warn",
+              "bad",
+              "na"
+            ],
+            "title": "Status"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "unit",
+          "status",
+          "explanation"
+        ],
+        "title": "HealthMetric"
+      },
+      "HealthResponse": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "title": "As Of",
+            "description": "Latest financial statement period end used"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/HealthMetric"
+            },
+            "type": "array",
+            "title": "Metrics"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "as_of",
+          "metrics"
+        ],
+        "title": "HealthResponse"
       },
       "HistoricalDataPoint": {
         "properties": {
@@ -2759,6 +3694,415 @@
         ],
         "title": "StockInfo",
         "description": "Schema for comprehensive stock information"
+      },
+      "TechnicalLatest": {
+        "properties": {
+          "close": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Close"
+          },
+          "rsi14": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rsi14"
+          },
+          "macd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Macd"
+          },
+          "macd_signal": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Macd Signal"
+          },
+          "sma50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma50"
+          },
+          "sma200": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma200"
+          },
+          "above_sma50": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Above Sma50"
+          },
+          "above_sma200": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Above Sma200"
+          },
+          "golden_cross_recent": {
+            "type": "boolean",
+            "title": "Golden Cross Recent",
+            "default": false
+          },
+          "death_cross_recent": {
+            "type": "boolean",
+            "title": "Death Cross Recent",
+            "default": false
+          },
+          "avg_volume_20": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Volume 20"
+          },
+          "avg_volume_50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Volume 50"
+          }
+        },
+        "type": "object",
+        "title": "TechnicalLatest"
+      },
+      "TechnicalLevels": {
+        "properties": {
+          "support": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Support",
+            "default": []
+          },
+          "resistance": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Resistance",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "TechnicalLevels"
+      },
+      "TechnicalPoint": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "title": "Date"
+          },
+          "open": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open"
+          },
+          "high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High"
+          },
+          "low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Low"
+          },
+          "close": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Close"
+          },
+          "volume": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volume"
+          },
+          "sma20": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma20"
+          },
+          "sma50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma50"
+          },
+          "sma200": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma200"
+          },
+          "ema12": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ema12"
+          },
+          "ema26": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ema26"
+          },
+          "rsi14": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rsi14"
+          },
+          "macd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Macd"
+          },
+          "macd_signal": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Macd Signal"
+          },
+          "macd_hist": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Macd Hist"
+          },
+          "bb_upper": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bb Upper"
+          },
+          "bb_middle": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bb Middle"
+          },
+          "bb_lower": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bb Lower"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date"
+        ],
+        "title": "TechnicalPoint"
+      },
+      "TechnicalsResponse": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "period": {
+            "type": "string",
+            "title": "Period"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/TechnicalPoint"
+            },
+            "type": "array",
+            "title": "Series"
+          },
+          "latest": {
+            "$ref": "#/components/schemas/TechnicalLatest"
+          },
+          "levels": {
+            "$ref": "#/components/schemas/TechnicalLevels"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "period",
+          "series",
+          "latest",
+          "levels"
+        ],
+        "title": "TechnicalsResponse"
       },
       "TickerNews": {
         "properties": {
