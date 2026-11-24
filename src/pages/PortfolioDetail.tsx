@@ -26,6 +26,7 @@ import { AllocationChart } from "@/components/portfolio/portfolioDetails/Allocat
 import { TopMovers } from "@/components/portfolio/portfolioDetails/TopMovers";
 import { KeyMetrics } from "@/components/portfolio/portfolioDetails/KeyMetrics";
 import { PortfolioAwards } from "@/components/portfolio/portfolioDetails/PortfolioAwards";
+import { PortfolioRiskPanel } from "@/components/portfolio/risk/PortfolioRiskPanel";
 import { ExportPortfolioDialog } from "@/components/portfolio/portfolioDetails/ExportPortfolioDialog";
 
 // Add custom animation keyframes for the spinning gradient
@@ -220,6 +221,13 @@ export const PortfolioDetail = () => {
               holdings={holdingsWithLivePrices || []}
               portfolioId={portfolioId}
               isLoading={isLoadingPrices}
+            />
+
+            {/* Risk */}
+            <PortfolioRiskPanel
+              portfolioId={portfolioId}
+              holdings={portfolio.holdings || []}
+              currency={portfolio.currency}
             />
 
             {/* Holdings List */}

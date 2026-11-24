@@ -102,40 +102,11 @@ export interface CompanyInfo {
   founded?: CompanyInfoFounded;
 }
 
-/**
- * Client description
- */
-export type CreateClientRequestDescription = string | null;
+export type CorrelationMatrixMatrixItemItem = number | null;
 
-/**
- * Schema for creating a new client
- */
-export interface CreateClientRequest {
-  /** Client name */
-  name: string;
-  /** Client description */
-  description?: CreateClientRequestDescription;
-}
-
-/**
- * Client description
- */
-export type CreateClientResponseDescription = string | null;
-
-/**
- * Schema for client creation response
- */
-export interface CreateClientResponse {
-  /** Generated client ID */
-  client_id: string;
-  /** Generated client secret */
-  client_secret: string;
-  /** Client name */
-  name: string;
-  /** Client description */
-  description?: CreateClientResponseDescription;
-  /** Creation timestamp */
-  created_at: string;
+export interface CorrelationMatrix {
+  tickers: string[];
+  matrix: CorrelationMatrixMatrixItemItem[][];
 }
 
 /**
@@ -270,6 +241,11 @@ export interface HistoricalDataResponse {
   period: string;
   /** List of historical data points */
   data: HistoricalDataPoint[];
+}
+
+export interface LargestPosition {
+  ticker: string;
+  weight: number;
 }
 
 /**
@@ -408,12 +384,101 @@ export interface NewsArticle {
   is_video?: boolean;
 }
 
+export interface PortfolioPositionInput {
+  /**
+   * Ticker symbol
+   * @minLength 1
+   * @maxLength 20
+   */
+  ticker: string;
+  /**
+   * Number of shares/units held
+   */
+  quantity: number;
+}
+
+export type PortfolioRiskRequestPeriod = typeof PortfolioRiskRequestPeriod[keyof typeof PortfolioRiskRequestPeriod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PortfolioRiskRequestPeriod = {
+  '6mo': '6mo',
+  '1y': '1y',
+  '2y': '2y',
+  '3y': '3y',
+  '5y': '5y',
+} as const;
+
+export interface PortfolioRiskRequest {
+  /**
+   * @minItems 1
+   * @maxItems 50
+   */
+  positions: PortfolioPositionInput[];
+  /** Benchmark ticker for beta */
+  benchmark?: string;
+  period?: PortfolioRiskRequestPeriod;
+  /** Annual risk-free rate as a decimal (0.03 = 3%) */
+  risk_free_rate?: number;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  base_currency?: string;
+}
+
+export type PortfolioRiskResponseBeta = number | null;
+
+export type PortfolioRiskResponseVolatilityAnnual = number | null;
+
+export type PortfolioRiskResponseAnnualReturn = number | null;
+
+export type PortfolioRiskResponseMaxDrawdown = number | null;
+
+export type PortfolioRiskResponseSharpeRatio = number | null;
+
+export type PortfolioRiskResponseEffectivePositions = number | null;
+
+export interface PortfolioRiskResponse {
+  as_of: string;
+  period: string;
+  benchmark: string;
+  base_currency: string;
+  total_value: number;
+  weights: PortfolioWeight[];
+  beta?: PortfolioRiskResponseBeta;
+  volatility_annual?: PortfolioRiskResponseVolatilityAnnual;
+  annual_return?: PortfolioRiskResponseAnnualReturn;
+  max_drawdown?: PortfolioRiskResponseMaxDrawdown;
+  sharpe_ratio?: PortfolioRiskResponseSharpeRatio;
+  largest_position: LargestPosition;
+  hhi: number;
+  effective_positions?: PortfolioRiskResponseEffectivePositions;
+  correlation: CorrelationMatrix;
+  missing_tickers: string[];
+  observations: number;
+  disclaimer?: string;
+}
+
+export interface PortfolioWeight {
+  ticker: string;
+  quantity: number;
+  /** Latest close in the asset's own currency */
+  price: number;
+  currency: string;
+  /** Position value in base currency */
+  value_base: number;
+  /** Fraction of portfolio value (0-1) */
+  weight: number;
+}
+
 /**
  * Predefined screener options
  */
 export type PredefinedScreener = typeof PredefinedScreener[keyof typeof PredefinedScreener];
 
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PredefinedScreener = {
   aggressive_small_caps: 'aggressive_small_caps',
   day_gainers: 'day_gainers',
