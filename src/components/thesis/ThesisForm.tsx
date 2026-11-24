@@ -69,12 +69,13 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
         id: thesis?.id,
         values: {
           ticker,
-          portfolio_id: portfolio,
+          // Radix Select can emit "" inside a form; never send an empty uuid.
+          portfolio_id: portfolio || null,
           why_bought: whyBought.trim(),
           catalysts: catalysts.map((c) => c.trim()).filter(Boolean),
           exit_triggers: exitTriggers.map((c) => c.trim()).filter(Boolean),
-          horizon,
-          review_date: reviewDate,
+          horizon: horizon || null,
+          review_date: reviewDate || null,
           status,
         },
       },
@@ -117,7 +118,7 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label>Time horizon</Label>
-          <Select value={horizon ?? NONE} onValueChange={(v) => setHorizon(v === NONE ? null : (v as ThesisHorizon))}>
+          <Select value={horizon ?? NONE} onValueChange={(v) => setHorizon(!v || v === NONE ? null : (v as ThesisHorizon))}>
             <SelectTrigger>
               <SelectValue placeholder="Not set" />
             </SelectTrigger>
@@ -160,7 +161,7 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
         {!lockPortfolio && (
           <div className="space-y-2">
             <Label>Portfolio (optional)</Label>
-            <Select value={portfolio ?? NONE} onValueChange={(v) => setPortfolio(v === NONE ? null : v)}>
+            <Select value={portfolio ?? NONE} onValueChange={(v) => setPortfolio(!v || v === NONE ? null : v)}>
               <SelectTrigger>
                 <SelectValue placeholder="No portfolio" />
               </SelectTrigger>

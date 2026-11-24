@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +15,19 @@ interface EditableListProps {
 export function EditableList({ label, placeholder, items, onChange, maxItems }: EditableListProps) {
   const update = (i: number, value: string) => onChange(items.map((it, idx) => (idx === i ? value : it)));
   const remove = (i: number) => onChange(items.filter((_, idx) => idx !== i));
+  const listRef = useRef<HTMLDivElement>(null);
+  const focusLast = useRef(false);
+
+  // Focus the row just added with the Add button.
+  useEffect(() => {
+    if (!focusLast.current) return;
+    focusLast.current = false;
+    const inputs = listRef.current?.querySelectorAll("input");
+    inputs?.[inputs.length - 1]?.focus();
+  }, [items.length]);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" ref={listRef}>
       <Label>{label}</Label>
       {items.map((item, i) => (
         <div key={i} className="flex items-center gap-2">
@@ -46,7 +57,10 @@ export function EditableList({ label, placeholder, items, onChange, maxItems }: 
           size="sm"
           className="gap-1"
           disabled={maxItems !== undefined && items.length >= maxItems}
-          onClick={() => onChange([...items, ""])}
+          onClick={() => {
+            focusLast.current = true;
+            onChange([...items, ""]);
+          }}
         >
           <Plus className="h-4 w-4" /> Add
         </Button>
