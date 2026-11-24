@@ -150,7 +150,7 @@ function FundamentalsContent({ data, period }: { data: FinancialsResponse; perio
           <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
             <XAxis dataKey="label" {...axisProps} />
-            <YAxis {...axisProps} tickFormatter={(v: number) => `${v}%`} width={44} />
+            <YAxis {...axisProps} tickFormatter={(v: number) => `${v}%`} width={44} domain={[(min: number) => Math.max(min, -100), (max: number) => Math.min(max, 100)]} allowDataOverflow />
             <Tooltip contentStyle={tooltipStyle} formatter={pct} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             <Line type="monotone" dataKey="gross_margin" name="Gross" stroke={C.primary} strokeWidth={2} dot={false} connectNulls />

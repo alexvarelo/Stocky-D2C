@@ -268,11 +268,11 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
                 ))}
                 {active.levels &&
                   tech.levels.support?.map((y) => (
-                    <ReferenceLine key={`s${y}`} y={y} stroke="#10b981" strokeDasharray="4 4" strokeOpacity={0.7} />
+                    <ReferenceLine key={`s${y}`} y={y} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
                   ))}
                 {active.levels &&
                   tech.levels.resistance?.map((y) => (
-                    <ReferenceLine key={`r${y}`} y={y} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.7} />
+                    <ReferenceLine key={`r${y}`} y={y} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
                   ))}
               </ComposedChart>
             </ResponsiveContainer>
@@ -304,8 +304,8 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
                 {xAxis(true)}
                 <YAxis domain={[0, 100]} ticks={[0, 30, 70, 100]} width={Y_WIDTH} {...axisProps} />
                 <Tooltip content={<ChartTooltip />} />
-                <ReferenceLine y={70} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.6} />
-                <ReferenceLine y={30} stroke="#10b981" strokeDasharray="4 4" strokeOpacity={0.6} />
+                <ReferenceLine y={70} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.6} />
+                <ReferenceLine y={30} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.6} />
                 <Line dataKey="rsi14" name="RSI" stroke="#8b5cf6" strokeWidth={1.5} dot={false} isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
