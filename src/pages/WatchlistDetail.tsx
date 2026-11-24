@@ -18,8 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ArrowUpRight, Trash2, Plus, Loader2, Search, Pencil } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import { ArrowUpRight, Trash2, Loader2, Search, Pencil, GitCompare } from 'lucide-react';
 import { useState } from 'react';
 import { AddToWatchlist } from '@/components/watchlist/AddToWatchlist';
 import { EditWatchlistDialog } from '@/components/watchlist/EditWatchlistDialog';
@@ -76,6 +75,14 @@ export default function WatchlistDetail() {
             </div>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
+            {items.length >= 2 && (
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link to={`/compare?tickers=${items.slice(0, 6).map((i: WatchlistItem) => i.ticker).join(',')}`}>
+                  <GitCompare className="h-4 w-4" />
+                  Compare
+                </Link>
+              </Button>
+            )}
             <Button 
               onClick={() => setShowEditDialog(true)}
               variant="outline"
