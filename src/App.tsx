@@ -28,6 +28,8 @@ const PortfolioDetail = lazy(() => import("./pages/PortfolioDetail"));
 const InstrumentPage = lazy(() => import("./pages/InstrumentPage").then((m) => ({ default: m.InstrumentPage })));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+const PortfolioScenarios = lazy(() => import("./pages/PortfolioScenarios"));
+const Strategies = lazy(() => import("./pages/Strategies"));
 const Watchlists = lazy(() => import("./pages/Watchlists"));
 const WatchlistDetail = lazy(() => import("./pages/WatchlistDetail"));
 const Compare = lazy(() => import("./pages/Compare"));
@@ -172,6 +174,8 @@ const App = () => (
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/portfolios" element={<Portfolios />} />
                     <Route path="/portfolio/:portfolioId" element={<PortfolioDetail />} />
+                    <Route path="/portfolio/:portfolioId/scenarios" element={<PortfolioScenarios />} />
+                    <Route path="/strategies" element={<Strategies />} />
                     <Route path="/watchlists" element={<Watchlists />} />
                     <Route path="/watchlist/:id" element={<WatchlistDetail />} />
                     <Route path="/article/:id" element={<ArticlePage />} />
