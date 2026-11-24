@@ -45,16 +45,6 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -64,41 +54,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/v1/clients": {
-      "post": {
-        "tags": [
-          "authentication"
-        ],
-        "summary": "Create new client",
-        "description": "Create a new client with generated credentials",
-        "operationId": "create_client_api_v1_clients_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateClientRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateClientResponse"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Client created successfully"
           },
           "422": {
             "description": "Validation Error",
@@ -106,16 +61,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -260,22 +205,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Screening service error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -354,22 +299,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Screening service error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -439,22 +384,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Search service error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -548,22 +493,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Search service error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -610,22 +555,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "503": {
             "description": "YFinance service unavailable",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -722,22 +667,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "503": {
             "description": "YFinance service unavailable",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -792,22 +737,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "503": {
             "description": "YFinance service unavailable",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -864,22 +809,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "503": {
             "description": "YFinance service unavailable",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -934,22 +879,22 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "503": {
             "description": "YFinance service unavailable",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -1026,16 +971,6 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
           "503": {
             "description": "YFinance service unavailable",
             "content": {
@@ -1045,8 +980,68 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
+      }
+    },
+    "/api/v1/portfolio/risk": {
+      "post": {
+        "tags": [
+          "risk"
+        ],
+        "summary": "Portfolio risk metrics",
+        "description": "Beta vs a benchmark, annualised volatility, max drawdown, Sharpe ratio, concentration (largest position, HHI) and correlation matrix for a buy-and-hold portfolio of the given positions. All ratios are decimals. Educational information, not financial advice.",
+        "operationId": "portfolio_risk_api_v1_portfolio_risk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioRiskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioRiskResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request or no usable price data"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/health": {
@@ -1087,8 +1082,8 @@
             "anyOf": [
               {
                 "type": "integer",
-                "maximum": 20,
-                "minimum": 1
+                "maximum": 20.0,
+                "minimum": 1.0
               },
               {
                 "type": "null"
@@ -1102,8 +1097,8 @@
             "anyOf": [
               {
                 "type": "integer",
-                "maximum": 30,
-                "minimum": 1
+                "maximum": 30.0,
+                "minimum": 1.0
               },
               {
                 "type": "null"
@@ -1256,78 +1251,39 @@
         "title": "CompanyInfo",
         "description": "Schema for company information"
       },
-      "CreateClientRequest": {
+      "CorrelationMatrix": {
         "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Client name"
+          "tickers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tickers"
           },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
+          "matrix": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "Client description"
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Matrix"
           }
         },
         "type": "object",
         "required": [
-          "name"
+          "tickers",
+          "matrix"
         ],
-        "title": "CreateClientRequest",
-        "description": "Schema for creating a new client"
-      },
-      "CreateClientResponse": {
-        "properties": {
-          "client_id": {
-            "type": "string",
-            "title": "Client Id",
-            "description": "Generated client ID"
-          },
-          "client_secret": {
-            "type": "string",
-            "title": "Client Secret",
-            "description": "Generated client secret"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Client name"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "Client description"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Creation timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "client_id",
-          "client_secret",
-          "name",
-          "created_at"
-        ],
-        "title": "CreateClientResponse",
-        "description": "Schema for client creation response"
+        "title": "CorrelationMatrix"
       },
       "EquityScreenResponse": {
         "properties": {
@@ -1603,6 +1559,24 @@
         "title": "HistoricalDataResponse",
         "description": "Schema for historical price data response"
       },
+      "LargestPosition": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "weight"
+        ],
+        "title": "LargestPosition"
+      },
       "MarketData": {
         "properties": {
           "symbol": {
@@ -1865,6 +1839,258 @@
         "title": "NewsArticle",
         "description": "Schema for news articles related to stocks"
       },
+      "PortfolioPositionInput": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Ticker",
+            "description": "Ticker symbol"
+          },
+          "quantity": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity",
+            "description": "Number of shares/units held"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "quantity"
+        ],
+        "title": "PortfolioPositionInput"
+      },
+      "PortfolioRiskRequest": {
+        "properties": {
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/PortfolioPositionInput"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Positions"
+          },
+          "benchmark": {
+            "type": "string",
+            "title": "Benchmark",
+            "description": "Benchmark ticker for beta",
+            "default": "^GSPC"
+          },
+          "period": {
+            "type": "string",
+            "enum": [
+              "6mo",
+              "1y",
+              "2y",
+              "3y",
+              "5y"
+            ],
+            "title": "Period",
+            "default": "1y"
+          },
+          "risk_free_rate": {
+            "type": "number",
+            "title": "Risk Free Rate",
+            "description": "Annual risk-free rate as a decimal (0.03 = 3%)",
+            "default": 0.0
+          },
+          "base_currency": {
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3,
+            "title": "Base Currency",
+            "default": "USD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "positions"
+        ],
+        "title": "PortfolioRiskRequest"
+      },
+      "PortfolioRiskResponse": {
+        "properties": {
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "title": "As Of"
+          },
+          "period": {
+            "type": "string",
+            "title": "Period"
+          },
+          "benchmark": {
+            "type": "string",
+            "title": "Benchmark"
+          },
+          "base_currency": {
+            "type": "string",
+            "title": "Base Currency"
+          },
+          "total_value": {
+            "type": "number",
+            "title": "Total Value"
+          },
+          "weights": {
+            "items": {
+              "$ref": "#/components/schemas/PortfolioWeight"
+            },
+            "type": "array",
+            "title": "Weights"
+          },
+          "beta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beta"
+          },
+          "volatility_annual": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volatility Annual"
+          },
+          "annual_return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Return"
+          },
+          "max_drawdown": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Drawdown"
+          },
+          "sharpe_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sharpe Ratio"
+          },
+          "largest_position": {
+            "$ref": "#/components/schemas/LargestPosition"
+          },
+          "hhi": {
+            "type": "number",
+            "title": "Hhi"
+          },
+          "effective_positions": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Positions"
+          },
+          "correlation": {
+            "$ref": "#/components/schemas/CorrelationMatrix"
+          },
+          "missing_tickers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Tickers"
+          },
+          "observations": {
+            "type": "integer",
+            "title": "Observations"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "as_of",
+          "period",
+          "benchmark",
+          "base_currency",
+          "total_value",
+          "weights",
+          "largest_position",
+          "hhi",
+          "correlation",
+          "missing_tickers",
+          "observations"
+        ],
+        "title": "PortfolioRiskResponse"
+      },
+      "PortfolioWeight": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "quantity": {
+            "type": "number",
+            "title": "Quantity"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price",
+            "description": "Latest close in the asset's own currency"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "value_base": {
+            "type": "number",
+            "title": "Value Base",
+            "description": "Position value in base currency"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight",
+            "description": "Fraction of portfolio value (0-1)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "quantity",
+          "price",
+          "currency",
+          "value_base",
+          "weight"
+        ],
+        "title": "PortfolioWeight"
+      },
       "PredefinedScreener": {
         "type": "string",
         "enum": [
@@ -1893,6 +2119,18 @@
             "type": "string",
             "title": "Symbol",
             "description": "Stock ticker symbol"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency",
+            "description": "Currency the price is denominated in, e.g. USD, EUR"
           },
           "current_price": {
             "anyOf": [
