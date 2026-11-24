@@ -820,7 +820,7 @@ export type Database = {
           name: string
           params: Json
           portfolio_id: string | null
-          result_summary: Json
+          result_summary: Json | null
           updated_at: string
           user_id: string
         }
@@ -862,7 +862,7 @@ export type Database = {
           id: string
           name: string
           params: Json
-          result_summary: Json
+          result_summary: Json | null
           strategy: string
           updated_at: string
           user_id: string

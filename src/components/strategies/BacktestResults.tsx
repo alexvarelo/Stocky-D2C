@@ -23,6 +23,7 @@ type Row = { label: React.ReactNode; get: (_m: BacktestMetrics) => string };
 export function BacktestResults({ result, onSave, saving }: Props) {
   const cur = result.base_currency;
   const [showTrades, setShowTrades] = useState(false);
+  const benchName = result.strategy === "dca" ? "Lump sum" : "Buy and hold";
   const tpl = TEMPLATES.find((t) => t.id === result.strategy);
   const data = useMemo(() => result.equity_curve, [result.equity_curve]);
 
@@ -61,7 +62,7 @@ export function BacktestResults({ result, onSave, saving }: Props) {
           <SaveButton label="Save strategy" title="Save strategy" defaultName={tpl?.name} saving={saving} onSave={onSave} />
         </div>
 
-        <div style={{ height: 300 }} className="w-full" role="img" aria-label="Equity curve of the strategy versus buy and hold and money invested">
+        <div style={{ height: 300 }} className="w-full" role="img" aria-label={`Equity curve of the strategy versus ${benchName.toLowerCase()} and money invested`}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
@@ -73,7 +74,7 @@ export function BacktestResults({ result, onSave, saving }: Props) {
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Line type="monotone" dataKey="strategy_value" name="Strategy" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Line type="monotone" dataKey="benchmark_value" name="Buy and hold" stroke="#f59e0b" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="benchmark_value" name={benchName} stroke="#f59e0b" strokeWidth={1.5} dot={false} isAnimationActive={false} />
               <Line type="stepAfter" dataKey="invested" name="Money invested" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 3" strokeWidth={1.5} dot={false} isAnimationActive={false} />
             </ComposedChart>
           </ResponsiveContainer>
@@ -85,7 +86,7 @@ export function BacktestResults({ result, onSave, saving }: Props) {
               <tr className="border-b border-border/50">
                 <th className="text-left font-medium p-2.5">Metric</th>
                 <th className="text-right font-medium p-2.5">Strategy</th>
-                <th className="text-right font-medium p-2.5">Buy and hold</th>
+                <th className="text-right font-medium p-2.5">{benchName}</th>
               </tr>
             </thead>
             <tbody>
@@ -99,6 +100,12 @@ export function BacktestResults({ result, onSave, saving }: Props) {
             </tbody>
           </table>
         </div>
+
+        <p className="text-xs text-muted-foreground">
+          {result.strategy === "dca"
+            ? "Lump sum puts the same total amount of money that the strategy invested over the period into the asset on day 0 and holds it."
+            : "Buy and hold invests the starting capital on day 0 and keeps it."}
+        </p>
 
         {result.notes.length > 0 && (
           <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-4">

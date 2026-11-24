@@ -15,7 +15,7 @@ export function invalidTickers(holdings: PortfolioHolding[]) {
 }
 
 /** Aggregate holdings by ticker; drop zero/negative quantities and unsupported symbols; cap at 50 largest. */
-export function toPositions(holdings: PortfolioHolding[]) {
+export function toPositions(holdings: PortfolioHolding[], limit = MAX_POSITIONS) {
   const byTicker = new Map<string, { quantity: number; value: number }>();
   for (const h of holdings) {
     const ticker = h.ticker?.trim().toUpperCase();
@@ -27,7 +27,7 @@ export function toPositions(holdings: PortfolioHolding[]) {
   }
   return [...byTicker.entries()]
     .sort((a, b) => b[1].value - a[1].value || a[0].localeCompare(b[0]))
-    .slice(0, MAX_POSITIONS)
+    .slice(0, limit)
     .map(([ticker, v]) => ({ ticker, quantity: v.quantity }))
     .sort((a, b) => a.ticker.localeCompare(b.ticker));
 }

@@ -9,9 +9,12 @@ export function apiErrorMessage(error: unknown, fallback = "Something went wrong
   if (typeof detail === "string" && detail.trim()) return detail;
   if (Array.isArray(detail)) {
     const msgs = detail
-      .map((d: { msg?: string; loc?: unknown[] }) =>
-        d?.msg ? `${Array.isArray(d.loc) ? d.loc.filter((x) => x !== "body").join(".") + ": " : ""}${d.msg}` : null,
-      )
+      .map((d: { msg?: string; loc?: unknown[] }) => {
+        if (!d?.msg) return null;
+        const loc = Array.isArray(d.loc) ? d.loc.filter((x) => x !== "body").join(".") : "";
+        const msg = d.msg.replace(/^Value error, /, "");
+        return loc ? `${loc}: ${msg}` : msg;
+      })
       .filter(Boolean);
     if (msgs.length) return msgs.join("; ");
   }

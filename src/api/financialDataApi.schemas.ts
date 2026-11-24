@@ -55,6 +55,7 @@ export interface BacktestParams {
   /**
    * dca: amount invested on the first trading day of each month
    * @minimum 0
+   * @maximum 1000000000
    */
   monthly_amount?: number;
   rebalance_frequency?: BacktestParamsRebalanceFrequency;
@@ -100,7 +101,10 @@ export interface BacktestRequest {
   tickers: BacktestTicker[];
   start_date: string;
   end_date: string;
-  /** @minimum 0 */
+  /**
+   * @minimum 0
+   * @maximum 1000000000
+   */
   initial_capital?: number;
   /** @pattern ^[A-Za-z]{3}$ */
   base_currency?: string;
@@ -841,6 +845,7 @@ export interface MonteCarloRequest {
   /**
    * Added every 21 trading days, in base currency
    * @minimum 0
+   * @maximum 1000000000
    */
   monthly_contribution?: number;
   lookback?: MonteCarloRequestLookback;
@@ -964,7 +969,8 @@ export interface PortfolioPositionInput {
    */
   ticker: string;
   /**
-   * Number of shares/units held
+   * Number of shares/units held (max 1e9)
+   * @maximum 1000000000
    */
   quantity: number;
 }
@@ -1207,6 +1213,7 @@ export const ScenarioExcludedReason = {
   no_fx: 'no_fx',
   unknown_currency: 'unknown_currency',
   short_history: 'short_history',
+  invalid_prices: 'invalid_prices',
 } as const;
 
 export interface ScenarioExcluded {
@@ -1468,6 +1475,11 @@ export const StressPositionMethod = {
   shock: 'shock',
 } as const;
 
+/**
+ * Beta (clamped to [0, 3]) used for beta_proxy/shock; null for 'historical' positions. Estimated from weekly (W-FRI) base-currency returns vs ^GSPC over the last 2y (>= 52 weekly observations), else 1.0
+ */
+export type StressPositionBeta = number | null;
+
 export interface StressPosition {
   ticker: string;
   /** Position return in the scenario (decimal, base currency) */
@@ -1475,6 +1487,8 @@ export interface StressPosition {
   method: StressPositionMethod;
   /** Current weight in the portfolio (0-1) */
   weight: number;
+  /** Beta (clamped to [0, 3]) used for beta_proxy/shock; null for 'historical' positions. Estimated from weekly (W-FRI) base-currency returns vs ^GSPC over the last 2y (>= 52 weekly observations), else 1.0 */
+  beta?: StressPositionBeta;
 }
 
 export interface StressRequest {
@@ -1697,10 +1711,24 @@ export interface WhatIfChanges {
   monthly_contribution?: WhatIfChangesMonthlyContribution;
 }
 
+/**
+ * Modified minus current of (final p50 / (start_value + total_contributions) - 1)
+ */
+export type WhatIfDeltaP50Return = number | null;
+
+/**
+ * Modified minus current of (final p5 / (start_value + total_contributions) - 1)
+ */
+export type WhatIfDeltaP5Return = number | null;
+
 export interface WhatIfDelta {
   p50: number;
   p5: number;
   prob_loss: number;
+  /** Modified minus current of (final p50 / (start_value + total_contributions) - 1) */
+  p50_return?: WhatIfDeltaP50Return;
+  /** Modified minus current of (final p5 / (start_value + total_contributions) - 1) */
+  p5_return?: WhatIfDeltaP5Return;
 }
 
 export interface WhatIfRequest {
@@ -1718,6 +1746,8 @@ export interface WhatIfResponse {
   current: MonteCarloSummary;
   modified: MonteCarloSummary;
   delta: WhatIfDelta;
+  /** Proceeds of the sells (qty x last price, base currency). Kept as cash with 0 return in the modified portfolio (included in its start_value); buys are funded by new money */
+  cash_from_sales?: number;
   risk_current: RiskSnapshot;
   risk_modified: RiskSnapshot;
   excluded?: ScenarioExcluded[];
@@ -1727,7 +1757,9 @@ export interface WhatIfResponse {
 export interface WhatIfTrade {
   /** @pattern ^[A-Za-z0-9.^=\-]{1,20}$ */
   ticker: string;
-  /** */
+  /**
+   * @maximum 1000000000
+   */
   quantity: number;
 }
 

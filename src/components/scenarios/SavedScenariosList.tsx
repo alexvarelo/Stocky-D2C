@@ -1,11 +1,10 @@
-import { Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteSavedScenario, useSavedScenarios, type SavedScenario } from "@/hooks/useSavedScenarios";
 import { fmtMoney, fmtPct } from "./format";
-import { ErrorBox } from "./shared";
+import { ConfirmDeleteButton, ErrorBox } from "./shared";
 
 const KIND_LABEL = { stress: "Stress", montecarlo: "Monte Carlo", whatif: "What if" } as const;
 
@@ -19,7 +18,7 @@ interface Summary {
 }
 
 function headline(s: SavedScenario): string {
-  const r = s.result_summary as Summary;
+  const r = (s.result_summary ?? {}) as Summary;
   const cur = r.base_currency || "USD";
   if (s.kind === "montecarlo") return `Median ${fmtMoney(r.final?.p50, cur)} · loss prob. ${fmtPct(r.prob_loss, 0)}`;
   if (s.kind === "whatif") return `Median ${fmtMoney(r.current?.p50, cur)} → ${fmtMoney(r.modified?.p50, cur)}`;
@@ -53,16 +52,7 @@ export function SavedScenariosList({ portfolioId, onLoad }: { portfolioId: strin
             <Button variant="outline" size="sm" onClick={() => onLoad(s)}>
               Load
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground"
-              aria-label={`Delete ${s.name}`}
-              disabled={del.isPending}
-              onClick={() => del.mutate(s.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <ConfirmDeleteButton name={s.name} disabled={del.isPending} onConfirm={() => del.mutate(s.id)} />
           </div>
         ))}
       </CardContent>
