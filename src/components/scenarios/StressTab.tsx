@@ -12,14 +12,16 @@ import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { apiErrorMessage } from "@/lib/apiError";
 import type { Position } from "@/lib/portfolioPositions";
-import { fmtMoney, fmtPct, toneClass } from "./format";
-import { ErrorBox, ExcludedNote, ResultsSkeleton, SaveButton } from "./shared";
+import { fmtMoney, fmtNum, fmtPct, toneClass } from "./format";
+import { ChangedHint, ErrorBox, ExcludedNote, ResultsSkeleton, SaveButton } from "./shared";
 
 export interface TabProps {
   positions: Position[];
-  baseCurrency: string;
+  /** undefined while the portfolio currency has not loaded; running is disabled until it is known. */
+  baseCurrency: string | undefined;
   initial?: Record<string, unknown>;
-  onSave: (_name: string, _params: Record<string, unknown>, _summary: Record<string, unknown>) => Promise<unknown>;
+  /** Omitted when the viewer is not allowed to save (not the portfolio owner). */
+  onSave?: (_name: string, _params: Record<string, unknown>, _summary: Record<string, unknown>) => Promise<unknown>;
   saving?: boolean;
 }
 
@@ -104,6 +106,7 @@ function ScenarioCard({ s, currency }: { s: StressScenario; currency: string }) 
                         <td className={`p-2 text-right tabular-nums ${toneClass(p.return)}`}>{fmtPct(p.return, 1, true)}</td>
                         <td className="p-2 text-muted-foreground whitespace-nowrap">
                           {p.method === "historical" ? "historical" : p.method === "beta_proxy" ? "from beta" : "shock"}
+                          {p.method !== "historical" && p.beta != null && <span className="ml-1 tabular-nums">· beta {fmtNum(p.beta)}</span>}
                         </td>
                       </tr>
                     ))}
@@ -118,10 +121,14 @@ function ScenarioCard({ s, currency }: { s: StressScenario; currency: string }) 
 }
 
 export function StressTab({ positions, baseCurrency, initial, onSave, saving }: TabProps) {
-  const initShocks = Array.isArray(initial?.shocks)
-    ? (initial.shocks as number[]).map((s) => String(Math.round(s * 1000) / 10))
-    : DEFAULT_SHOCKS;
-  const [shocks, setShocks] = useState<string[]>(initShocks);
+  const savedShocks = Array.isArray(initial?.shocks)
+    ? (initial.shocks as unknown[])
+        .filter((s): s is number => typeof s === "number" && Number.isFinite(s) && s >= -0.95 && s <= 1)
+        .slice(0, MAX_SHOCKS)
+        .map((s) => String(Math.round(s * 1000) / 10))
+    : [];
+  const [shocks, setShocks] = useState<string[]>(savedShocks.length ? savedShocks : DEFAULT_SHOCKS);
+  const [ran, setRan] = useState<number[] | null>(null);
   const mutation = useStressApiV1ScenariosStressPost();
   const result: StressResponse | undefined = mutation.data?.data;
 
@@ -129,10 +136,15 @@ export function StressTab({ positions, baseCurrency, initial, onSave, saving }: 
   const shocksValid = shocks.every((s, i) => s.trim() !== "" && Number.isFinite(parsed[i]) && parsed[i] >= -95 && parsed[i] <= 100);
   const shockDecimals = parsed.map((p) => Math.round(p * 100) / 10000);
 
-  const run = () =>
+  const changed = !!result && !!ran && JSON.stringify(ran) !== JSON.stringify(shocksValid ? shockDecimals : []);
+
+  const run = () => {
+    const sent = shocksValid ? shockDecimals : [];
+    setRan(sent);
     mutation.mutate({
-      data: { positions, base_currency: baseCurrency, shocks: shocksValid ? shockDecimals : [] },
+      data: { positions, base_currency: baseCurrency!, shocks: sent },
     });
+  };
 
   return (
     <div className="space-y-4">
@@ -148,8 +160,8 @@ export function StressTab({ positions, baseCurrency, initial, onSave, saving }: 
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Market drop sizes (%)</Label>
-            <div className="flex flex-wrap gap-2 items-center">
+            <Label id="stress-shocks-label">Market drop sizes (%)</Label>
+            <div role="group" aria-labelledby="stress-shocks-label" className="flex flex-wrap gap-2 items-center">
               {shocks.map((s, i) => (
                 <div key={i} className="flex items-center gap-1">
                   <Input
@@ -182,10 +194,11 @@ export function StressTab({ positions, baseCurrency, initial, onSave, saving }: 
             </div>
             {!shocksValid && <p className="text-xs text-destructive">Enter values between -95 and 100.</p>}
           </div>
-          <Button onClick={run} disabled={mutation.isPending || !shocksValid || positions.length === 0} className="gap-2">
+          <Button onClick={run} disabled={mutation.isPending || !shocksValid || positions.length === 0 || !baseCurrency} className="gap-2">
             <Play className="h-4 w-4" aria-hidden />
             {result ? "Run again" : "Run stress test"}
           </Button>
+          <ChangedHint show={changed} />
         </CardContent>
       </Card>
 
@@ -200,6 +213,7 @@ export function StressTab({ positions, baseCurrency, initial, onSave, saving }: 
             <p className="text-sm text-muted-foreground">
               Current value: <span className="font-semibold text-foreground">{fmtMoney(result.current_value, result.base_currency)}</span>
             </p>
+            {onSave && (
             <SaveButton
               label="Save scenario"
               title="Save stress test"
@@ -208,7 +222,7 @@ export function StressTab({ positions, baseCurrency, initial, onSave, saving }: 
               onSave={(name) =>
                 onSave(
                   name,
-                  { shocks: shockDecimals },
+                  { shocks: ran ?? [] },
                   {
                     current_value: result.current_value,
                     base_currency: result.base_currency,
@@ -222,6 +236,7 @@ export function StressTab({ positions, baseCurrency, initial, onSave, saving }: 
                 )
               }
             />
+            )}
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {result.scenarios.map((s) => (

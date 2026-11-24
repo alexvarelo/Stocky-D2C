@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 import { useMontecarloApiV1ScenariosMontecarloPost } from "@/api/scenarios/scenarios";
-import { MonteCarloRequestLookback, type MonteCarloResponse } from "@/api/financialDataApi.schemas";
+import type { MonteCarloRequestLookback, MonteCarloResponse } from "@/api/financialDataApi.schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,15 @@ import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { apiErrorMessage } from "@/lib/apiError";
 import { FanChart } from "./FanChart";
-import { fmtMoney, fmtPct } from "./format";
-import { ErrorBox, ExcludedNote, ResultsSkeleton, SaveButton, Stat } from "./shared";
+import { MAX_AMOUNT, fmtMoney, fmtPct } from "./format";
+import { isAmount, loadAmount, loadHorizon, loadLookback } from "./params";
+import { ChangedHint, ErrorBox, ExcludedNote, ResultsSkeleton, SaveButton, Stat } from "./shared";
 import type { TabProps } from "./StressTab";
 
 export const PATHS = 5000;
 
 export function HorizonLookbackInputs({
+  idPrefix = "mc",
   horizon,
   setHorizon,
   lookback,
@@ -26,6 +28,7 @@ export function HorizonLookbackInputs({
   setContribution,
   contributionLabel = "Monthly contribution",
 }: {
+  idPrefix?: string;
   horizon: number;
   setHorizon: (_n: number) => void;
   lookback: MonteCarloRequestLookback;
@@ -37,8 +40,9 @@ export function HorizonLookbackInputs({
   return (
     <div className="grid gap-4 sm:grid-cols-3">
       <div className="space-y-2">
-        <Label>Horizon</Label>
+        <Label id={`${idPrefix}-horizon`}>Horizon</Label>
         <ToggleGroup
+          aria-labelledby={`${idPrefix}-horizon`}
           type="single"
           variant="outline"
           value={String(horizon)}
@@ -53,9 +57,10 @@ export function HorizonLookbackInputs({
         </ToggleGroup>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="mc-contrib">{contributionLabel}</Label>
+        <Label htmlFor={`${idPrefix}-contrib`}>{contributionLabel}</Label>
         <Input
-          id="mc-contrib"
+          id={`${idPrefix}-contrib`}
+          max={MAX_AMOUNT}
           type="number"
           inputMode="decimal"
           min={0}
@@ -65,8 +70,9 @@ export function HorizonLookbackInputs({
         />
       </div>
       <div className="space-y-2">
-        <Label>Past data used</Label>
+        <Label id={`${idPrefix}-lookback`}>Past data used</Label>
         <ToggleGroup
+          aria-labelledby={`${idPrefix}-lookback`}
           type="single"
           variant="outline"
           value={lookback}
@@ -84,28 +90,36 @@ export function HorizonLookbackInputs({
   );
 }
 
+interface Params {
+  horizon_years: number;
+  lookback: MonteCarloRequestLookback;
+  monthly_contribution: number;
+}
+
 export const SIM_EXPLAINER =
   "This is a simulation built by reshuffling your holdings' past daily returns. It shows a range of possible outcomes and is not a forecast.";
 
 export function MonteCarloTab({ positions, baseCurrency, initial, onSave, saving }: TabProps) {
-  const [horizon, setHorizon] = useState<number>(typeof initial?.horizon_years === "number" ? initial.horizon_years : 3);
-  const [lookback, setLookback] = useState<MonteCarloRequestLookback>(
-    (initial?.lookback as MonteCarloRequestLookback) ?? MonteCarloRequestLookback["5y"],
-  );
-  const [contribution, setContribution] = useState<string>(String(initial?.monthly_contribution ?? 0));
+  const [horizon, setHorizon] = useState<number>(loadHorizon(initial?.horizon_years));
+  const [lookback, setLookback] = useState<MonteCarloRequestLookback>(loadLookback(initial?.lookback));
+  const [contribution, setContribution] = useState<string>(loadAmount(initial?.monthly_contribution));
+  const [ran, setRan] = useState<Params | null>(null);
   const mutation = useMontecarloApiV1ScenariosMontecarloPost();
   const result: MonteCarloResponse | undefined = mutation.data?.data;
 
   const contribNum = Number(contribution);
-  const valid = contribution.trim() !== "" && Number.isFinite(contribNum) && contribNum >= 0;
-  const params = { horizon_years: horizon, lookback, monthly_contribution: valid ? contribNum : 0 };
+  const valid = isAmount(contribution);
+  const params: Params = { horizon_years: horizon, lookback, monthly_contribution: valid ? contribNum : 0 };
+  const changed = !!result && !!ran && JSON.stringify(ran) !== JSON.stringify(params);
 
-  const run = () =>
+  const run = () => {
+    setRan(params);
     mutation.mutate({
-      data: { positions, base_currency: baseCurrency, paths: PATHS, ...params },
+      data: { positions, base_currency: baseCurrency!, paths: PATHS, ...params },
     });
+  };
 
-  const cur = result?.base_currency ?? baseCurrency;
+  const cur = result?.base_currency ?? baseCurrency ?? "USD";
 
   return (
     <div className="space-y-4">
@@ -125,11 +139,12 @@ export function MonteCarloTab({ positions, baseCurrency, initial, onSave, saving
             contribution={contribution}
             setContribution={setContribution}
           />
-          {!valid && <p className="text-xs text-destructive">Contribution must be 0 or more.</p>}
-          <Button onClick={run} disabled={mutation.isPending || !valid || positions.length === 0} className="gap-2">
+          {!valid && <p className="text-xs text-destructive">Contribution must be between 0 and 1,000,000,000.</p>}
+          <Button onClick={run} disabled={mutation.isPending || !valid || positions.length === 0 || !baseCurrency} className="gap-2">
             <Play className="h-4 w-4" aria-hidden />
             {result ? "Run again" : "Run simulation"}
           </Button>
+          <ChangedHint show={changed} />
         </CardContent>
       </Card>
 
@@ -143,13 +158,14 @@ export function MonteCarloTab({ positions, baseCurrency, initial, onSave, saving
               <h3 className="font-semibold">
                 Simulated value over {result.horizon_years} {result.horizon_years === 1 ? "year" : "years"}
               </h3>
+              {onSave && (
               <SaveButton
                 label="Save scenario"
                 title="Save simulation"
                 defaultName={`Simulation ${result.horizon_years}y`}
                 saving={saving}
                 onSave={(name) =>
-                  onSave(name, params, {
+                  onSave(name, { ...(ran ?? params) }, {
                     base_currency: result.base_currency,
                     start_value: result.start_value,
                     total_contributions: result.total_contributions,
@@ -159,6 +175,7 @@ export function MonteCarloTab({ positions, baseCurrency, initial, onSave, saving
                   })
                 }
               />
+              )}
             </div>
             <FanChart percentiles={result.percentiles} currency={cur} />
             <p className="text-xs text-muted-foreground">

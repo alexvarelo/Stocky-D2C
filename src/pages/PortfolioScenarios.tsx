@@ -5,7 +5,10 @@ import { usePortfolio } from "@/api/portfolio/portfolio";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MAX_POSITIONS, toBaseCurrency, toPositions } from "@/lib/portfolioPositions";
+import { MAX_POSITIONS, invalidTickers, toPositions } from "@/lib/portfolioPositions";
+import { useAuth } from "@/lib/auth";
+import { CURRENCIES } from "@/components/scenarios/format";
+import { MAX_WHATIF_TICKERS } from "@/components/scenarios/WhatIfTab";
 import { StressTab } from "@/components/scenarios/StressTab";
 import { MonteCarloTab } from "@/components/scenarios/MonteCarloTab";
 import { WhatIfTab } from "@/components/scenarios/WhatIfTab";
@@ -17,17 +20,27 @@ import { EducationalDisclaimer } from "@/components/compliance/EducationalDiscla
 export default function PortfolioScenarios() {
   const { portfolioId } = useParams<{ portfolioId: string }>();
   const { data: portfolio, isLoading, error } = usePortfolio(portfolioId ?? "");
+  const { user } = useAuth();
   const create = useCreateSavedScenario();
   const [tab, setTab] = useState<ScenarioKind>("stress");
   const [loaded, setLoaded] = useState<{ nonce: number; kind: ScenarioKind; params: Record<string, unknown> } | null>(null);
 
   const holdings = useMemo(() => portfolio?.holdings ?? [], [portfolio?.holdings]);
   const positions = useMemo(() => toPositions(holdings), [holdings]);
-  const baseCurrency = toBaseCurrency(portfolio?.currency);
+  const whatIfPositions = useMemo(() => toPositions(holdings, MAX_WHATIF_TICKERS), [holdings]);
+  const uniqueCount = useMemo(() => toPositions(holdings, Infinity).length, [holdings]);
+  const skipped = useMemo(() => invalidTickers(holdings), [holdings]);
+  const isOwner = !!user?.id && user.id === portfolio?.user_id;
+  const rawCurrency = portfolio?.currency?.trim().toUpperCase();
+  // undefined until the portfolio currency is known; runs stay disabled meanwhile.
+  const currencyKnown = !!rawCurrency && rawCurrency.length === 3;
+  const supported = currencyKnown && (CURRENCIES as readonly string[]).includes(rawCurrency);
+  const baseCurrency: string | undefined = currencyKnown ? (supported ? rawCurrency : "USD") : undefined;
 
-  const makeSave =
-    (kind: ScenarioKind) => (name: string, params: Record<string, unknown>, summary: Record<string, unknown>) =>
-      create.mutateAsync({ portfolio_id: portfolioId ?? null, name, kind, params, result_summary: summary });
+  const makeSave = isOwner
+    ? (kind: ScenarioKind) => (name: string, params: Record<string, unknown>, summary: Record<string, unknown>) =>
+        create.mutateAsync({ portfolio_id: portfolioId ?? null, name, kind, params, result_summary: summary })
+    : () => undefined;
 
   const initialFor = (kind: ScenarioKind) => (loaded?.kind === kind ? loaded.params : undefined);
   const keyFor = (kind: ScenarioKind) => `${kind}-${loaded?.kind === kind ? loaded.nonce : 0}`;
@@ -69,7 +82,7 @@ export default function PortfolioScenarios() {
           Scenarios
         </h1>
         <p className="text-sm text-muted-foreground">
-          {portfolio.name} · amounts in {baseCurrency}. Explore how your holdings would have reacted to past events and what ranges of outcomes
+          {portfolio.name} · amounts in {baseCurrency ?? "…"}. Explore how your holdings would have reacted to past events and what ranges of outcomes
           a simulation produces.
         </p>
         <EducationalDisclaimer />
@@ -85,9 +98,21 @@ export default function PortfolioScenarios() {
         </div>
       ) : (
         <>
-          {holdings.filter((h) => h.quantity > 0).length > MAX_POSITIONS && (
-            <p className="text-xs text-muted-foreground">Using the {MAX_POSITIONS} largest positions.</p>
+          {uniqueCount > MAX_POSITIONS && <p className="text-xs text-muted-foreground">Using the {MAX_POSITIONS} largest positions.</p>}
+          {uniqueCount > MAX_WHATIF_TICKERS && tab === "whatif" && (
+            <p className="text-xs text-muted-foreground">What if uses the {MAX_WHATIF_TICKERS} largest positions.</p>
           )}
+          {skipped.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Skipped (unsupported ticker format): {skipped.join(", ")}.
+            </p>
+          )}
+          {currencyKnown && !supported && (
+            <p className="text-xs text-muted-foreground">
+              {rawCurrency} is not supported for scenarios; amounts are calculated in USD.
+            </p>
+          )}
+          {!currencyKnown && <p className="text-xs text-muted-foreground">Waiting for the portfolio currency before simulations can run.</p>}
           <Tabs value={tab} onValueChange={(v) => setTab(v as ScenarioKind)} className="space-y-4">
             <TabsList className="grid w-full grid-cols-3 sm:w-auto sm:inline-grid">
               <TabsTrigger value="stress">Stress</TabsTrigger>
@@ -102,10 +127,10 @@ export default function PortfolioScenarios() {
               <MonteCarloTab key={keyFor("montecarlo")} positions={positions} baseCurrency={baseCurrency} initial={initialFor("montecarlo")} onSave={makeSave("montecarlo")} saving={create.isPending} />
             </TabsContent>
             <TabsContent value="whatif" forceMount className="data-[state=inactive]:hidden mt-0">
-              <WhatIfTab key={keyFor("whatif")} positions={positions} baseCurrency={baseCurrency} initial={initialFor("whatif")} onSave={makeSave("whatif")} saving={create.isPending} />
+              <WhatIfTab key={keyFor("whatif")} positions={whatIfPositions} baseCurrency={baseCurrency} initial={initialFor("whatif")} onSave={makeSave("whatif")} saving={create.isPending} />
             </TabsContent>
           </Tabs>
-          {portfolioId && <SavedScenariosList portfolioId={portfolioId} onLoad={onLoad} />}
+          {portfolioId && isOwner && <SavedScenariosList portfolioId={portfolioId} onLoad={onLoad} />}
         </>
       )}
     </div>

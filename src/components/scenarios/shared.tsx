@@ -1,9 +1,20 @@
 import { useState, type ReactNode } from "react";
-import { AlertTriangle, RefreshCw, Save } from "lucide-react";
+import { AlertTriangle, RefreshCw, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -13,13 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ScenarioExcluded } from "@/api/financialDataApi.schemas";
-
-export const EXCLUSION_REASON: Record<string, string> = {
-  no_history: "no price history",
-  no_fx: "no exchange rate",
-  unknown_currency: "unknown currency",
-  short_history: "too little history",
-};
+import { EXCLUSION_REASON } from "./format";
 
 export function ErrorBox({ message, onRetry, retrying }: { message: string; onRetry?: () => void; retrying?: boolean }) {
   return (
@@ -35,6 +40,15 @@ export function ErrorBox({ message, onRetry, retrying }: { message: string; onRe
         </Button>
       )}
     </div>
+  );
+}
+
+export function ChangedHint({ show }: { show: boolean }) {
+  if (!show) return null;
+  return (
+    <p className="text-xs text-muted-foreground" role="status">
+      Inputs changed — run again to update.
+    </p>
   );
 }
 
@@ -161,5 +175,28 @@ export function SaveButton({
         }}
       />
     </>
+  );
+}
+
+/** Trash icon button that asks for confirmation before calling onConfirm. */
+export function ConfirmDeleteButton({ name, disabled, onConfirm }: { name: string; disabled?: boolean; onConfirm: () => void }) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" aria-label={`Delete ${name}`} disabled={disabled}>
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md rounded-3xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete "{name}"?</AlertDialogTitle>
+          <AlertDialogDescription>This removes the saved settings and headline numbers. It cannot be undone.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>Delete</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

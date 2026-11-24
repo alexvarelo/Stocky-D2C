@@ -11,11 +11,14 @@ import { TEMPLATES, defaultForm, formFromSaved, type FormState } from "@/compone
 import { ErrorBox, ResultsSkeleton } from "@/components/scenarios/shared";
 import { apiErrorMessage } from "@/lib/apiError";
 import { VALID_TICKER } from "@/lib/portfolioPositions";
+import { CURRENCIES, MAX_AMOUNT } from "@/components/scenarios/format";
+import { ChangedHint } from "@/components/scenarios/shared";
 import { useCreateSavedStrategy, type SavedStrategy } from "@/hooks/useSavedStrategies";
 
 function validate(f: FormState): string[] {
   const errs: string[] = [];
   const tpl = TEMPLATES.find((t) => t.id === f.strategy)!;
+  if (f.tickers.length === 0) errs.push("Add at least one ticker.");
   if (f.tickers.some((t) => !t.ticker || !VALID_TICKER.test(t.ticker))) errs.push("Choose a valid ticker for every row.");
   if (!tpl.singleTicker && f.tickers.some((t) => !(Number(t.weight) > 0))) errs.push("Weights must be above zero.");
   if (new Set(f.tickers.map((t) => t.ticker)).size !== f.tickers.length) errs.push("Each ticker can only appear once.");
@@ -27,10 +30,27 @@ function validate(f: FormState): string[] {
     if (f.end_date > new Date().toISOString().slice(0, 10)) errs.push("End date cannot be in the future.");
     if ((end - start) / 86400000 < 180) errs.push("The period must span at least 180 days.");
   }
-  if (!(Number(f.initial_capital) >= 0) || f.initial_capital.trim() === "") errs.push("Initial capital must be 0 or more.");
-  if (f.strategy === "dca" && (!(Number(f.monthly_amount) >= 0) || f.monthly_amount.trim() === "")) errs.push("Monthly amount must be 0 or more.");
-  if (f.strategy === "ma_cross" && !(Number(f.fast) >= 2 && Number(f.fast) < Number(f.slow) && Number(f.slow) <= 600)) errs.push("Fast average must be at least 2 and below the slow one (max 600).");
-  if (f.strategy === "rsi" && !(Number(f.rsi_buy) < Number(f.rsi_sell))) errs.push("RSI buy level must be below the sell level.");
+  const money = (v: string) => v.trim() !== "" && Number.isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= MAX_AMOUNT;
+  const capital = Number(f.initial_capital);
+  if (!money(f.initial_capital)) errs.push("Initial capital must be between 0 and 1,000,000,000.");
+  else if (f.strategy !== "dca" && !(capital > 0)) errs.push("Initial capital must be above zero.");
+  if (f.strategy === "dca") {
+    if (!money(f.monthly_amount)) errs.push("Monthly amount must be between 0 and 1,000,000,000.");
+    else if (money(f.initial_capital) && !(capital > 0 || Number(f.monthly_amount) > 0)) errs.push("Set an initial capital or a monthly amount above zero.");
+  }
+  if (!(CURRENCIES as readonly string[]).includes(f.base_currency)) errs.push("Choose a supported currency.");
+  if (f.strategy === "ma_cross") {
+    const fast = Number(f.fast);
+    const slow = Number(f.slow);
+    if (!(Number.isInteger(fast) && Number.isInteger(slow) && fast >= 2 && fast <= 400 && fast < slow && slow <= 600))
+      errs.push("Fast and slow averages must be whole days: fast between 2 and 400, below the slow one (max 600).");
+  }
+  if (f.strategy === "rsi") {
+    const buy = Number(f.rsi_buy);
+    const sell = Number(f.rsi_sell);
+    if (!(f.rsi_buy.trim() !== "" && f.rsi_sell.trim() !== "" && buy > 0 && sell < 100 && buy < sell))
+      errs.push("RSI levels must be between 0 and 100, with the buy level below the sell level.");
+  }
   const fee = Number(f.fee_bps);
   if (!(fee >= 0 && fee <= 100) || f.fee_bps.trim() === "") errs.push("Fee must be between 0 and 100 bps.");
   return errs;
@@ -64,11 +84,17 @@ export default function Strategies() {
   const create = useCreateSavedStrategy();
   const errors = validate(form);
   const result = mutation.data?.data;
+  const [ran, setRan] = useState<FormState | null>(null);
+  const changed = !!result && !!ran && JSON.stringify(ran) !== JSON.stringify(form);
 
-  const run = () => mutation.mutate({ data: toRequest(form) });
+  const run = () => {
+    setRan(form);
+    mutation.mutate({ data: toRequest(form) });
+  };
 
   const load = (s: SavedStrategy) => {
     setForm(formFromSaved(s.strategy, s.params));
+    setRan(null);
     mutation.reset();
   };
 
@@ -88,6 +114,7 @@ export default function Strategies() {
       <Card className="rounded-3xl border-border/50">
         <CardContent className="p-4 sm:p-6">
           <BacktestForm form={form} onChange={setForm} onRun={run} running={mutation.isPending} errors={errors} />
+          <ChangedHint show={changed} />
         </CardContent>
       </Card>
 
@@ -100,8 +127,8 @@ export default function Strategies() {
           onSave={(name) =>
             create.mutateAsync({
               name,
-              strategy: form.strategy,
-              params: { ...form },
+              strategy: result.strategy,
+              params: { ...(ran ?? form), strategy: result.strategy },
               result_summary: {
                 base_currency: result.base_currency,
                 start_date: result.start_date,
