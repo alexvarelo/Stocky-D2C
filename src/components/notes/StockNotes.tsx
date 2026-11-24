@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
 import { format } from "date-fns";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,13 @@ import {
 } from "@/hooks/useStockNotes";
 import { ThesisSection } from "@/components/thesis/ThesisSection";
 
+const MDEditor = lazy(() => import("@uiw/react-md-editor"));
+const MarkdownPreview = lazy(() =>
+  import("@uiw/react-md-editor").then((m) => ({ default: m.default.Markdown })),
+);
+
+const NOTE_MAX_CHARS = 20000;
+
 function NoteEditor({
   ticker,
   note,
@@ -51,7 +57,23 @@ function NoteEditor({
 
   return (
     <div className="space-y-3" data-color-mode={resolvedTheme}>
-      <MDEditor value={value} onChange={(v) => setValue(v ?? "")} height={240} preview="edit" />
+      <Suspense fallback={<Skeleton className="h-60 w-full" />}>
+        <MDEditor
+          value={value}
+          onChange={(v) => setValue((v ?? "").slice(0, NOTE_MAX_CHARS))}
+          height={240}
+          preview="edit"
+          textareaProps={{ maxLength: NOTE_MAX_CHARS }}
+        />
+      </Suspense>
+      <p
+        className={
+          value.length >= NOTE_MAX_CHARS * 0.9 ? "text-xs text-amber-600 dark:text-amber-400" : "text-xs text-muted-foreground"
+        }
+      >
+        {value.length.toLocaleString()} / {NOTE_MAX_CHARS.toLocaleString()}
+        {value.length >= NOTE_MAX_CHARS && " · limit reached"}
+      </p>
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onDone}>
           Cancel
@@ -120,7 +142,9 @@ export function StockNotes({ ticker }: { ticker: string }) {
                 ) : (
                   <>
                     <div data-color-mode={resolvedTheme}>
-                      <MDEditor.Markdown source={note.body} style={{ background: "transparent" }} />
+                      <Suspense fallback={<Skeleton className="h-12 w-full" />}>
+                        <MarkdownPreview source={note.body} style={{ background: "transparent" }} />
+                      </Suspense>
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs text-muted-foreground">

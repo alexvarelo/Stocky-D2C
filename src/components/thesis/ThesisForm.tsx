@@ -12,6 +12,8 @@ import { EditableList } from "./EditableList";
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
 import { useAuth } from "@/lib/auth";
 import {
+  THESIS_MAX_LIST_ITEMS,
+  THESIS_MAX_WHY,
   useSaveThesis,
   type InvestmentThesis,
   type ThesisHorizon,
@@ -40,10 +42,28 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
   const [horizon, setHorizon] = useState<ThesisHorizon | null>(thesis?.horizon ?? null);
   const [reviewDate, setReviewDate] = useState<string | null>(thesis?.review_date ?? null);
   const [status, setStatus] = useState<ThesisStatus>(thesis?.status ?? "active");
-  const [portfolio, setPortfolio] = useState<string | null>(thesis ? thesis.portfolio_id : portfolioId ?? null);
+  const [portfolioChoice, setPortfolioChoice] = useState<string | null | undefined>(undefined);
+
+  // When creating from the instrument page, preselect the portfolio if the user holds the ticker in exactly one.
+  const holdingPortfolios = (portfolios ?? []).filter((p) =>
+    ((p as { holdings?: { ticker: string }[] }).holdings ?? []).some(
+      (h) => h.ticker?.toUpperCase() === ticker.toUpperCase(),
+    ),
+  );
+  const autoPortfolio = holdingPortfolios.length === 1 ? holdingPortfolios[0].id : null;
+  const portfolio =
+    portfolioChoice !== undefined
+      ? portfolioChoice
+      : thesis
+        ? thesis.portfolio_id
+        : portfolioId ?? autoPortfolio;
+  const setPortfolio = (v: string | null) => setPortfolioChoice(v);
+  const whyTooLong = whyBought.length > THESIS_MAX_WHY;
+  const canSubmit = whyBought.trim().length > 0 && !whyTooLong;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canSubmit) return;
     save.mutate(
       {
         id: thesis?.id,
@@ -71,16 +91,27 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
           rows={4}
           value={whyBought}
           onChange={(e) => setWhyBought(e.target.value)}
+          maxLength={THESIS_MAX_WHY}
+          required
           placeholder="Your reasoning in your own words"
         />
+        <p
+          className={
+            whyBought.length >= THESIS_MAX_WHY * 0.9 ? "text-xs text-amber-600 dark:text-amber-400" : "text-xs text-muted-foreground"
+          }
+        >
+          {whyBought.length.toLocaleString()} / {THESIS_MAX_WHY.toLocaleString()}
+          {whyBought.length >= THESIS_MAX_WHY && " · limit reached"}
+        </p>
       </div>
 
-      <EditableList label="Catalysts" placeholder="What could make this work out?" items={catalysts} onChange={setCatalysts} />
+      <EditableList label="Catalysts" placeholder="What could make this work out?" items={catalysts} onChange={setCatalysts} maxItems={THESIS_MAX_LIST_ITEMS} />
       <EditableList
         label="Exit triggers"
         placeholder="What would make you reconsider?"
         items={exitTriggers}
         onChange={setExitTriggers}
+        maxItems={THESIS_MAX_LIST_ITEMS}
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -168,7 +199,7 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
         <Button type="button" variant="outline" onClick={onDone}>
           Cancel
         </Button>
-        <Button type="submit" disabled={save.isPending}>
+        <Button type="submit" disabled={save.isPending || !canSubmit}>
           {save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {thesis ? "Save thesis" : "Create thesis"}
         </Button>

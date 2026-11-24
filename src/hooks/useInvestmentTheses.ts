@@ -25,6 +25,9 @@ export interface ThesisInput {
   status: ThesisStatus;
 }
 
+export const THESIS_MAX_WHY = 5000;
+export const THESIS_MAX_LIST_ITEMS = 20;
+
 const THESES_KEY = "investment-theses";
 
 const normalize = (rows: ThesisRow[] | null): InvestmentThesis[] =>
@@ -71,6 +74,31 @@ export function useThesesByPortfolio(portfolioId?: string) {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return normalize(data);
+    },
+  });
+}
+
+/**
+ * Theses that apply to a position: those linked to this portfolio plus general ones
+ * (portfolio_id null) for the same ticker. Portfolio-specific theses come first.
+ */
+export function useThesesForPosition(ticker?: string, portfolioId?: string) {
+  const { user } = useAuth();
+  const symbol = (ticker || "").toUpperCase();
+  return useQuery<InvestmentThesis[]>({
+    queryKey: [THESES_KEY, "position", user?.id, portfolioId, symbol],
+    enabled: !!user?.id && !!portfolioId && !!symbol,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("investment_theses")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("ticker", symbol)
+        .or(`portfolio_id.eq.${portfolioId},portfolio_id.is.null`)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const rows = normalize(data);
+      return [...rows.filter((t) => t.portfolio_id === portfolioId), ...rows.filter((t) => t.portfolio_id !== portfolioId)];
     },
   });
 }
@@ -154,6 +182,21 @@ export function useUpdateThesisStatus() {
             : error.message,
         variant: "destructive",
       }),
+  });
+}
+
+export function useDeleteThesis() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("investment_theses").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [THESES_KEY] }),
+    onError: (error: Error) =>
+      toast({ title: "Could not delete thesis", description: error.message, variant: "destructive" }),
   });
 }
 

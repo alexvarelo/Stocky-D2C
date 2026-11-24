@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
-import { isThesisDue, useThesesByPortfolio, type InvestmentThesis } from "@/hooks/useInvestmentTheses";
+import { isThesisDue, useThesesForPosition, type InvestmentThesis } from "@/hooks/useInvestmentTheses";
 import { ThesisCard } from "./ThesisCard";
 import { ThesisForm } from "./ThesisForm";
 
@@ -18,7 +18,7 @@ interface PositionThesisButtonProps {
 /** Compact thesis indicator for a position. Opens the thesis (or the form to add one) in a sheet. */
 export function PositionThesisButton({ ticker, portfolioId, className }: PositionThesisButtonProps) {
   const { user } = useAuth();
-  const { data: theses } = useThesesByPortfolio(portfolioId);
+  const { data: theses } = useThesesForPosition(ticker, portfolioId);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<InvestmentThesis | null>(null);
   const [adding, setAdding] = useState(false);
@@ -48,11 +48,7 @@ export function PositionThesisButton({ ticker, portfolioId, className }: Positio
             size="icon"
             className={cn("h-8 w-8 shrink-0", className)}
             aria-label={`${label} for ${ticker}`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setOpen(true);
-            }}
+            onClick={() => setOpen(true)}
           >
             <Icon
               className={cn(
@@ -93,7 +89,12 @@ export function PositionThesisButton({ ticker, portfolioId, className }: Positio
           ) : (
             <div className="space-y-3">
               {forTicker.map((t) => (
-                <ThesisCard key={t.id} thesis={t} onEdit={() => setEditing(t)} />
+                <ThesisCard
+                  key={t.id}
+                  thesis={t}
+                  onEdit={() => setEditing(t)}
+                  scopeLabel={t.portfolio_id === portfolioId ? undefined : "General thesis"}
+                />
               ))}
               <Button variant="outline" size="sm" onClick={() => setAdding(true)}>
                 Add another thesis

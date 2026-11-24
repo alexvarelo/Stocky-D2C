@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePortfolio, useDeletePortfolio } from "@/api/portfolio/portfolio";
 import { usePortfolioFollows } from "@/api/portfolio/usePortfolioFollows";
 import { usePortfolioTransactions } from "@/api/transaction/usePortfolioTransactions";
@@ -60,6 +61,7 @@ export const PortfolioDetail = () => {
     error
   } = usePortfolio(portfolioId);
   const { mutateAsync: deletePortfolio } = useDeletePortfolio();
+  const queryClient = useQueryClient();
 
   // Load transactions in parallel
   const { data: transactions, isLoading: isLoadingTransactions } = usePortfolioTransactions(portfolioId);
@@ -134,6 +136,7 @@ export const PortfolioDetail = () => {
 
     try {
       await deletePortfolio(portfolioId);
+      queryClient.invalidateQueries({ queryKey: ["investment-theses"] });
       toast({
         title: "Portfolio deleted",
         description: "Your portfolio has been successfully deleted.",

@@ -8,9 +8,10 @@ interface EditableListProps {
   placeholder: string;
   items: string[];
   onChange: (_items: string[]) => void;
+  maxItems?: number;
 }
 
-export function EditableList({ label, placeholder, items, onChange }: EditableListProps) {
+export function EditableList({ label, placeholder, items, onChange, maxItems }: EditableListProps) {
   const update = (i: number, value: string) => onChange(items.map((it, idx) => (idx === i ? value : it)));
   const remove = (i: number) => onChange(items.filter((_, idx) => idx !== i));
 
@@ -23,6 +24,7 @@ export function EditableList({ label, placeholder, items, onChange }: EditableLi
             value={item}
             placeholder={placeholder}
             aria-label={`${label} ${i + 1}`}
+            maxLength={500}
             onChange={(e) => update(i, e.target.value)}
           />
           <Button
@@ -37,9 +39,21 @@ export function EditableList({ label, placeholder, items, onChange }: EditableLi
           </Button>
         </div>
       ))}
-      <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => onChange([...items, ""])}>
-        <Plus className="h-4 w-4" /> Add
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-1"
+          disabled={maxItems !== undefined && items.length >= maxItems}
+          onClick={() => onChange([...items, ""])}
+        >
+          <Plus className="h-4 w-4" /> Add
+        </Button>
+        {maxItems !== undefined && items.length >= maxItems && (
+          <span className="text-xs text-muted-foreground">Maximum of {maxItems} items reached</span>
+        )}
+      </div>
     </div>
   );
 }

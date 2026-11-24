@@ -21,6 +21,7 @@ export function Term({ id, children, className }: TermProps) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
   const lastPointer = useRef<string>("mouse");
+  const openedByFocus = useRef(false);
 
   const cancelClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -69,9 +70,26 @@ export function Term({ id, children, className }: TermProps) {
           }}
           onFocus={(e) => {
             // Only keyboard focus opens the card; mouse/touch focus is handled by hover/tap.
-            if (e.currentTarget.matches(":focus-visible")) setOpen(true);
+            if (e.currentTarget.matches(":focus-visible")) {
+              openedByFocus.current = true;
+              setOpen(true);
+            }
+          }}
+          onBlur={() => {
+            openedByFocus.current = false;
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen(false);
           }}
           onClick={(e) => {
+            // Enter/Space (detail 0) right after focus-open keeps it open; a later Enter toggles.
+            if (e.detail === 0 && openedByFocus.current) {
+              e.preventDefault();
+              openedByFocus.current = false;
+              cancelClose();
+              setOpen(true);
+              return;
+            }
             // Mouse users already opened it via hover; a click should keep it open, not toggle it shut.
             if (hoverCapable() && e.detail > 0) {
               e.preventDefault();

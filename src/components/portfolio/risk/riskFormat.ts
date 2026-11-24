@@ -30,7 +30,7 @@ export function describeDrawdown(v: number | null | undefined): string | null {
 
 export function describeSharpe(v: number | null | undefined): string | null {
   if (v == null) return null;
-  return `Return per unit of volatility: ${v.toFixed(2)}`;
+  return `Return per unit of volatility (risk-free rate 0%): ${v.toFixed(2)}`;
 }
 
 export function describeReturn(v: number | null | undefined): string | null {

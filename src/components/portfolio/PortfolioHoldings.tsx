@@ -219,11 +219,14 @@ const HoldingCard = ({
   const isReturnPositive = pnl >= 0;
 
   return (
-    <Link
-      to={`/instrument/${holding.ticker}`}
-      className="block rounded-2xl border border-border/50 bg-card/50 p-4 active:bg-muted/40 transition-colors"
-    >
-      <div className="flex items-center justify-between gap-3">
+    <div className="relative rounded-2xl border border-border/50 bg-card/50 p-4 active:bg-muted/40 transition-colors">
+      {/* Stretched link: covers the whole card; the thesis button sits above it. */}
+      <Link
+        to={`/instrument/${holding.ticker}`}
+        aria-label={`Open ${holding.ticker}`}
+        className="absolute inset-0 z-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+      <div className="pointer-events-none relative flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <CompanyLogo ticker={holding.ticker} size={32} />
           <div className="flex flex-col min-w-0">
@@ -234,7 +237,11 @@ const HoldingCard = ({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-        {portfolioId && <PositionThesisButton ticker={holding.ticker} portfolioId={portfolioId} />}
+        {portfolioId && (
+          <div className="pointer-events-auto relative z-10">
+            <PositionThesisButton ticker={holding.ticker} portfolioId={portfolioId} />
+          </div>
+        )}
         <div className="flex flex-col items-end shrink-0">
           {isLoadingPrices ? (
             <Skeleton className="h-4 w-20" />
@@ -248,7 +255,7 @@ const HoldingCard = ({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3 text-xs">
+      <div className="pointer-events-none relative mt-3 flex items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-1.5">
           {isLoadingPrices ? (
             <Skeleton className="h-3.5 w-16" />
@@ -278,7 +285,7 @@ const HoldingCard = ({
         )}
       </div>
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="pointer-events-none relative mt-3 flex items-center gap-2">
         <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-primary rounded-full"
@@ -289,7 +296,7 @@ const HoldingCard = ({
           {Math.round(allocation)}% of portfolio
         </span>
       </div>
-    </Link>
+    </div>
   );
 };
 

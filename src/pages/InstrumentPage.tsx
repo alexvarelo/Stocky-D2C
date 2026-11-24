@@ -203,21 +203,21 @@ export function InstrumentPage() {
       {/* Tabs for Main Content */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4 max-w-lg mb-6">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsTrigger value="overview" aria-label="Overview" className="flex items-center gap-2">
             <BarChart2 className="h-4 w-4" />
-            <span>Overview</span>
+            <span className="hidden sm:inline">Overview</span>
           </TabsTrigger>
-          <TabsTrigger value="simulation" className="flex items-center gap-2">
+          <TabsTrigger value="simulation" aria-label="Simulation" className="flex items-center gap-2">
             <Calculator className="h-4 w-4" />
-            <span>Simulation</span>
+            <span className="hidden sm:inline">Simulation</span>
           </TabsTrigger>
-          <TabsTrigger value="discussion" className="flex items-center gap-2">
+          <TabsTrigger value="discussion" aria-label="Community" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            <span>Community</span>
+            <span className="hidden sm:inline">Community</span>
           </TabsTrigger>
-          <TabsTrigger value="notes" className="flex items-center gap-2">
+          <TabsTrigger value="notes" aria-label="Notes" className="flex items-center gap-2">
             <NotebookPen className="h-4 w-4" />
-            <span>Notes</span>
+            <span className="hidden sm:inline">Notes</span>
           </TabsTrigger>
         </TabsList>
 

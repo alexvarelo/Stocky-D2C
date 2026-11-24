@@ -1,10 +1,21 @@
 import { format, parseISO } from "date-fns";
-import { CalendarClock, Pencil, CheckCircle2, XCircle } from "lucide-react";
+import { useState } from "react";
+import { CalendarClock, Pencil, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { isThesisDue, useUpdateThesisStatus, type InvestmentThesis } from "@/hooks/useInvestmentTheses";
+import { isThesisDue, useDeleteThesis, useUpdateThesisStatus, type InvestmentThesis } from "@/hooks/useInvestmentTheses";
 
 const HORIZON_LABEL = { short: "Short term", medium: "Medium term", long: "Long term" } as const;
 const STATUS_LABEL = { active: "Active", closed: "Closed", invalidated: "Invalidated" } as const;
@@ -12,10 +23,14 @@ const STATUS_LABEL = { active: "Active", closed: "Closed", invalidated: "Invalid
 interface ThesisCardProps {
   thesis: InvestmentThesis;
   onEdit: () => void;
+  /** Shown as a badge, e.g. "General thesis". */
+  scopeLabel?: string;
 }
 
-export function ThesisCard({ thesis, onEdit }: ThesisCardProps) {
+export function ThesisCard({ thesis, onEdit, scopeLabel }: ThesisCardProps) {
   const updateStatus = useUpdateThesisStatus();
+  const remove = useDeleteThesis();
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const due = isThesisDue(thesis);
   const isActive = thesis.status === "active";
 
@@ -24,6 +39,7 @@ export function ThesisCard({ thesis, onEdit }: ThesisCardProps) {
       <CardContent className="space-y-4 pt-6">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isActive ? "default" : "secondary"}>{STATUS_LABEL[thesis.status]}</Badge>
+          {scopeLabel && <Badge variant="outline">{scopeLabel}</Badge>}
           {thesis.horizon && <Badge variant="outline">{HORIZON_LABEL[thesis.horizon]}</Badge>}
           {thesis.review_date && (
             <span
@@ -90,8 +106,33 @@ export function ThesisCard({ thesis, onEdit }: ThesisCardProps) {
               </Button>
             </>
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1 text-destructive hover:text-destructive"
+            onClick={() => setConfirmOpen(true)}
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </Button>
         </div>
       </CardContent>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this thesis?</AlertDialogTitle>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => remove.mutate(thesis.id, { onSettled: () => setConfirmOpen(false) })}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

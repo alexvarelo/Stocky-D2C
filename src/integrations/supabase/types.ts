@@ -416,7 +416,7 @@ export type Database = {
           ticker: string
           updated_at?: string
           user_id: string
-          why_bought?: string
+          why_bought: string
         }
         Update: {
           catalysts?: string[]

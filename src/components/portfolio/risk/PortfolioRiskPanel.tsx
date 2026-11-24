@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, RefreshCw, ShieldAlert } from "lucide-react";
 import { portfolioRiskApiV1PortfolioRiskPost } from "@/api/risk/risk";
@@ -56,12 +57,13 @@ interface MetricProps {
   value: string;
   reading?: string | null;
   isNull?: boolean;
+  tooltip?: string;
 }
 
-function MetricCard({ label, value, reading, isNull }: MetricProps) {
+function MetricCard({ label, value, reading, isNull, tooltip }: MetricProps) {
   return (
     <div className="rounded-2xl border border-border/50 bg-card/50 p-3 sm:p-4 flex flex-col gap-1">
-      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-xs text-muted-foreground" title={tooltip}>{label}</div>
       <div className="text-xl font-semibold tabular-nums" title={isNull ? NO_DATA_HINT : undefined}>
         {value}
       </div>
@@ -88,6 +90,10 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
   const baseCurrency = currency && currency.length === 3 ? currency.toUpperCase() : "USD";
 
   const positions = useMemo(() => toPositions(holdings), [holdings]);
+  const totalPositions = useMemo(
+    () => new Set(holdings.filter((h) => h.ticker?.trim() && h.quantity > 0).map((h) => h.ticker.trim().toUpperCase())).size,
+    [holdings]
+  );
   const positionsKey = useMemo(
     () => positions.map((p) => `${p.ticker}:${p.quantity}`).join(","),
     [positions]
@@ -119,7 +125,7 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
           </CardTitle>
           {data?.as_of && (
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              As of {new Date(data.as_of).toLocaleDateString()}
+              As of {parseISO(data.as_of).toLocaleDateString()}
             </p>
           )}
         </div>
@@ -156,6 +162,11 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
           </div>
         ) : (
           <div className={isFetching ? "opacity-60 transition-opacity space-y-5" : "space-y-5"}>
+            {totalPositions > MAX_POSITIONS && (
+              <p className="text-xs text-muted-foreground">
+                Showing risk for the {MAX_POSITIONS} largest positions.
+              </p>
+            )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <MetricCard
                 label={<Term id="beta">Beta vs S&amp;P 500</Term>}
@@ -180,6 +191,7 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
                 value={fmtNum(data.sharpe_ratio)}
                 isNull={data.sharpe_ratio == null}
                 reading={describeSharpe(data.sharpe_ratio)}
+                tooltip="Calculated with a 0% risk-free rate"
               />
               <MetricCard
                 label={<Term id="annual-return">Annual return</Term>}
