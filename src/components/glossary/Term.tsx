@@ -11,6 +11,9 @@ interface TermProps {
 
 const CLOSE_DELAY_MS = 120;
 
+/** Only one glossary card is open at a time: opening one closes whichever was open. */
+let closeActive: (() => void) | null = null;
+
 /**
  * Wraps a metric label with a dotted underline and a glossary popover.
  * Desktop: opens on hover/focus. Touch: opens on tap. Keyboard: Enter/Space toggles, Esc closes.
@@ -18,8 +21,26 @@ const CLOSE_DELAY_MS = 120;
  */
 export function Term({ id, children, className }: TermProps) {
   const entry = getGlossaryEntry(id);
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const closeSelf = useRef(() => setOpenState(false));
+
+  const setOpen = useCallback((next: boolean) => {
+    if (next && closeActive !== closeSelf.current) {
+      closeActive?.();
+      closeActive = closeSelf.current;
+    } else if (!next && closeActive === closeSelf.current) {
+      closeActive = null;
+    }
+    setOpenState(next);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (closeActive === closeSelf.current) closeActive = null;
+    },
+    [],
+  );
   const lastPointer = useRef<string>("mouse");
   const openedByFocus = useRef(false);
 
@@ -30,7 +51,7 @@ export function Term({ id, children, className }: TermProps) {
   const scheduleClose = useCallback(() => {
     cancelClose();
     closeTimer.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
-  }, [cancelClose]);
+  }, [cancelClose, setOpen]);
 
   useEffect(() => cancelClose, [cancelClose]);
 
