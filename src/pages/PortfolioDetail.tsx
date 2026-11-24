@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePortfolio, useDeletePortfolio } from "@/api/portfolio/portfolio";
 import { usePortfolioFollows } from "@/api/portfolio/usePortfolioFollows";
 import { usePortfolioTransactions } from "@/api/transaction/usePortfolioTransactions";
@@ -26,6 +27,7 @@ import { AllocationChart } from "@/components/portfolio/portfolioDetails/Allocat
 import { TopMovers } from "@/components/portfolio/portfolioDetails/TopMovers";
 import { KeyMetrics } from "@/components/portfolio/portfolioDetails/KeyMetrics";
 import { PortfolioAwards } from "@/components/portfolio/portfolioDetails/PortfolioAwards";
+import { PortfolioRiskPanel } from "@/components/portfolio/risk/PortfolioRiskPanel";
 import { ExportPortfolioDialog } from "@/components/portfolio/portfolioDetails/ExportPortfolioDialog";
 
 // Add custom animation keyframes for the spinning gradient
@@ -59,6 +61,7 @@ export const PortfolioDetail = () => {
     error
   } = usePortfolio(portfolioId);
   const { mutateAsync: deletePortfolio } = useDeletePortfolio();
+  const queryClient = useQueryClient();
 
   // Load transactions in parallel
   const { data: transactions, isLoading: isLoadingTransactions } = usePortfolioTransactions(portfolioId);
@@ -133,6 +136,7 @@ export const PortfolioDetail = () => {
 
     try {
       await deletePortfolio(portfolioId);
+      queryClient.invalidateQueries({ queryKey: ["investment-theses"] });
       toast({
         title: "Portfolio deleted",
         description: "Your portfolio has been successfully deleted.",
@@ -222,12 +226,20 @@ export const PortfolioDetail = () => {
               isLoading={isLoadingPrices}
             />
 
+            {/* Risk */}
+            <PortfolioRiskPanel
+              portfolioId={portfolioId}
+              holdings={portfolio.holdings || []}
+              currency={portfolio.currency}
+            />
+
             {/* Holdings List */}
             <PortfolioHoldings
               holdings={holdingsWithLivePrices || []}
               isLoading={isLoadingPortfolio}
               isLoadingPrices={isLoadingPrices}
               livePrices={livePrices}
+              portfolioId={portfolioId}
             />
 
             {/* Transactions */}

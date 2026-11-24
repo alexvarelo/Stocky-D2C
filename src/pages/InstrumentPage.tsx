@@ -15,7 +15,8 @@ import {
   Calculator,
   MessageSquare,
   Star,
-  Plus
+  Plus,
+  NotebookPen
 } from "lucide-react";
 import { useGetStockInfoApiV1StockTickerGet } from "@/api/stock/stock";
 import type { StockInfo, CompanyInfo } from "@/api/financialDataApi.schemas";
@@ -27,6 +28,8 @@ import { InvestmentSimulator } from "@/components/instruments/InvestmentSimulato
 import { TransactionDrawer } from "@/components/transactions/TransactionDrawer";
 import { InstrumentNewsSentimentCard } from "@/components/instruments/InstrumentNewsSentimentCard";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { StockNotes } from "@/components/notes/StockNotes";
+import { Term } from "@/components/glossary/Term";
 
 // Formatter components
 import {
@@ -118,7 +121,7 @@ export function InstrumentPage() {
     );
   }
 
-  const renderInfoCard = (title: string, value: React.ReactNode) => {
+  const renderInfoCard = (title: React.ReactNode, value: React.ReactNode) => {
     // If value is undefined, null, or empty, return N/A
     if (value === undefined || value === null || value === "") {
       return (
@@ -199,18 +202,22 @@ export function InstrumentPage() {
       {ticker && <InstrumentPostsCarousel ticker={ticker} />}
       {/* Tabs for Main Content */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md mb-6">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-4 max-w-lg mb-6">
+          <TabsTrigger value="overview" aria-label="Overview" className="flex items-center gap-2">
             <BarChart2 className="h-4 w-4" />
-            <span>Overview</span>
+            <span className="hidden sm:inline">Overview</span>
           </TabsTrigger>
-          <TabsTrigger value="simulation" className="flex items-center gap-2">
+          <TabsTrigger value="simulation" aria-label="Simulation" className="flex items-center gap-2">
             <Calculator className="h-4 w-4" />
-            <span>Simulation</span>
+            <span className="hidden sm:inline">Simulation</span>
           </TabsTrigger>
-          <TabsTrigger value="discussion" className="flex items-center gap-2">
+          <TabsTrigger value="discussion" aria-label="Community" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            <span>Community</span>
+            <span className="hidden sm:inline">Community</span>
+          </TabsTrigger>
+          <TabsTrigger value="notes" aria-label="Notes" className="flex items-center gap-2">
+            <NotebookPen className="h-4 w-4" />
+            <span className="hidden sm:inline">Notes</span>
           </TabsTrigger>
         </TabsList>
 
@@ -282,22 +289,22 @@ export function InstrumentPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {renderInfoCard(
-                      "Market Cap",
+                      <Term id="market-cap">Market Cap</Term>,
                       <MoneyDisplay
                         value={companyInfo?.market_cap}
                         currency={priceData?.currency}
                       />
                     )}
                     {renderInfoCard(
-                      "P/E (TTM)",
+                      <Term id="pe-ratio">P/E (TTM)</Term>,
                       <FormattedNumber value={companyInfo?.pe_ratio} />
                     )}
                     {renderInfoCard(
-                      "EPS (TTM)",
+                      <Term id="eps">EPS (TTM)</Term>,
                       <FormattedNumber value={companyInfo?.eps} />
                     )}
                     {renderInfoCard(
-                      "Dividend Yield",
+                      <Term id="dividend-yield">Dividend Yield</Term>,
                       <PercentageDisplay value={companyInfo?.dividend_yield} />
                     )}
                     {renderInfoCard(
@@ -321,7 +328,7 @@ export function InstrumentPage() {
                     )}
                     {additionalData?.beta !== undefined &&
                       renderInfoCard(
-                        "Beta",
+                        <Term id="beta">Beta</Term>,
                         <FormattedNumber value={additionalData.beta} />
                       )}
                     {additionalData?.totalRevenue !== undefined &&
@@ -342,7 +349,7 @@ export function InstrumentPage() {
                       )}
                     {additionalData?.profitMargins !== undefined &&
                       renderInfoCard(
-                        "Profit Margin",
+                        <Term id="net-margin">Profit Margin</Term>,
                         <PercentageDisplay
                           value={additionalData.profitMargins}
                         />
@@ -417,6 +424,10 @@ export function InstrumentPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="notes" className="mt-0">
+          {ticker && <StockNotes ticker={ticker} />}
         </TabsContent>
 
         <TabsContent value="discussion" className="mt-0">

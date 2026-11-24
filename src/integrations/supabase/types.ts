@@ -389,6 +389,66 @@ export type Database = {
           },
         ]
       }
+      investment_theses: {
+        Row: {
+          catalysts: string[]
+          created_at: string
+          exit_triggers: string[]
+          horizon: string | null
+          id: string
+          portfolio_id: string | null
+          review_date: string | null
+          status: string
+          ticker: string
+          updated_at: string
+          user_id: string
+          why_bought: string
+        }
+        Insert: {
+          catalysts?: string[]
+          created_at?: string
+          exit_triggers?: string[]
+          horizon?: string | null
+          id?: string
+          portfolio_id?: string | null
+          review_date?: string | null
+          status?: string
+          ticker: string
+          updated_at?: string
+          user_id: string
+          why_bought: string
+        }
+        Update: {
+          catalysts?: string[]
+          created_at?: string
+          exit_triggers?: string[]
+          horizon?: string | null
+          id?: string
+          portfolio_id?: string | null
+          review_date?: string | null
+          status?: string
+          ticker?: string
+          updated_at?: string
+          user_id?: string
+          why_bought?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_theses_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_theses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -712,6 +772,41 @@ export type Database = {
           },
           {
             foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          ticker: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          ticker: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          ticker?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_notes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"

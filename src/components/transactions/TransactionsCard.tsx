@@ -63,6 +63,9 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => (
         ${(transaction.quantity * transaction.price_per_share).toFixed(2)}
       </span>
     </div>
+    {transaction.notes?.trim() && (
+      <p className="mt-2 text-xs italic text-muted-foreground break-words">Why: {transaction.notes}</p>
+    )}
   </div>
 );
 
@@ -234,6 +237,11 @@ export function TransactionsCard({
                       <CompanyLogo ticker={transaction.ticker} size={22} />
                       {transaction.ticker}
                     </Link>
+                    {transaction.notes?.trim() && (
+                      <p className="mt-1 max-w-[260px] truncate text-xs italic text-muted-foreground" title={transaction.notes}>
+                        Why: {transaction.notes}
+                      </p>
+                    )}
                   </TableCell>
                   <TableCell className="text-right text-muted-foreground">
                     {transaction.quantity.toLocaleString()}

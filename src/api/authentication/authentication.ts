@@ -25,8 +25,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CreateClientRequest,
-  CreateClientResponse,
   ErrorResponse,
   HTTPValidationError,
   TokenRequest,
@@ -100,71 +98,6 @@ export const useGetTokenApiV1TokenPost = <TError = ErrorResponse | HTTPValidatio
       > => {
 
       const mutationOptions = getGetTokenApiV1TokenPostMutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    /**
- * Create a new client with generated credentials
- * @summary Create new client
- */
-export const createClientApiV1ClientsPost = (
-    createClientRequest: CreateClientRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return useSendRequest<CreateClientResponse | null>(
-      {url: `/api/v1/clients`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createClientRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getCreateClientApiV1ClientsPostMutationOptions = <TError = HTTPValidationError | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createClientApiV1ClientsPost>>, TError,{data: CreateClientRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof createClientApiV1ClientsPost>>, TError,{data: CreateClientRequest}, TContext> => {
-
-const mutationKey = ['createClientApiV1ClientsPost'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createClientApiV1ClientsPost>>, {data: CreateClientRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createClientApiV1ClientsPost(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateClientApiV1ClientsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createClientApiV1ClientsPost>>>
-    export type CreateClientApiV1ClientsPostMutationBody = CreateClientRequest
-    export type CreateClientApiV1ClientsPostMutationError = HTTPValidationError | ErrorResponse
-
-    /**
- * @summary Create new client
- */
-export const useCreateClientApiV1ClientsPost = <TError = HTTPValidationError | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createClientApiV1ClientsPost>>, TError,{data: CreateClientRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createClientApiV1ClientsPost>>,
-        TError,
-        {data: CreateClientRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getCreateClientApiV1ClientsPostMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }
