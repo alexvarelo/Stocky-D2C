@@ -28,9 +28,11 @@ export function formatDecimalPercent(value: number | null | undefined): string {
 }
 
 /** Format a health metric value by unit. */
-export function formatHealthValue(metric: Pick<HealthMetric, "value" | "unit">): string {
+export function formatHealthValue(metric: Pick<HealthMetric, "value" | "unit"> & { key?: string }): string {
   const { value, unit } = metric;
   if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  // Altman Z is an open-ended score, not out of 9 like Piotroski F.
+  if (metric.key === "altman_z") return value.toFixed(2);
   switch (unit) {
     case "months":
       return `${value.toFixed(1)} mo`;
