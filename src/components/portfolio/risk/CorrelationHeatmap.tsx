@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { PortfolioRiskResponse } from "@/api/financialDataApi.schemas";
-import { Term } from "./riskShims";
+import { Term } from "@/components/glossary/Term";
 import { correlationColor, fmtNum } from "./riskFormat";
 
 const MAX_TICKERS = 12;

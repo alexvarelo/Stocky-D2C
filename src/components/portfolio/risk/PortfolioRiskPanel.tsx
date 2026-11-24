@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Term, EducationalDisclaimer } from "./riskShims";
+import { Term } from "@/components/glossary/Term";
+import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { CorrelationHeatmap } from "./CorrelationHeatmap";
 import {
   NO_DATA,
