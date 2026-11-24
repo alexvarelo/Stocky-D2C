@@ -41,12 +41,24 @@ interface Props {
   currency?: string;
 }
 
-/** Aggregate holdings by ticker; drop zero/negative quantities; cap at 50 largest. */
+/** Same pattern the risk API validates; one bad symbol would otherwise reject the whole request. */
+const VALID_TICKER = /^[A-Za-z0-9.^=-]{1,20}$/;
+
+function invalidTickers(holdings: PortfolioHolding[]) {
+  const out = new Set<string>();
+  for (const h of holdings) {
+    const ticker = h.ticker?.trim().toUpperCase();
+    if (ticker && h.quantity > 0 && !VALID_TICKER.test(ticker)) out.add(ticker);
+  }
+  return [...out].sort();
+}
+
+/** Aggregate holdings by ticker; drop zero/negative quantities and unsupported symbols; cap at 50 largest. */
 function toPositions(holdings: PortfolioHolding[]) {
   const byTicker = new Map<string, { quantity: number; value: number }>();
   for (const h of holdings) {
     const ticker = h.ticker?.trim().toUpperCase();
-    if (!ticker || !(h.quantity > 0)) continue;
+    if (!ticker || !(h.quantity > 0) || !VALID_TICKER.test(ticker)) continue;
     const prev = byTicker.get(ticker) ?? { quantity: 0, value: 0 };
     prev.quantity += h.quantity;
     prev.value += (h.current_price ?? 0) * h.quantity;
@@ -97,6 +109,7 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
   const baseCurrency = currency && currency.length === 3 ? currency.toUpperCase() : "USD";
 
   const positions = useMemo(() => toPositions(holdings), [holdings]);
+  const skipped = useMemo(() => invalidTickers(holdings), [holdings]);
   const totalPositions = useMemo(
     () => new Set(holdings.filter((h) => h.ticker?.trim() && h.quantity > 0).map((h) => h.ticker.trim().toUpperCase())).size,
     [holdings]
@@ -227,16 +240,17 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
 
             <CorrelationHeatmap data={data} />
 
-            {data.missing_tickers.length > 0 && (
+            {(data.missing_tickers.length > 0 || skipped.length > 0) && (
               <p className="text-xs text-muted-foreground flex gap-2 items-start rounded-xl bg-muted/50 p-3">
                 <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
                 <span>
                   Excluded:{" "}
-                  {data.excluded && data.excluded.length > 0
-                    ? data.excluded
-                        .map((e) => `${e.ticker} (${EXCLUSION_REASON[e.reason] ?? "unavailable"})`)
-                        .join(", ")
-                    : data.missing_tickers.join(", ")}
+                  {[
+                    ...(data.excluded && data.excluded.length > 0
+                      ? data.excluded.map((e) => `${e.ticker} (${EXCLUSION_REASON[e.reason] ?? "unavailable"})`)
+                      : data.missing_tickers),
+                    ...skipped.map((t) => `${t} (unsupported symbol)`),
+                  ].join(", ")}
                   .
                 </span>
               </p>
