@@ -627,11 +627,11 @@ export function TransactionForm({
             </div>
 
             <div>
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="notes">Why? (optional)</Label>
               <Textarea
                 id="notes"
                 {...form.register("notes")}
-                placeholder="Add any notes about this transaction"
+                placeholder="Why are you making this trade? Future you will thank you."
               />
             </div>
           </div>
