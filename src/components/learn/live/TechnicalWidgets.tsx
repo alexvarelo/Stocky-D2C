@@ -97,8 +97,8 @@ export function RsiWidget({ ticker }: WidgetProps) {
                 {xAxis}
                 <YAxis domain={[0, 100]} ticks={[0, 30, 70, 100]} width={36} {...CHART_AXIS} />
                 <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 1)} />
-                <ReferenceLine y={70} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.6} />
-                <ReferenceLine y={30} stroke="#10b981" strokeDasharray="4 4" strokeOpacity={0.6} />
+                <ReferenceLine y={70} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.6} />
+                <ReferenceLine y={30} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.6} />
                 <Line dataKey="rsi14" name="RSI" stroke="#8b5cf6" strokeWidth={1.5} dot={false} isAnimationActive={false} />
               </ComposedChart>
             </Box>
@@ -300,10 +300,10 @@ export function SupportResistanceWidget({ ticker }: WidgetProps) {
                 <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v)} />
                 <Line dataKey="close" name="Close" stroke="#10b981" strokeWidth={2} dot={false} isAnimationActive={false} />
                 {support.map((y) => (
-                  <ReferenceLine key={`s${y}`} y={y} stroke="#10b981" strokeDasharray="4 4" strokeOpacity={0.7} />
+                  <ReferenceLine key={`s${y}`} y={y} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
                 ))}
                 {resistance.map((y) => (
-                  <ReferenceLine key={`r${y}`} y={y} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.7} />
+                  <ReferenceLine key={`r${y}`} y={y} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
                 ))}
               </ComposedChart>
             </Box>

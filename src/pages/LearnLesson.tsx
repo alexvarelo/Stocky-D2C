@@ -72,7 +72,7 @@ export default function LearnLesson() {
         </section>
       )}
 
-      {lesson.liveExample && <LiveExample key={lesson.id} example={lesson.liveExample} />}
+      {lesson.liveExample && <LiveExample key={`live-${lesson.id}`} example={lesson.liveExample} />}
 
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <span>Still unclear? Ask Stocky to explain it.</span>
@@ -80,7 +80,7 @@ export default function LearnLesson() {
       </div>
 
       <LessonQuiz
-        key={lesson.id}
+        key={`quiz-${lesson.id}`}
         lesson={lesson}
         onComplete={(score) =>
           save.mutate(
