@@ -6,6 +6,167 @@
  * OpenAPI spec version: 1.0.0
  */
 /**
+ * Time-weighted annualised return: daily returns chained excluding external cash flows, annualised over calendar days (365.25). Not money-weighted.
+ */
+export type BacktestMetricsCagr = number | null;
+
+/**
+ * Most negative peak-to-trough fraction of the time-weighted return index (unaffected by contributions)
+ */
+export type BacktestMetricsMaxDrawdown = number | null;
+
+/**
+ * Std of daily time-weighted returns * sqrt(252)
+ */
+export type BacktestMetricsVolatilityAnnual = number | null;
+
+export interface BacktestMetrics {
+  final_value: number;
+  total_invested: number;
+  /** final_value / total_invested - 1 (money-in vs money-out) */
+  total_return: number;
+  /** Time-weighted annualised return: daily returns chained excluding external cash flows, annualised over calendar days (365.25). Not money-weighted. */
+  cagr?: BacktestMetricsCagr;
+  /** Most negative peak-to-trough fraction of the time-weighted return index (unaffected by contributions) */
+  max_drawdown?: BacktestMetricsMaxDrawdown;
+  /** Std of daily time-weighted returns * sqrt(252) */
+  volatility_annual?: BacktestMetricsVolatilityAnnual;
+  trades: number;
+  /** Fraction of days with a non-zero invested position */
+  time_in_market: number;
+}
+
+export interface BacktestMetricsPair {
+  strategy: BacktestMetrics;
+  benchmark: BacktestMetrics;
+}
+
+export type BacktestParamsRebalanceFrequency = typeof BacktestParamsRebalanceFrequency[keyof typeof BacktestParamsRebalanceFrequency];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BacktestParamsRebalanceFrequency = {
+  monthly: 'monthly',
+  quarterly: 'quarterly',
+  yearly: 'yearly',
+} as const;
+
+export interface BacktestParams {
+  /**
+   * dca: amount invested on the first trading day of each month
+   * @minimum 0
+   */
+  monthly_amount?: number;
+  rebalance_frequency?: BacktestParamsRebalanceFrequency;
+  /**
+   * rsi: buy when RSI(14) crosses below this level
+   */
+  rsi_buy?: number;
+  /**
+   * rsi: sell when RSI(14) crosses above this level
+   */
+  rsi_sell?: number;
+  /**
+   * ma_cross: fast SMA window
+   * @minimum 2
+   * @maximum 400
+   */
+  fast?: number;
+  /**
+   * ma_cross: slow SMA window
+   * @minimum 3
+   * @maximum 600
+   */
+  slow?: number;
+}
+
+export type BacktestRequestStrategy = typeof BacktestRequestStrategy[keyof typeof BacktestRequestStrategy];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BacktestRequestStrategy = {
+  dca: 'dca',
+  rebalance: 'rebalance',
+  rsi: 'rsi',
+  ma_cross: 'ma_cross',
+} as const;
+
+export interface BacktestRequest {
+  strategy: BacktestRequestStrategy;
+  /**
+   * @minItems 1
+   * @maxItems 15
+   */
+  tickers: BacktestTicker[];
+  start_date: string;
+  end_date: string;
+  /** @minimum 0 */
+  initial_capital?: number;
+  /** @pattern ^[A-Za-z]{3}$ */
+  base_currency?: string;
+  params?: BacktestParams;
+  /**
+   * Fee per trade in basis points of traded notional
+   * @minimum 0
+   * @maximum 100
+   */
+  fee_bps?: number;
+}
+
+export type BacktestResponseStrategy = typeof BacktestResponseStrategy[keyof typeof BacktestResponseStrategy];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BacktestResponseStrategy = {
+  dca: 'dca',
+  rebalance: 'rebalance',
+  rsi: 'rsi',
+  ma_cross: 'ma_cross',
+} as const;
+
+export interface BacktestResponse {
+  strategy: BacktestResponseStrategy;
+  base_currency: string;
+  /** First simulated trading day */
+  start_date: string;
+  /** Last simulated trading day */
+  end_date: string;
+  equity_curve: EquityPoint[];
+  metrics: BacktestMetricsPair;
+  /** Most recent 200 strategy trades */
+  trades: BacktestTrade[];
+  notes: string[];
+  disclaimer?: string;
+}
+
+export interface BacktestTicker {
+  /** @pattern ^[A-Za-z0-9.^=\-]{1,20}$ */
+  ticker: string;
+  /**
+   * Relative weight; weights are normalised to sum to 1
+   */
+  weight: number;
+}
+
+export type BacktestTradeSide = typeof BacktestTradeSide[keyof typeof BacktestTradeSide];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BacktestTradeSide = {
+  buy: 'buy',
+  sell: 'sell',
+} as const;
+
+export interface BacktestTrade {
+  date: string;
+  ticker: string;
+  side: BacktestTradeSide;
+  quantity: number;
+  /** Close in base currency */
+  price: number;
+}
+
+/**
  * Maximum number of news items per ticker
  */
 export type BatchNewsRequestLimitPerTicker = number | null;
@@ -211,6 +372,14 @@ export interface CorrelationMatrix {
   matrix: CorrelationMatrixMatrixItemItem[][];
 }
 
+export interface EquityPoint {
+  date: string;
+  strategy_value: number;
+  benchmark_value: number;
+  /** Cumulative external cash contributed up to this date */
+  invested: number;
+}
+
 /**
  * The query that was executed (if custom query)
  */
@@ -274,6 +443,15 @@ export const ExcludedTickerReason = {
 export interface ExcludedTicker {
   ticker: string;
   reason: ExcludedTickerReason;
+}
+
+export interface FinalDistribution {
+  p5: number;
+  p25: number;
+  p50: number;
+  p75: number;
+  p95: number;
+  mean: number;
 }
 
 export type FinancialItemRevenue = number | null;
@@ -566,6 +744,79 @@ export interface MarketDataResponse {
   last_updated: string;
 }
 
+export type MonteCarloRequestLookback = typeof MonteCarloRequestLookback[keyof typeof MonteCarloRequestLookback];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const MonteCarloRequestLookback = {
+  '3y': '3y',
+  '5y': '5y',
+  '10y': '10y',
+} as const;
+
+/**
+ * RNG seed (default 42)
+ */
+export type MonteCarloRequestSeed = number | null;
+
+export interface MonteCarloRequest {
+  /**
+   * @minItems 1
+   * @maxItems 50
+   */
+  positions: PortfolioPositionInput[];
+  /** @pattern ^[A-Za-z]{3}$ */
+  base_currency?: string;
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
+  horizon_years?: number;
+  /**
+   * @minimum 1000
+   * @maximum 10000
+   */
+  paths?: number;
+  /**
+   * Added every 21 trading days, in base currency
+   * @minimum 0
+   */
+  monthly_contribution?: number;
+  lookback?: MonteCarloRequestLookback;
+  /** RNG seed (default 42) */
+  seed?: MonteCarloRequestSeed;
+}
+
+export interface MonteCarloResponse {
+  start_value: number;
+  total_contributions: number;
+  percentiles: PercentilePoint[];
+  final: FinalDistribution;
+  /** Share of paths ending below start value + total contributions */
+  prob_loss: number;
+  /** Share of paths with max drawdown <= -20% */
+  prob_drawdown_20: number;
+  base_currency: string;
+  horizon_years: number;
+  paths: number;
+  seed: number;
+  lookback_used: string;
+  observations: number;
+  excluded?: ScenarioExcluded[];
+  disclaimer?: string;
+}
+
+export interface MonteCarloSummary {
+  start_value: number;
+  total_contributions: number;
+  percentiles: PercentilePoint[];
+  final: FinalDistribution;
+  /** Share of paths ending below start value + total contributions */
+  prob_loss: number;
+  /** Share of paths with max drawdown <= -20% */
+  prob_drawdown_20: number;
+}
+
 /**
  * Unique identifier for the article
  */
@@ -634,6 +885,15 @@ export interface NewsArticle {
   description?: NewsArticleDescription;
   /** Whether the content is a video */
   is_video?: boolean;
+}
+
+export interface PercentilePoint {
+  day: number;
+  p5: number;
+  p25: number;
+  p50: number;
+  p75: number;
+  p95: number;
 }
 
 export interface PortfolioPositionInput {
@@ -864,6 +1124,35 @@ export interface PriceData {
   last_updated?: PriceDataLastUpdated;
 }
 
+export type RiskSnapshotVolatilityAnnual = number | null;
+
+export type RiskSnapshotBeta = number | null;
+
+export type RiskSnapshotMaxDrawdown = number | null;
+
+export interface RiskSnapshot {
+  volatility_annual?: RiskSnapshotVolatilityAnnual;
+  beta?: RiskSnapshotBeta;
+  max_drawdown?: RiskSnapshotMaxDrawdown;
+  hhi: number;
+}
+
+export type ScenarioExcludedReason = typeof ScenarioExcludedReason[keyof typeof ScenarioExcludedReason];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ScenarioExcludedReason = {
+  no_history: 'no_history',
+  no_fx: 'no_fx',
+  unknown_currency: 'unknown_currency',
+  short_history: 'short_history',
+} as const;
+
+export interface ScenarioExcluded {
+  ticker: string;
+  reason: ScenarioExcludedReason;
+}
+
 /**
  * Schema for search API response
  */
@@ -1091,6 +1380,79 @@ export interface StockInfo {
   additional_data?: StockInfoAdditionalData;
 }
 
+export type StressPositionMethod = typeof StressPositionMethod[keyof typeof StressPositionMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StressPositionMethod = {
+  historical: 'historical',
+  beta_proxy: 'beta_proxy',
+  shock: 'shock',
+} as const;
+
+export interface StressPosition {
+  ticker: string;
+  /** Position return in the scenario (decimal, base currency) */
+  return: number;
+  method: StressPositionMethod;
+  /** Current weight in the portfolio (0-1) */
+  weight: number;
+}
+
+export interface StressRequest {
+  /**
+   * @minItems 1
+   * @maxItems 50
+   */
+  positions: PortfolioPositionInput[];
+  /** @pattern ^[A-Za-z]{3}$ */
+  base_currency?: string;
+  /**
+   * Market shocks as decimals (-0.2 = -20%)
+   * @maxItems 10
+   */
+  shocks?: number[];
+}
+
+export interface StressResponse {
+  base_currency: string;
+  current_value: number;
+  scenarios: StressScenario[];
+  excluded?: ScenarioExcluded[];
+  disclaimer?: string;
+}
+
+export type StressScenarioPeriodStart = string | null;
+
+export type StressScenarioPeriodEnd = string | null;
+
+/**
+ * 'historical' if every position has its own data; 'beta_proxy' if any position used beta x benchmark; 'shock' for market shocks
+ */
+export type StressScenarioMethod = typeof StressScenarioMethod[keyof typeof StressScenarioMethod];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StressScenarioMethod = {
+  historical: 'historical',
+  beta_proxy: 'beta_proxy',
+  shock: 'shock',
+} as const;
+
+export interface StressScenario {
+  key: string;
+  label: string;
+  period_start?: StressScenarioPeriodStart;
+  period_end?: StressScenarioPeriodEnd;
+  /** 'historical' if every position has its own data; 'beta_proxy' if any position used beta x benchmark; 'shock' for market shocks */
+  method: StressScenarioMethod;
+  portfolio_return: number;
+  value_after: number;
+  pnl: number;
+  positions: StressPosition[];
+  benchmark_return: number;
+}
+
 export type TechnicalLatestClose = number | null;
 
 export type TechnicalLatestRsi14 = number | null;
@@ -1241,6 +1603,54 @@ export interface ValidationError {
   loc: ValidationErrorLocItem[];
   msg: string;
   type: string;
+}
+
+/**
+ * Contribution of the modified portfolio (defaults to the current one)
+ */
+export type WhatIfChangesMonthlyContribution = number | null;
+
+export interface WhatIfChanges {
+  /** @maxItems 50 */
+  sell?: WhatIfTrade[];
+  /** @maxItems 50 */
+  buy?: WhatIfTrade[];
+  /** Contribution of the modified portfolio (defaults to the current one) */
+  monthly_contribution?: WhatIfChangesMonthlyContribution;
+}
+
+export interface WhatIfDelta {
+  p50: number;
+  p5: number;
+  prob_loss: number;
+}
+
+export interface WhatIfRequest {
+  current: MonteCarloRequest;
+  changes: WhatIfChanges;
+}
+
+export interface WhatIfResponse {
+  base_currency: string;
+  horizon_years: number;
+  paths: number;
+  seed: number;
+  lookback_used: string;
+  observations: number;
+  current: MonteCarloSummary;
+  modified: MonteCarloSummary;
+  delta: WhatIfDelta;
+  risk_current: RiskSnapshot;
+  risk_modified: RiskSnapshot;
+  excluded?: ScenarioExcluded[];
+  disclaimer?: string;
+}
+
+export interface WhatIfTrade {
+  /** @pattern ^[A-Za-z0-9.^=\-]{1,20}$ */
+  ticker: string;
+  /** */
+  quantity: number;
 }
 
 export type ScreenEquitiesApiV1ScreenPostParams = {
