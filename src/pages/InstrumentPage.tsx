@@ -1,4 +1,5 @@
-import { useParams } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
@@ -16,7 +17,10 @@ import {
   MessageSquare,
   Star,
   Plus,
-  NotebookPen
+  NotebookPen,
+  Landmark,
+  LineChart,
+  GitCompare
 } from "lucide-react";
 import { useGetStockInfoApiV1StockTickerGet } from "@/api/stock/stock";
 import type { StockInfo, CompanyInfo } from "@/api/financialDataApi.schemas";
@@ -30,6 +34,11 @@ import { InstrumentNewsSentimentCard } from "@/components/instruments/Instrument
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
 import { StockNotes } from "@/components/notes/StockNotes";
 import { Term } from "@/components/glossary/Term";
+import { HealthIndicator } from "@/components/instruments/HealthIndicator";
+
+const FundamentalsTab = lazy(() => import("@/components/instruments/fundamentals/FundamentalsTab"));
+
+const TechnicalTab = lazy(() => import("@/components/technicals/TechnicalTab"));
 
 // Formatter components
 import {
@@ -156,6 +165,11 @@ export function InstrumentPage() {
                 {stockInfo.company_info?.name || ticker} ({stockInfo.symbol})
               </h1>
             </div>
+            {ticker && (
+              <div className="mt-2">
+                <HealthIndicator ticker={ticker} />
+              </div>
+            )}
           </div>
           <div className="flex flex-col items-start sm:items-end gap-2">
             {additionalData.website && (
@@ -185,6 +199,12 @@ export function InstrumentPage() {
                   <span className="truncate">New Transaction</span>
                 </Button>
               </TransactionDrawer>
+              <Button asChild variant="outline" size="sm" className="gap-2 text-sm w-full sm:w-auto">
+                <Link to={`/compare?tickers=${encodeURIComponent(ticker || "")}`}>
+                  <GitCompare className="h-4 w-4 flex-shrink-0" />
+                  Compare
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -202,10 +222,18 @@ export function InstrumentPage() {
       {ticker && <InstrumentPostsCarousel ticker={ticker} />}
       {/* Tabs for Main Content */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 max-w-lg mb-6">
+        <TabsList className="grid w-full grid-cols-6 max-w-2xl mb-6">
           <TabsTrigger value="overview" aria-label="Overview" className="flex items-center gap-2">
             <BarChart2 className="h-4 w-4" />
             <span className="hidden sm:inline">Overview</span>
+          </TabsTrigger>
+          <TabsTrigger value="fundamentals" aria-label="Fundamentals" className="flex items-center gap-2">
+            <Landmark className="h-4 w-4" />
+            <span className="hidden sm:inline">Fundamentals</span>
+          </TabsTrigger>
+          <TabsTrigger value="technical" aria-label="Technical" className="flex items-center gap-2">
+            <LineChart className="h-4 w-4" />
+            <span className="hidden sm:inline">Technical</span>
           </TabsTrigger>
           <TabsTrigger value="simulation" aria-label="Simulation" className="flex items-center gap-2">
             <Calculator className="h-4 w-4" />
@@ -410,6 +438,22 @@ export function InstrumentPage() {
               />
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="fundamentals" className="mt-0">
+          {ticker && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <FundamentalsTab ticker={ticker} />
+            </Suspense>
+          )}
+        </TabsContent>
+
+        <TabsContent value="technical" className="mt-0">
+          {ticker && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <TechnicalTab ticker={ticker} currency={priceData?.currency} />
+            </Suspense>
+          )}
         </TabsContent>
 
         <TabsContent value="simulation" className="mt-0">

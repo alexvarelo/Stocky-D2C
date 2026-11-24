@@ -30,6 +30,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const Watchlists = lazy(() => import("./pages/Watchlists"));
 const WatchlistDetail = lazy(() => import("./pages/WatchlistDetail"));
+const Compare = lazy(() => import("./pages/Compare"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const SettingsPage = lazy(() => import("./pages/Settings"));
@@ -180,6 +181,7 @@ const App = () => (
                     {/* Old links to the removed Market Research page land on Discovery. */}
                     <Route path="/market-research" element={<Navigate to="/discover" replace />} />
                     <Route path="/instrument/:ticker" element={<InstrumentPage />} />
+                    <Route path="/compare" element={<Compare />} />
                     <Route path="/settings" element={<SettingsPage />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
