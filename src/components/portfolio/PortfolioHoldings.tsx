@@ -23,12 +23,15 @@ import type { RealtimePrice } from "@/api/stock/useRealtimePrices";
 import { usePriceFlash, priceFlashClass } from "@/hooks/usePriceFlash";
 import { ArrowUp, ArrowDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PositionThesisButton } from "@/components/thesis/PositionThesisButton";
 
 interface PortfolioHoldingsProps {
   holdings: PortfolioHolding[];
   isLoading?: boolean;
   isLoadingPrices?: boolean;
   livePrices?: Record<string, RealtimePrice>;
+  /** Enables the per-position thesis indicator. */
+  portfolioId?: string;
 }
 
 type SortColumn = "asset" | "price" | "value" | "today" | "return" | "allocation";
@@ -88,10 +91,12 @@ const HoldingRow = ({
   row,
   isLive,
   isLoadingPrices,
+  portfolioId,
 }: {
   row: Row;
   isLive: boolean;
   isLoadingPrices: boolean;
+  portfolioId?: string;
 }) => {
   const { holding, marketValue, pnl, pnlPercentage, todayChangePercent, allocation } = row;
   const flash = usePriceFlash(isLive ? holding.current_price : undefined);
@@ -100,6 +105,7 @@ const HoldingRow = ({
   return (
     <TableRow className="group hover:bg-muted/30 border-border/50 transition-colors">
       <TableCell className="pl-6 py-4">
+        <div className="flex items-center gap-1">
         <Link
           to={`/instrument/${holding.ticker}`}
           className="flex items-center gap-3 group/link"
@@ -114,6 +120,8 @@ const HoldingRow = ({
             </span>
           </div>
         </Link>
+        {portfolioId && <PositionThesisButton ticker={holding.ticker} portfolioId={portfolioId} />}
+        </div>
       </TableCell>
       <TableCell className="text-right font-medium">
         {isLoadingPrices ? (
@@ -198,10 +206,12 @@ const HoldingCard = ({
   row,
   isLive,
   isLoadingPrices,
+  portfolioId,
 }: {
   row: Row;
   isLive: boolean;
   isLoadingPrices: boolean;
+  portfolioId?: string;
 }) => {
   const { holding, marketValue, pnl, pnlPercentage, todayChangePercent, allocation } = row;
   const flash = usePriceFlash(isLive ? holding.current_price : undefined);
@@ -223,6 +233,8 @@ const HoldingCard = ({
             </span>
           </div>
         </div>
+        <div className="flex items-center gap-1 shrink-0">
+        {portfolioId && <PositionThesisButton ticker={holding.ticker} portfolioId={portfolioId} />}
         <div className="flex flex-col items-end shrink-0">
           {isLoadingPrices ? (
             <Skeleton className="h-4 w-20" />
@@ -232,6 +244,7 @@ const HoldingCard = ({
           <span className={`text-xs font-medium ${isTodayPositive ? "text-success" : "text-danger"}`}>
             {isTodayPositive ? "+" : ""}{formatPercentage(todayChangePercent)} today
           </span>
+        </div>
         </div>
       </div>
 
@@ -369,7 +382,8 @@ export const PortfolioHoldings = ({
   holdings,
   isLoading = false,
   isLoadingPrices = false,
-  livePrices = {}
+  livePrices = {},
+  portfolioId,
 }: PortfolioHoldingsProps) => {
   const [sortColumn, setSortColumn] = useState<SortColumn>("allocation");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -494,6 +508,7 @@ export const PortfolioHoldings = ({
                 row={row}
                 isLive={isLive}
                 isLoadingPrices={isLoadingPrices}
+                portfolioId={portfolioId}
               />
             );
           })}
@@ -521,6 +536,7 @@ export const PortfolioHoldings = ({
                     row={row}
                     isLive={isLive}
                     isLoadingPrices={isLoadingPrices}
+                    portfolioId={portfolioId}
                   />
                 );
               })}

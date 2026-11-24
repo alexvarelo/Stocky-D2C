@@ -7,6 +7,7 @@ import {
   DashboardSkeleton,
 } from "@/components/dashboard/DashboardSkeleton";
 import { HoldingsDonutChart } from "@/components/charts/HoldingsDonutChart";
+import { ThesisReviewReminder } from "@/components/thesis/ThesisReviewReminder";
 import { ActivityCalendar } from "@/components/profile/ActivityCalendar";
 
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
@@ -48,6 +49,8 @@ const Dashboard = () => {
       transition={{ duration: 0.3 }}
       className="min-h-screen md:p-6 space-y-8"
     >
+      <ThesisReviewReminder />
+
       {/* Total Wealth */}
       <WealthHero portfolios={portfolios || []} />
 

@@ -228,6 +228,7 @@ export const PortfolioDetail = () => {
               isLoading={isLoadingPortfolio}
               isLoadingPrices={isLoadingPrices}
               livePrices={livePrices}
+              portfolioId={portfolioId}
             />
 
             {/* Transactions */}
