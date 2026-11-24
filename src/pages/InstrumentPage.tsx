@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
@@ -18,7 +18,9 @@ import {
   Star,
   Plus,
   NotebookPen,
-  Landmark
+  Landmark,
+  LineChart,
+  GitCompare
 } from "lucide-react";
 import { useGetStockInfoApiV1StockTickerGet } from "@/api/stock/stock";
 import type { StockInfo, CompanyInfo } from "@/api/financialDataApi.schemas";
@@ -35,6 +37,8 @@ import { Term } from "@/components/glossary/Term";
 import { HealthIndicator } from "@/components/instruments/HealthIndicator";
 
 const FundamentalsTab = lazy(() => import("@/components/instruments/fundamentals/FundamentalsTab"));
+
+const TechnicalTab = lazy(() => import("@/components/technicals/TechnicalTab"));
 
 // Formatter components
 import {
@@ -195,6 +199,12 @@ export function InstrumentPage() {
                   <span className="truncate">New Transaction</span>
                 </Button>
               </TransactionDrawer>
+              <Button asChild variant="outline" size="sm" className="gap-2 text-sm w-full sm:w-auto">
+                <Link to={`/compare?tickers=${encodeURIComponent(ticker || "")}`}>
+                  <GitCompare className="h-4 w-4 flex-shrink-0" />
+                  Compare
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -212,7 +222,7 @@ export function InstrumentPage() {
       {ticker && <InstrumentPostsCarousel ticker={ticker} />}
       {/* Tabs for Main Content */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 max-w-lg mb-6">
+        <TabsList className="grid w-full grid-cols-6 max-w-2xl mb-6">
           <TabsTrigger value="overview" aria-label="Overview" className="flex items-center gap-2">
             <BarChart2 className="h-4 w-4" />
             <span className="hidden sm:inline">Overview</span>
@@ -220,6 +230,10 @@ export function InstrumentPage() {
           <TabsTrigger value="fundamentals" aria-label="Fundamentals" className="flex items-center gap-2">
             <Landmark className="h-4 w-4" />
             <span className="hidden sm:inline">Fundamentals</span>
+          </TabsTrigger>
+          <TabsTrigger value="technical" aria-label="Technical" className="flex items-center gap-2">
+            <LineChart className="h-4 w-4" />
+            <span className="hidden sm:inline">Technical</span>
           </TabsTrigger>
           <TabsTrigger value="simulation" aria-label="Simulation" className="flex items-center gap-2">
             <Calculator className="h-4 w-4" />
@@ -430,6 +444,14 @@ export function InstrumentPage() {
           {ticker && (
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
               <FundamentalsTab ticker={ticker} />
+            </Suspense>
+          )}
+        </TabsContent>
+
+        <TabsContent value="technical" className="mt-0">
+          {ticker && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <TechnicalTab ticker={ticker} currency={priceData?.currency} />
             </Suspense>
           )}
         </TabsContent>
