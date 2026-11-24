@@ -28,6 +28,13 @@ import {
 
 const MAX_POSITIONS = 50;
 
+const EXCLUSION_REASON: Record<string, string> = {
+  no_history: "no price history",
+  no_fx: "no exchange rate",
+  unknown_currency: "unknown currency",
+  limit: "over position limit",
+};
+
 interface Props {
   portfolioId?: string;
   holdings: PortfolioHolding[];
@@ -223,7 +230,15 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
             {data.missing_tickers.length > 0 && (
               <p className="text-xs text-muted-foreground flex gap-2 items-start rounded-xl bg-muted/50 p-3">
                 <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
-                <span>Excluded: no price history for {data.missing_tickers.join(", ")}.</span>
+                <span>
+                  Excluded:{" "}
+                  {data.excluded && data.excluded.length > 0
+                    ? data.excluded
+                        .map((e) => `${e.ticker} (${EXCLUSION_REASON[e.reason] ?? "unavailable"})`)
+                        .join(", ")
+                    : data.missing_tickers.join(", ")}
+                  .
+                </span>
               </p>
             )}
           </div>

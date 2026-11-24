@@ -158,6 +158,22 @@ export interface ErrorResponse {
   status_code: number;
 }
 
+export type ExcludedTickerReason = typeof ExcludedTickerReason[keyof typeof ExcludedTickerReason];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ExcludedTickerReason = {
+  no_history: 'no_history',
+  no_fx: 'no_fx',
+  unknown_currency: 'unknown_currency',
+  limit: 'limit',
+} as const;
+
+export interface ExcludedTicker {
+  ticker: string;
+  reason: ExcludedTickerReason;
+}
+
 export interface HTTPValidationError {
   detail?: ValidationError[];
 }
@@ -387,8 +403,7 @@ export interface NewsArticle {
 export interface PortfolioPositionInput {
   /**
    * Ticker symbol
-   * @minLength 1
-   * @maxLength 20
+   * @pattern ^[A-Za-z0-9.^=\-]{1,20}$
    */
   ticker: string;
   /**
@@ -415,17 +430,26 @@ export interface PortfolioRiskRequest {
    * @maxItems 50
    */
   positions: PortfolioPositionInput[];
-  /** Benchmark ticker for beta */
+  /**
+   * Benchmark ticker for beta
+   * @pattern ^[A-Za-z0-9.^=\-]{1,20}$
+   */
   benchmark?: string;
   period?: PortfolioRiskRequestPeriod;
-  /** Annual risk-free rate as a decimal (0.03 = 3%) */
-  risk_free_rate?: number;
   /**
-   * @minLength 3
-   * @maxLength 3
+   * Annual risk-free rate as a decimal (0.03 = 3%)
+   * @minimum -0.05
+   * @maximum 0.2
    */
+  risk_free_rate?: number;
+  /** @pattern ^[A-Za-z]{3}$ */
   base_currency?: string;
 }
+
+/**
+ * Currency the benchmark was converted from (null if unknown)
+ */
+export type PortfolioRiskResponseBenchmarkCurrency = string | null;
 
 export type PortfolioRiskResponseBeta = number | null;
 
@@ -441,8 +465,12 @@ export type PortfolioRiskResponseEffectivePositions = number | null;
 
 export interface PortfolioRiskResponse {
   as_of: string;
+  /** Common last date used for prices, weights and total_value */
+  valuation_date: string;
   period: string;
   benchmark: string;
+  /** Currency the benchmark was converted from (null if unknown) */
+  benchmark_currency?: PortfolioRiskResponseBenchmarkCurrency;
   base_currency: string;
   total_value: number;
   weights: PortfolioWeight[];
@@ -455,7 +483,9 @@ export interface PortfolioRiskResponse {
   hhi: number;
   effective_positions?: PortfolioRiskResponseEffectivePositions;
   correlation: CorrelationMatrix;
+  /** Tickers of `excluded` (kept for backward compatibility) */
   missing_tickers: string[];
+  excluded?: ExcludedTicker[];
   observations: number;
   disclaimer?: string;
 }
@@ -463,9 +493,11 @@ export interface PortfolioRiskResponse {
 export interface PortfolioWeight {
   ticker: string;
   quantity: number;
-  /** Latest close in the asset's own currency */
+  /** Close on valuation_date, in the asset's quoted currency/unit (pence for GBp) */
   price: number;
   currency: string;
+  /** Base currency per quoted unit; price * quantity * fx_rate == value_base */
+  fx_rate: number;
   /** Position value in base currency */
   value_base: number;
   /** Fraction of portfolio value (0-1) */

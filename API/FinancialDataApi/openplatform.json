@@ -1388,6 +1388,30 @@
         "title": "ErrorResponse",
         "description": "Schema for error responses"
       },
+      "ExcludedTicker": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "no_history",
+              "no_fx",
+              "unknown_currency",
+              "limit"
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "reason"
+        ],
+        "title": "ExcludedTicker"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1843,8 +1867,7 @@
         "properties": {
           "ticker": {
             "type": "string",
-            "maxLength": 20,
-            "minLength": 1,
+            "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
             "title": "Ticker",
             "description": "Ticker symbol"
           },
@@ -1875,6 +1898,7 @@
           },
           "benchmark": {
             "type": "string",
+            "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
             "title": "Benchmark",
             "description": "Benchmark ticker for beta",
             "default": "^GSPC"
@@ -1893,14 +1917,15 @@
           },
           "risk_free_rate": {
             "type": "number",
+            "maximum": 0.2,
+            "minimum": -0.05,
             "title": "Risk Free Rate",
             "description": "Annual risk-free rate as a decimal (0.03 = 3%)",
             "default": 0.0
           },
           "base_currency": {
             "type": "string",
-            "maxLength": 3,
-            "minLength": 3,
+            "pattern": "^[A-Za-z]{3}$",
             "title": "Base Currency",
             "default": "USD"
           }
@@ -1918,6 +1943,12 @@
             "format": "date",
             "title": "As Of"
           },
+          "valuation_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Valuation Date",
+            "description": "Common last date used for prices, weights and total_value"
+          },
           "period": {
             "type": "string",
             "title": "Period"
@@ -1925,6 +1956,18 @@
           "benchmark": {
             "type": "string",
             "title": "Benchmark"
+          },
+          "benchmark_currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Currency",
+            "description": "Currency the benchmark was converted from (null if unknown)"
           },
           "base_currency": {
             "type": "string",
@@ -2022,7 +2065,16 @@
               "type": "string"
             },
             "type": "array",
-            "title": "Missing Tickers"
+            "title": "Missing Tickers",
+            "description": "Tickers of `excluded` (kept for backward compatibility)"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/ExcludedTicker"
+            },
+            "type": "array",
+            "title": "Excluded",
+            "default": []
           },
           "observations": {
             "type": "integer",
@@ -2037,6 +2089,7 @@
         "type": "object",
         "required": [
           "as_of",
+          "valuation_date",
           "period",
           "benchmark",
           "base_currency",
@@ -2063,11 +2116,16 @@
           "price": {
             "type": "number",
             "title": "Price",
-            "description": "Latest close in the asset's own currency"
+            "description": "Close on valuation_date, in the asset's quoted currency/unit (pence for GBp)"
           },
           "currency": {
             "type": "string",
             "title": "Currency"
+          },
+          "fx_rate": {
+            "type": "number",
+            "title": "Fx Rate",
+            "description": "Base currency per quoted unit; price * quantity * fx_rate == value_base"
           },
           "value_base": {
             "type": "number",
@@ -2086,6 +2144,7 @@
           "quantity",
           "price",
           "currency",
+          "fx_rate",
           "value_base",
           "weight"
         ],
