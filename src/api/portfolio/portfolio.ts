@@ -242,26 +242,18 @@ export const usePortfolio = (portfolioId: string, includePrices = true) => {
     : (storedValue?.total_value || calculatedTotalValue);
 
   const finalTotalReturnPercentage = (livePrices && Object.keys(livePrices).length > 0)
-    ? (totalInvested > 0 ? (totalTodayChange / totalInvested) * 100 : 0) // This logic seems to be for today change, not total return. 
-    // Wait, totalTodayChange is for TODAY. 
-    // Total return is (currentValue - invested) / invested.
-    : (storedValue?.total_return_percentage || (totalInvested > 0 ? ((calculatedTotalValue - totalInvested) / totalInvested) * 100 : 0));
+    ? (totalInvested > 0 ? ((calculatedTotalValue - totalInvested) / totalInvested) * 100 : 0)
+    : (storedValue?.total_return_percentage ?? (totalInvested > 0 ? ((calculatedTotalValue - totalInvested) / totalInvested) * 100 : 0));
 
-  // Actually, the original code didn't return total_value explicitly in the Portfolio interface, 
-  // it seems it was derived in the components or I missed it.
-  // Let's check the Portfolio interface. It has holdings.
-  // The components usually calculate total value from holdings.
-  // But if we want to pass a pre-calculated value, we should add it to the interface or ensure holdings sum up to it.
-  // Since we updated holdings with stored prices, the sum should be correct-ish.
-
-  // However, PortfolioHero takes totalValue as a prop.
-  // In PortfolioDetail, it probably calculates it.
+  // Today's change is measured against yesterday's value (today's value minus the change),
+  // not against the amount invested.
+  const previousCloseValue = calculatedTotalValue - totalTodayChange;
 
   const portfolioWithPrices: Portfolio = {
     ...basicPortfolio,
     holdings: holdingsWithPrices,
     today_change: totalTodayChange,
-    today_change_percent: totalInvested > 0 ? (totalTodayChange / totalInvested) * 100 : 0,
+    today_change_percent: previousCloseValue > 0 ? (totalTodayChange / previousCloseValue) * 100 : 0,
     // If we have a stored total return, we could potentially use it, but calculating from holdings is usually safer for consistency
     total_value: finalTotalValue,
     total_return_percentage: finalTotalReturnPercentage,

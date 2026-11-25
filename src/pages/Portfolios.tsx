@@ -158,6 +158,12 @@ const Portfolios = () => {
                       isOwnPortfolio={true}
                       totalValue={portfolio.total_value}
                       totalReturnPercentage={portfolio.total_return_percentage}
+                      totalCost={portfolio.total_cost}
+                      todayChange={portfolio.today_change}
+                      todayChangePercent={portfolio.today_change_percent}
+                      unpricedTickers={portfolio.unpriced_tickers}
+                      valuedAt={portfolio.valued_at}
+                      currency={portfolio.currency}
                     />
                   </motion.div>
                 ))}
