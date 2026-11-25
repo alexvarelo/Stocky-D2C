@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, RefreshCw, ShieldAlert } from "lucide-react";
+import { AlertTriangle, ChevronDown, RefreshCw, ShieldAlert } from "lucide-react";
 import { portfolioRiskApiV1PortfolioRiskPost } from "@/api/risk/risk";
 import type { PortfolioRiskRequestPeriod, PortfolioRiskResponse } from "@/api/financialDataApi.schemas";
 import type { PortfolioHolding } from "@/api/portfolio/portfolio";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ExplainThis } from "@/components/explain/ExplainThis";
 import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
@@ -84,8 +85,37 @@ function RiskSkeleton() {
   );
 }
 
+const OPEN_KEY = "stocky.portfolio-risk-open";
+
+function readOpen(): boolean {
+  try {
+    return window.localStorage.getItem(OPEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/** One compact figure for the collapsed summary row. */
+function SummaryFigure({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <dt className="truncate text-[11px] text-muted-foreground">{label}</dt>
+      <dd className="truncate text-base font-semibold tabular-nums">{value}</dd>
+    </div>
+  );
+}
+
 export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
   const [period, setPeriod] = useState<PortfolioRiskRequestPeriod>("1y");
+  // Collapsed by default so holdings stay near the top; remembered per browser.
+  const [open, setOpen] = useState<boolean>(readOpen);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(OPEN_KEY, open ? "1" : "0");
+    } catch {
+      /* storage unavailable: the panel still works, it just won't remember */
+    }
+  }, [open]);
   const baseCurrency = currency && currency.length === 3 ? currency.toUpperCase() : "USD";
 
   const positions = useMemo(() => toPositions(holdings), [holdings]);
@@ -115,7 +145,20 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
 
   const periodLong = PERIOD_OPTIONS.find((p) => p.value === period)?.long ?? period;
 
+  const summary = data && !isError && positions.length > 0 && (
+    <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <SummaryFigure label="Beta vs S&P 500" value={fmtNum(data.beta)} />
+      <SummaryFigure label="Volatility" value={fmtPct(data.volatility_annual)} />
+      <SummaryFigure label="Max drawdown" value={fmtPct(data.max_drawdown)} />
+      <SummaryFigure
+        label="Largest position"
+        value={data.largest_position ? `${data.largest_position.ticker} ${fmtPct(data.largest_position.weight)}` : NO_DATA}
+      />
+    </dl>
+  );
+
   return (
+    <Collapsible open={open} onOpenChange={setOpen} asChild>
     <Card className="rounded-3xl border-border/50">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2">
         <div>
@@ -129,22 +172,44 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
             </p>
           )}
         </div>
-        <ToggleGroup
-          type="single"
-          size="sm"
-          variant="outline"
-          value={period}
-          onValueChange={(v) => v && setPeriod(v as PortfolioRiskRequestPeriod)}
-          aria-label="Risk period"
-        >
-          {PERIOD_OPTIONS.map((p) => (
-            <ToggleGroupItem key={p.value} value={p.value} className="px-3">
-              {p.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        <div className="flex flex-wrap items-center gap-2">
+          {open && (
+            <ToggleGroup
+              type="single"
+              size="sm"
+              variant="outline"
+              value={period}
+              onValueChange={(v) => v && setPeriod(v as PortfolioRiskRequestPeriod)}
+              aria-label="Risk period"
+            >
+              {PERIOD_OPTIONS.map((p) => (
+                <ToggleGroupItem key={p.value} value={p.value} className="px-3">
+                  {p.label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          )}
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+              {open ? "Hide details" : "Show details"}
+              <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
+            </Button>
+          </CollapsibleTrigger>
+        </div>
       </CardHeader>
       <CardContent className="space-y-5">
+        {!open && (
+          positions.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Add holdings to this portfolio to see its risk metrics.</p>
+          ) : isLoading ? (
+            <Skeleton className="h-12 rounded-xl" />
+          ) : isError || !data ? (
+            <p className="text-sm text-muted-foreground">Couldn't load risk metrics. Open the details to retry.</p>
+          ) : (
+            summary
+          )
+        )}
+        <CollapsibleContent className="space-y-5">
         {positions.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
             Add holdings to this portfolio to see its risk metrics.
@@ -245,6 +310,7 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
             )}
           </div>
         )}
+        </CollapsibleContent>
 
         <div className="space-y-1 pt-1 border-t border-border/50">
           <p className="text-xs text-muted-foreground pt-3">
@@ -254,6 +320,7 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
         </div>
       </CardContent>
     </Card>
+    </Collapsible>
   );
 }
 

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import {
   Card,
   CardHeader,
@@ -9,7 +9,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, Lock, User, Users, Heart, HeartOff, ArrowRight } from 'lucide-react';
+import { Eye, Lock, User, Users, Heart, ArrowRight, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/use-toast';
 import { usePortfolioFollows } from '@/api/portfolio/usePortfolioFollows';
@@ -42,8 +42,15 @@ export interface PortfolioCardProps {
   user_avatar_url?: string;
   className?: string;
   isOwnPortfolio?: boolean;
+  /** Stored valuation (own portfolios). When present the card doesn't fetch live prices. */
   totalValue?: number;
   totalReturnPercentage?: number;
+  totalCost?: number;
+  todayChange?: number;
+  todayChangePercent?: number;
+  unpricedTickers?: string[];
+  valuedAt?: string;
+  currency?: string;
 }
 
 export const PortfolioCard: React.FC<PortfolioCardProps> = ({
@@ -63,6 +70,12 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
   isOwnPortfolio,
   totalValue,
   totalReturnPercentage,
+  totalCost,
+  todayChange,
+  todayChangePercent,
+  unpricedTickers = [],
+  valuedAt,
+  currency,
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -101,60 +114,55 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
     }
   };
 
-  // Get portfolio data with metrics - ONLY if we don't have stored values
-  // Or fetch it in background but don't block UI
-  const { data: portfolioData, isLoading: isBasicLoading, isLoadingPrices: isPricesLoading } = usePortfolio(id, true);
-
-  // If we have stored values, we are NOT loading
+  // Own portfolios come with figures stored by the twice-daily valuation job, so the list
+  // doesn't fetch live prices for every card. Followed portfolios (whose stored values the
+  // viewer can't read) still calculate from live prices.
   const hasStoredValues = totalValue !== undefined;
+  const {
+    data: portfolioData,
+    isLoading: isBasicLoading,
+    isLoadingPrices: isPricesLoading,
+  } = usePortfolio(hasStoredValues ? '' : id, true);
   const isLoadingPrices = !hasStoredValues && (isBasicLoading || isPricesLoading);
 
-  // Calculate portfolio metrics from portfolio data
   const portfolioMetrics = useMemo(() => {
-    // If we have stored values, use them!
     if (hasStoredValues) {
+      const value = totalValue || 0;
+      const pct = totalReturnPercentage || 0;
+      // Older rows have no stored cost: derive it from the return (cost = value / (1 + r)).
+      const cost = totalCost ?? (pct > -100 ? value / (1 + pct / 100) : 0);
+      const earnedLost = value - cost;
       return {
-        currentValue: totalValue || 0,
-        costBasis: 0,
-        earnedLost: totalValue * (totalReturnPercentage || 0) / 100,
-        isPositive: (totalReturnPercentage || 0) >= 0,
-        formattedPerformance: Math.abs(totalReturnPercentage || 0).toFixed(2)
+        currentValue: value,
+        costBasis: cost,
+        earnedLost,
+        formattedPerformance: Math.abs(pct).toFixed(2),
       };
     }
 
-    if (!portfolioData?.holdings?.length) {
-      return {
-        currentValue: 0,
-        costBasis: 0,
-        earnedLost: 0,
-        isPositive: true,
-        formattedPerformance: '0.00'
-      };
-    }
-
-    const { currentValue, costBasis } = portfolioData.holdings.reduce<{ currentValue: number; costBasis: number }>(
-      (acc, holding) => {
-        const price = holding.current_price || 0;
-        return {
-          currentValue: acc.currentValue + (price * holding.quantity),
-          costBasis: acc.costBasis + ((holding.average_price || 0) * holding.quantity)
-        };
-      },
+    const holdingsList = portfolioData?.holdings ?? [];
+    const { currentValue, costBasis } = holdingsList.reduce<{ currentValue: number; costBasis: number }>(
+      (acc, holding) => ({
+        currentValue: acc.currentValue + (holding.current_price || 0) * holding.quantity,
+        costBasis: acc.costBasis + (holding.average_price || 0) * holding.quantity,
+      }),
       { currentValue: 0, costBasis: 0 }
     );
-
     const earnedLost = currentValue - costBasis;
     const performance = costBasis > 0 ? earnedLost / costBasis : 0;
-
     return {
       currentValue,
       costBasis,
       earnedLost,
-      isPositive: earnedLost >= 0,
-      formattedPerformance: (Math.abs(performance) * 100).toFixed(2)
+      formattedPerformance: (Math.abs(performance) * 100).toFixed(2),
     };
-  }, [portfolioData, totalValue, totalReturnPercentage, hasStoredValues]);
+  }, [portfolioData, totalValue, totalReturnPercentage, totalCost, hasStoredValues]);
 
+  const dayChange = hasStoredValues ? todayChange ?? 0 : portfolioData?.today_change ?? 0;
+  const dayChangePercent = hasStoredValues ? todayChangePercent ?? 0 : portfolioData?.today_change_percent ?? 0;
+  const valuedDate = valuedAt ? new Date(valuedAt) : null;
+  const dayLabel = !hasStoredValues || !valuedDate || isToday(valuedDate) ? 'today' : `on ${format(valuedDate, 'd MMM')}`;
+  const money = (n: number) => formatCurrency(n, currency);
 
   // Calculate total number of holdings
   const totalHoldings = holdings?.length || 0;
@@ -169,8 +177,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
     }
   }, [created_at]);
 
-  const todayPercent = portfolioData?.today_change_percent || 0;
-  const todayUp = todayPercent >= 0;
+  const todayUp = dayChangePercent >= 0;
   const returnUp = portfolioMetrics.earnedLost >= 0;
   const upPill = 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400';
   const downPill = 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400';
@@ -259,7 +266,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
               <Skeleton className="h-8 w-36" />
             ) : (
               <p className="text-2xl font-bold tabular-nums tracking-tight break-all">
-                {formatCurrency(portfolioMetrics.currentValue)}
+                {money(portfolioMetrics.currentValue)}
               </p>
             )}
             {isLoadingPrices ? (
@@ -267,10 +274,10 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
             ) : (
               <span className={`inline-flex flex-wrap items-center gap-x-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${todayUp ? upPill : downPill}`}>
                 {todayUp ? '+' : ''}
-                {todayPercent.toFixed(2)}%
+                {dayChangePercent.toFixed(2)}%
                 <span className="opacity-50" aria-hidden>•</span>
-                {formatCurrency(portfolioData?.today_change || 0)}
-                <span className="opacity-70">today</span>
+                {money(dayChange)}
+                <span className="opacity-70">{dayLabel}</span>
               </span>
             )}
           </div>
@@ -282,7 +289,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
             ) : (
               <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span className={`text-sm font-semibold tabular-nums ${returnUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {formatCurrency(portfolioMetrics.earnedLost)}
+                  {money(portfolioMetrics.earnedLost)}
                 </span>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${returnUp ? upPill : downPill}`}>
                   {returnUp ? '+' : '−'}
@@ -291,6 +298,15 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
               </span>
             )}
           </div>
+
+          {hasStoredValues && unpricedTickers.length > 0 && (
+            <p className="flex items-start gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span>
+                No current price for {unpricedTickers.join(', ')}. Valued at the last known price or cost.
+              </span>
+            </p>
+          )}
 
           <div className="mt-auto border-t border-border/50 pt-4">
             <div className="mb-3 flex items-center justify-between text-sm">
@@ -327,7 +343,11 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 pt-4 text-xs text-muted-foreground">
-            <span className="whitespace-nowrap">Created {formattedDate}</span>
+            <span className="whitespace-nowrap">
+              {hasStoredValues && valuedDate
+                ? `Prices as of ${format(valuedDate, 'd MMM, HH:mm')}`
+                : `Created ${formattedDate}`}
+            </span>
             <span className="flex items-center whitespace-nowrap font-medium text-primary transition-transform duration-300 group-hover:translate-x-1">
               Details <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden />
             </span>

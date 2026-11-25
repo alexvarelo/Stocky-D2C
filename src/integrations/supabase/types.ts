@@ -568,22 +568,34 @@ export type Database = {
         Row: {
           currency: string
           portfolio_id: string
+          today_change: number | null
+          today_change_percent: number | null
+          total_cost: number | null
           total_return_percentage: number | null
           total_value: number
+          unpriced_tickers: string[]
           updated_at: string | null
         }
         Insert: {
           currency?: string
           portfolio_id: string
+          today_change?: number | null
+          today_change_percent?: number | null
+          total_cost?: number | null
           total_return_percentage?: number | null
           total_value: number
+          unpriced_tickers?: string[]
           updated_at?: string | null
         }
         Update: {
           currency?: string
           portfolio_id?: string
+          today_change?: number | null
+          today_change_percent?: number | null
+          total_cost?: number | null
           total_return_percentage?: number | null
           total_value?: number
+          unpriced_tickers?: string[]
           updated_at?: string | null
         }
         Relationships: [
@@ -924,19 +936,55 @@ export type Database = {
           },
         ]
       }
+      ticker_price_history: {
+        Row: {
+          close: number
+          created_at: string
+          currency: string | null
+          previous_close: number | null
+          price_date: string
+          ticker: string
+        }
+        Insert: {
+          close: number
+          created_at?: string
+          currency?: string | null
+          previous_close?: number | null
+          price_date: string
+          ticker: string
+        }
+        Update: {
+          close?: number
+          created_at?: string
+          currency?: string | null
+          previous_close?: number | null
+          price_date?: string
+          ticker?: string
+        }
+        Relationships: []
+      }
       ticker_prices: {
         Row: {
+          change_percent: number | null
+          currency: string | null
           last_updated: string | null
+          previous_close: number | null
           price: number
           ticker: string
         }
         Insert: {
+          change_percent?: number | null
+          currency?: string | null
           last_updated?: string | null
+          previous_close?: number | null
           price: number
           ticker: string
         }
         Update: {
+          change_percent?: number | null
+          currency?: string | null
           last_updated?: string | null
+          previous_close?: number | null
           price?: number
           ticker?: string
         }

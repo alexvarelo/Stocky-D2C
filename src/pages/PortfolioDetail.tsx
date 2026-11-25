@@ -226,6 +226,22 @@ export const PortfolioDetail = () => {
               isLoading={isLoadingPrices}
             />
 
+            {/* Holdings List */}
+            <PortfolioHoldings
+              holdings={holdingsWithLivePrices || []}
+              isLoading={isLoadingPortfolio}
+              isLoadingPrices={isLoadingPrices}
+              livePrices={livePrices}
+              portfolioId={portfolioId}
+            />
+
+            {/* Risk */}
+            <PortfolioRiskPanel
+              portfolioId={portfolioId}
+              holdings={portfolio.holdings || []}
+              currency={portfolio.currency}
+            />
+
             {/* Scenarios entry point */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl border border-border/50 p-4">
               <div>
@@ -236,22 +252,6 @@ export const PortfolioDetail = () => {
                 <Link to={`/portfolio/${portfolioId}/scenarios`}>Explore scenarios</Link>
               </Button>
             </div>
-
-            {/* Risk */}
-            <PortfolioRiskPanel
-              portfolioId={portfolioId}
-              holdings={portfolio.holdings || []}
-              currency={portfolio.currency}
-            />
-
-            {/* Holdings List */}
-            <PortfolioHoldings
-              holdings={holdingsWithLivePrices || []}
-              isLoading={isLoadingPortfolio}
-              isLoadingPrices={isLoadingPrices}
-              livePrices={livePrices}
-              portfolioId={portfolioId}
-            />
 
             {/* Transactions */}
             <TransactionsCard
