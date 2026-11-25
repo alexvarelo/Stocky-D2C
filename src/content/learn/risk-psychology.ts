@@ -43,6 +43,9 @@ Equating low beta with low risk, or high beta with "bad". Beta measures sensitiv
       caption: "See the beta of an example ticker against the S&P 500.",
     },
     glossaryIds: ["beta", "volatility", "correlation", "benchmark"],
+    steps: {
+      "read-0": { title: "A beta of 1.5 amplifies the market", visual: "beta-amplify" },
+    },
     quiz: [
       {
         id: "beta-lesson-q1",

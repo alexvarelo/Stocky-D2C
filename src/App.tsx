@@ -154,6 +154,34 @@ function MainLayoutShell() {
   );
 }
 
+/**
+ * Full-screen layout for lessons ("focus mode"): no sidebar, footer, bottom tabs or floating chat
+ * button. The page brings its own top and bottom bars; the chat stays available through context.
+ */
+function FocusLayout() {
+  return (
+    <StockyChatProvider>
+      <FocusLayoutShell />
+    </StockyChatProvider>
+  );
+}
+
+function FocusLayoutShell() {
+  const chat = useStockyChat();
+  const location = useLocation();
+
+  return (
+    <div className="min-h-[100svh] w-full bg-background">
+      <ErrorBoundary key={location.pathname}>
+        <Suspense fallback={<PageFallback />}>
+          <Outlet />
+        </Suspense>
+      </ErrorBoundary>
+      <StockyChat open={chat?.open ?? false} onOpenChange={(open) => chat?.setOpen(open)} draft={chat?.draft} />
+    </div>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -193,7 +221,6 @@ const App = () => (
                     <Route path="/strategies" element={<Strategies />} />
                     <Route path="/learn" element={<Learn />} />
                     <Route path="/learn/:trackId" element={<LearnTrack />} />
-                    <Route path="/learn/:trackId/:lessonId" element={<LearnLesson />} />
                     <Route path="/watchlists" element={<Watchlists />} />
                     <Route path="/watchlist/:id" element={<WatchlistDetail />} />
                     <Route path="/article/:id" element={<ArticlePage />} />
@@ -205,6 +232,15 @@ const App = () => (
                     <Route path="/instrument/:ticker" element={<InstrumentPage />} />
                     <Route path="/compare" element={<Compare />} />
                     <Route path="/settings" element={<SettingsPage />} />
+                  </Route>
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <FocusLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route path="/learn/:trackId/:lessonId" element={<LearnLesson />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
