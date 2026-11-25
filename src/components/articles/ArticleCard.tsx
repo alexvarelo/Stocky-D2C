@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CalendarIcon, User, ArrowRight } from 'lucide-react';
-import { format } from 'date-fns';
+import { format } from '@/lib/dateFormat';
 import { Link } from 'react-router-dom';
 import type { Article } from '@/api/articles/useArticles';
 

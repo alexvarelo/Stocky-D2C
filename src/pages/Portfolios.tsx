@@ -21,9 +21,11 @@ import { useFollowedPortfolios } from "@/api/portfolio/useFollowedPortfolios";
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Portfolios = () => {
   const { user } = useAuth();
+  const { t } = useTranslation('portfolio');
   const [showCreateWizard, setShowCreateWizard] = useState(false);
   const [activeTab, setActiveTab] = useState("my-portfolios");
 
@@ -90,9 +92,9 @@ const Portfolios = () => {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Portfolios</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('list.title')}</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Manage and track your investment portfolios
+              {t('list.subtitle')}
             </p>
           </div>
           <Button
@@ -100,7 +102,7 @@ const Portfolios = () => {
             className="w-full sm:w-auto"
           >
             <Plus className="mr-2 h-4 w-4" />
-            New Portfolio
+            {t('list.new')}
           </Button>
         </div>
 
@@ -112,11 +114,11 @@ const Portfolios = () => {
           <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto sm:mx-0">
             <TabsTrigger value="my-portfolios" className="text-xs sm:text-sm">
               <FolderOpen className="mr-2 h-4 w-4" />
-              My Portfolios
+              {t('list.tabs.mine')}
             </TabsTrigger>
             <TabsTrigger value="following" className="text-xs sm:text-sm">
               <Heart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-              Following
+              {t('list.tabs.following')}
             </TabsTrigger>
           </TabsList>
 
@@ -131,16 +133,16 @@ const Portfolios = () => {
               <Card className="border-dashed">
                 <CardHeader className="space-y-1 text-center">
                   <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <CardTitle className="text-2xl">No portfolios yet</CardTitle>
+                  <CardTitle className="text-2xl">{t('list.empty.title')}</CardTitle>
                   <CardDescription className="text-muted-foreground">
-                    Create your first portfolio to get started
+                    {t('list.empty.description')}
                   </CardDescription>
                   <Button
                     onClick={() => setShowCreateWizard(true)}
                     className="mt-4"
                   >
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Portfolio
+                    {t('list.empty.cta')}
                   </Button>
                 </CardHeader>
               </Card>
@@ -183,15 +185,15 @@ const Portfolios = () => {
                 <CardHeader className="space-y-1 text-center">
                   <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                   <CardTitle className="text-2xl">
-                    Not following any portfolios
+                    {t('list.emptyFollowing.title')}
                   </CardTitle>
                   <CardDescription className="text-muted-foreground">
-                    Discover and follow public portfolios to see them here
+                    {t('list.emptyFollowing.description')}
                   </CardDescription>
                   <Button variant="outline" className="mt-4">
                     <Link to="/discover">
                       <Users className="mr-2 h-4 w-4" />
-                      Discover Portfolios
+                      {t('list.emptyFollowing.cta')}
                     </Link>
                   </Button>
                 </CardHeader>

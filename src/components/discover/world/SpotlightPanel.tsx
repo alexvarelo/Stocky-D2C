@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { cn } from "@/lib/utils";
 import { invokeFunction } from "@/api/functions";
 import { useGetHistoricalDataApiV1StockTickerHistoryGet } from "@/api/stock/stock";

@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StockyLogo } from '@/components/brand/StockyLogo';
 import { TrendingUp, Shield, Globe, ArrowRight, ArrowLeft, Loader2, MailCheck } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
+import { LanguageSelect } from '@/components/i18n/LanguageSelect';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -24,6 +26,7 @@ const GoogleIcon = ({ className }: { className?: string }) => (
 
 const Auth = () => {
   const { user, loading, signIn, signUp, resetPassword, signInWithGoogle } = useAuth();
+  const { t } = useTranslation('auth');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
@@ -61,10 +64,10 @@ const Auth = () => {
 
     const errors: typeof formErrors = {};
     if (formData.password.length < MIN_PASSWORD_LENGTH) {
-      errors.password = `Must be at least ${MIN_PASSWORD_LENGTH} characters long`;
+      errors.password = t('validation.passwordMin', { count: MIN_PASSWORD_LENGTH });
     }
     if (formData.confirmPassword !== formData.password) {
-      errors.confirmPassword = 'Passwords do not match';
+      errors.confirmPassword = t('validation.passwordMismatch');
     }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -147,30 +150,33 @@ const Auth = () => {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-[56px] font-medium leading-[1.0] tracking-[-0.8px] mb-6">
-                The future of<br />social investing
+                {t('hero.titleLine1')}<br />{t('hero.titleLine2')}
               </h1>
               <p className="text-lg text-white/70 leading-relaxed font-normal" style={{ letterSpacing: '-0.09px' }}>
-                Join a global community of investors. Track portfolios, share insights, and grow your wealth with professional-grade tools.
+                {t('hero.subtitle')}
               </p>
             </motion.div>
 
             <div className="space-y-5">
-              <FeatureRow icon={TrendingUp} title="Advanced Analytics" description="Performance, allocation and dividends in one place" delay={0.2} />
-              <FeatureRow icon={Globe} title="Global Markets" description="Track stocks and ETFs from US and European exchanges" delay={0.3} />
-              <FeatureRow icon={Shield} title="Private by Default" description="Your portfolios stay private unless you choose to share them" delay={0.4} />
+              <FeatureRow icon={TrendingUp} title={t('features.analytics.title')} description={t('features.analytics.description')} delay={0.2} />
+              <FeatureRow icon={Globe} title={t('features.markets.title')} description={t('features.markets.description')} delay={0.3} />
+              <FeatureRow icon={Shield} title={t('features.privacy.title')} description={t('features.privacy.description')} delay={0.4} />
             </div>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-white/30">
             <span>© {new Date().getFullYear()} Stockfolio</span>
-            <Link to="/legal/privacy" className="hover:text-white/60 transition-colors">Privacy Policy</Link>
-            <Link to="/legal/terms" className="hover:text-white/60 transition-colors">Terms of Service</Link>
+            <Link to="/legal/privacy" className="hover:text-white/60 transition-colors">{t('legal.privacyPolicy')}</Link>
+            <Link to="/legal/terms" className="hover:text-white/60 transition-colors">{t('legal.termsOfService')}</Link>
           </div>
         </div>
       </div>
 
       {/* Right Panel - Auth Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 relative">
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+          <LanguageSelect className="h-9 w-[130px]" />
+        </div>
         <div className="w-full max-w-md space-y-10">
           {/* Mobile Logo */}
           <div className="lg:hidden flex flex-col items-center mb-8 space-y-4">
@@ -194,7 +200,7 @@ const Auth = () => {
                   className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Back to sign in
+                  {t('forgot.back')}
                 </button>
 
                 {resetSent ? (
@@ -203,30 +209,35 @@ const Auth = () => {
                       <MailCheck className="h-7 w-7 text-primary" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-2xl font-bold tracking-tight">Check your email</h2>
+                      <h2 className="text-2xl font-bold tracking-tight">{t('forgot.sentTitle')}</h2>
                       <p className="text-muted-foreground">
-                        We've sent a password reset link to <span className="font-medium text-foreground">{formData.email}</span>. Follow the link to choose a new password.
+                        <Trans
+                          t={t}
+                          i18nKey="forgot.sentBody"
+                          values={{ email: formData.email }}
+                          components={{ strong: <span className="font-medium text-foreground" /> }}
+                        />
                       </p>
                     </div>
                     <Button variant="outline" className="w-full h-12" onClick={backToSignIn}>
-                      Back to sign in
+                      {t('forgot.back')}
                     </Button>
                   </div>
                 ) : (
                   <>
                     <div className="text-center lg:text-left space-y-2">
-                      <h2 className="text-3xl font-bold tracking-tight">Reset your password</h2>
+                      <h2 className="text-3xl font-bold tracking-tight">{t('forgot.title')}</h2>
                       <p className="text-muted-foreground">
-                        Enter the email linked to your account and we'll send you a reset link.
+                        {t('forgot.subtitle')}
                       </p>
                     </div>
                     <form onSubmit={handleForgotPassword} className="space-y-4">
                       <Input
                         type="email"
                         name="email"
-                        aria-label="Email address"
+                        aria-label={t('fields.email')}
                                 autoComplete="email"
-                                placeholder="Email address"
+                                placeholder={t('fields.email')}
                         value={formData.email}
                         onChange={handleInputChange}
                         required
@@ -238,7 +249,7 @@ const Auth = () => {
                         className="w-full h-12 text-base font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
                         disabled={isLoading}
                       >
-                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Send reset link'}
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t('forgot.submit')}
                         {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
                       </Button>
                     </form>
@@ -255,19 +266,19 @@ const Auth = () => {
               >
                 <div className="text-center lg:text-left space-y-2 mb-10">
                   <h2 className="text-3xl font-bold tracking-tight">
-                    {activeTab === 'signin' ? 'Welcome back' : 'Create your account'}
+                    {activeTab === 'signin' ? t('signin.title') : t('signup.title')}
                   </h2>
                   <p className="text-muted-foreground">
                     {activeTab === 'signin'
-                      ? 'Enter your details to access your portfolio.'
-                      : 'Start your investment journey in seconds.'}
+                      ? t('signin.subtitle')
+                      : t('signup.subtitle')}
                   </p>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'signin' | 'signup')} className="w-full">
                   <TabsList className="grid w-full grid-cols-2 mb-8 p-1 bg-muted/50 rounded-full">
-                    <TabsTrigger value="signin" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Sign In</TabsTrigger>
-                    <TabsTrigger value="signup" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Sign Up</TabsTrigger>
+                    <TabsTrigger value="signin" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">{t('signin.tab')}</TabsTrigger>
+                    <TabsTrigger value="signup" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">{t('signup.tab')}</TabsTrigger>
                   </TabsList>
 
                   <div className="relative min-h-[320px]">
@@ -285,9 +296,9 @@ const Auth = () => {
                               <Input
                                 type="email"
                                 name="email"
-                                aria-label="Email address"
+                                aria-label={t('fields.email')}
                                 autoComplete="email"
-                                placeholder="Email address"
+                                placeholder={t('fields.email')}
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 required
@@ -298,9 +309,9 @@ const Auth = () => {
                               <Input
                                 type="password"
                                 name="password"
-                                aria-label="Password"
+                                aria-label={t('fields.password')}
                                 autoComplete="current-password"
-                                placeholder="Password"
+                                placeholder={t('fields.password')}
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 required
@@ -313,7 +324,7 @@ const Auth = () => {
                                   onClick={enterForgotMode}
                                   className="px-0 h-auto text-xs text-muted-foreground hover:text-primary"
                                 >
-                                  Forgot password?
+                                  {t('signin.forgot')}
                                 </Button>
                               </div>
                             </div>
@@ -322,7 +333,7 @@ const Auth = () => {
                               className="w-full h-12 text-base font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
                               disabled={isLoading}
                             >
-                              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Sign In'}
+                              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t('signin.submit')}
                               {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
                             </Button>
                           </form>
@@ -335,9 +346,9 @@ const Auth = () => {
                                 <Input
                                   type="text"
                                   name="fullName"
-                                  aria-label="Full name"
+                                  aria-label={t('fields.fullName')}
                                   autoComplete="name"
-                                  placeholder="Full Name"
+                                  placeholder={t('fields.fullName')}
                                   value={formData.fullName}
                                   onChange={handleInputChange}
                                   required
@@ -348,9 +359,9 @@ const Auth = () => {
                                 <Input
                                   type="text"
                                   name="username"
-                                  aria-label="Username"
+                                  aria-label={t('fields.username')}
                                   autoComplete="username"
-                                  placeholder="Username"
+                                  placeholder={t('fields.username')}
                                   value={formData.username}
                                   onChange={handleInputChange}
                                   required
@@ -362,9 +373,9 @@ const Auth = () => {
                               <Input
                                 type="email"
                                 name="email"
-                                aria-label="Email address"
+                                aria-label={t('fields.email')}
                                 autoComplete="email"
-                                placeholder="Email address"
+                                placeholder={t('fields.email')}
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 required
@@ -375,10 +386,10 @@ const Auth = () => {
                               <Input
                                 type="password"
                                 name="password"
-                                aria-label="Create a password"
+                                aria-label={t('fields.newPassword')}
                                 autoComplete="new-password"
                                 aria-describedby="signup-password-hint"
-                                placeholder="Create a password"
+                                placeholder={t('fields.newPassword')}
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 required
@@ -386,17 +397,17 @@ const Auth = () => {
                                 className={`h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all ${formErrors.password ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : ''}`}
                               />
                               <p id="signup-password-hint" className={`text-xs ml-1 ${formErrors.password ? 'text-destructive' : 'text-muted-foreground'}`}>
-                                {formErrors.password || `Must be at least ${MIN_PASSWORD_LENGTH} characters long`}
+                                {formErrors.password || t('validation.passwordMin', { count: MIN_PASSWORD_LENGTH })}
                               </p>
                             </div>
                             <div className="space-y-2">
                               <Input
                                 type="password"
                                 name="confirmPassword"
-                                aria-label="Confirm password"
+                                aria-label={t('fields.confirmPassword')}
                                 autoComplete="new-password"
                                 aria-describedby={formErrors.confirmPassword ? "signup-confirm-error" : undefined}
-                                placeholder="Confirm password"
+                                placeholder={t('fields.confirmPassword')}
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 required
@@ -412,14 +423,18 @@ const Auth = () => {
                               className="w-full h-12 text-base font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
                               disabled={isLoading}
                             >
-                              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
+                              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t('signup.submit')}
                               {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
                             </Button>
                             <p className="text-xs text-center text-muted-foreground">
-                              By creating an account you agree to the{' '}
-                              <Link to="/legal/terms" className="underline underline-offset-2 hover:text-foreground">Terms</Link>{' '}
-                              and{' '}
-                              <Link to="/legal/privacy" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>.
+                              <Trans
+                                t={t}
+                                i18nKey="signup.agree"
+                                components={{
+                                  terms: <Link to="/legal/terms" className="underline underline-offset-2 hover:text-foreground" />,
+                                  privacy: <Link to="/legal/privacy" className="underline underline-offset-2 hover:text-foreground" />,
+                                }}
+                              />
                             </p>
                           </form>
                         </TabsContent>
@@ -430,7 +445,7 @@ const Auth = () => {
 
                 <div className="flex items-center gap-3 my-6">
                   <div className="h-px flex-1 bg-border" />
-                  <span className="text-xs text-muted-foreground">OR</span>
+                  <span className="text-xs text-muted-foreground">{t('or')}</span>
                   <div className="h-px flex-1 bg-border" />
                 </div>
 
@@ -446,7 +461,7 @@ const Auth = () => {
                   ) : (
                     <GoogleIcon className="h-4 w-4 mr-2" />
                   )}
-                  Continue with Google
+                  {t('google')}
                 </Button>
               </motion.div>
             )}

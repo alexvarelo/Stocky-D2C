@@ -1,4 +1,5 @@
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { useState } from "react";
 import { CalendarClock, Pencil, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import {

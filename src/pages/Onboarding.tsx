@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TERMS_VERSION } from '@/pages/legal/legalContent';
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, TrendingUp } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 
 type Step = 'welcome' | 'identity' | 'personalize' | 'done';
 const FORM_STEPS: Step[] = ['identity', 'personalize'];
@@ -19,6 +20,7 @@ const Onboarding = () => {
   const { user, userProfile, profileLoading, refetchUserProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation('onboarding');
 
   const [step, setStep] = useState<Step>('welcome');
   const [submitting, setSubmitting] = useState(false);
@@ -62,9 +64,9 @@ const Onboarding = () => {
 
   const validateIdentity = () => {
     const next: typeof errors = {};
-    if (fields.username.trim().length < 3) next.username = 'Username must be at least 3 characters';
-    if (!fields.fullName.trim()) next.fullName = 'Full name is required';
-    if (!acceptedTerms) next.terms = 'Please accept the Terms and Privacy Policy to continue';
+    if (fields.username.trim().length < 3) next.username = t('validation.usernameMin', { count: 3 });
+    if (!fields.fullName.trim()) next.fullName = t('validation.fullNameRequired');
+    if (!acceptedTerms) next.terms = t('validation.terms');
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -103,8 +105,8 @@ const Onboarding = () => {
       setTimeout(() => navigate('/dashboard', { replace: true }), 1600);
     } catch (error) {
       toast({
-        title: 'Something went wrong',
-        description: error instanceof Error ? error.message : 'Failed to save your profile. Please try again.',
+        title: t('toast.errorTitle'),
+        description: error instanceof Error ? error.message : t('toast.errorDescription'),
         variant: 'destructive',
       });
     } finally {
@@ -183,7 +185,7 @@ const Onboarding = () => {
                     transition={{ delay: 0.3, duration: 0.4 }}
                     className="text-4xl font-medium leading-[1.05] tracking-[-0.4px]"
                   >
-                    Welcome to Stocky,<br />{firstName}
+                    {t('welcome.title')}<br />{firstName}
                   </motion.h1>
                   <motion.p
                     initial={{ opacity: 0, y: 10 }}
@@ -191,7 +193,7 @@ const Onboarding = () => {
                     transition={{ delay: 0.4, duration: 0.4 }}
                     className="text-white/60 text-base leading-relaxed max-w-sm mx-auto"
                   >
-                    Let's set up your profile — it takes less than a minute and gets you straight to the market.
+                    {t('welcome.subtitle')}
                   </motion.p>
                 </div>
 
@@ -201,7 +203,7 @@ const Onboarding = () => {
                   transition={{ delay: 0.55, duration: 0.4 }}
                 >
                   <Button onClick={goToIdentity} size="xl" className="w-full sm:w-auto px-10">
-                    Let's get started
+                    {t('welcome.cta')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </motion.div>
@@ -218,18 +220,18 @@ const Onboarding = () => {
                 className="space-y-8"
               >
                 <div className="space-y-2 text-center">
-                  <h2 className="text-2xl font-medium tracking-tight">Tell us about you</h2>
-                  <p className="text-white/60 text-sm">This is how the community will find and recognize you.</p>
+                  <h2 className="text-2xl font-medium tracking-tight">{t('identity.title')}</h2>
+                  <p className="text-white/60 text-sm">{t('identity.subtitle')}</p>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-1.5">
                     <Input
-                      aria-label="Full name"
+                      aria-label={t('fields.fullName')}
                       autoComplete="name"
                       aria-invalid={!!errors.fullName}
                       aria-describedby={errors.fullName ? 'onboarding-fullname-error' : undefined}
-                      placeholder="Full name"
+                      placeholder={t('fields.fullName')}
                       value={fields.fullName}
                       onChange={updateField('fullName')}
                       autoFocus
@@ -239,11 +241,11 @@ const Onboarding = () => {
                   </div>
                   <div className="space-y-1.5">
                     <Input
-                      aria-label="Username"
+                      aria-label={t('fields.username')}
                       autoComplete="username"
                       aria-invalid={!!errors.username}
                       aria-describedby={errors.username ? 'onboarding-username-error' : undefined}
-                      placeholder="Username"
+                      placeholder={t('fields.username')}
                       value={fields.username}
                       onChange={updateField('username')}
                       className="h-14 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-[#494fdf] focus:ring-1 focus:ring-[#494fdf]/40"
@@ -264,11 +266,14 @@ const Onboarding = () => {
                         className="mt-0.5 border-white/40 data-[state=checked]:bg-[#494fdf] data-[state=checked]:border-[#494fdf]"
                       />
                       <label htmlFor="accept-terms" className="text-sm text-white/70 leading-relaxed">
-                        I'm 18 or older and I accept the{' '}
-                        <Link to="/legal/terms" target="_blank" className="underline underline-offset-2 hover:text-white">Terms</Link>{' '}
-                        and{' '}
-                        <Link to="/legal/privacy" target="_blank" className="underline underline-offset-2 hover:text-white">Privacy Policy</Link>.
-                        I understand Stockfolio doesn't give investment advice.
+                        <Trans
+                          t={t}
+                          i18nKey="identity.terms"
+                          components={{
+                            terms: <Link to="/legal/terms" target="_blank" className="underline underline-offset-2 hover:text-white" />,
+                            privacy: <Link to="/legal/privacy" target="_blank" className="underline underline-offset-2 hover:text-white" />,
+                          }}
+                        />
                       </label>
                     </div>
                     {errors.terms && <p id="onboarding-terms-error" role="alert" className="text-xs text-[#ff6b7d] ml-1">{errors.terms}</p>}
@@ -276,7 +281,7 @@ const Onboarding = () => {
                 </div>
 
                 <Button onClick={goToPersonalize} size="xl" className="w-full">
-                  Continue
+                  {t('common:actions.continue')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </motion.div>
@@ -292,8 +297,8 @@ const Onboarding = () => {
                 className="space-y-8"
               >
                 <div className="space-y-2 text-center">
-                  <h2 className="text-2xl font-medium tracking-tight">Make it yours</h2>
-                  <p className="text-white/60 text-sm">Optional — add a photo and a short bio, or skip for now.</p>
+                  <h2 className="text-2xl font-medium tracking-tight">{t('personalize.title')}</h2>
+                  <p className="text-white/60 text-sm">{t('personalize.subtitle')}</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -307,16 +312,16 @@ const Onboarding = () => {
 
                 <div className="space-y-4">
                   <Input
-                    aria-label="Avatar URL (optional)"
+                    aria-label={t('fields.avatarUrl')}
                     type="url"
-                    placeholder="Avatar URL (optional)"
+                    placeholder={t('fields.avatarUrl')}
                     value={fields.avatarUrl}
                     onChange={updateField('avatarUrl')}
                     className="h-14 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-[#494fdf] focus:ring-1 focus:ring-[#494fdf]/40"
                   />
                   <Input
-                    aria-label="Short bio (optional)"
-                    placeholder="Short bio (optional)"
+                    aria-label={t('fields.bio')}
+                    placeholder={t('fields.bio')}
                     value={fields.bio}
                     onChange={updateField('bio')}
                     maxLength={200}
@@ -328,7 +333,7 @@ const Onboarding = () => {
                   <Button onClick={() => finishOnboarding(false)} size="xl" className="w-full" disabled={submitting}>
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                       <>
-                        Finish
+                        {t('personalize.finish')}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
@@ -339,7 +344,7 @@ const Onboarding = () => {
                     disabled={submitting}
                     className="w-full text-center text-sm text-white/50 hover:text-white/80 transition-colors py-1"
                   >
-                    Skip for now
+                    {t('personalize.skip')}
                   </button>
                 </div>
 
@@ -349,7 +354,7 @@ const Onboarding = () => {
                   className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Back
+                  {t('common:actions.back')}
                 </button>
               </motion.div>
             )}
@@ -370,10 +375,10 @@ const Onboarding = () => {
                 >
                   <CheckCircle2 className="h-8 w-8 text-[#8b8ff2]" />
                 </motion.div>
-                <h2 className="text-2xl font-medium tracking-tight">You're all set, {firstName}</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t('done.title', { name: firstName })}</h2>
                 <p className="text-white/60 text-sm flex items-center justify-center gap-1.5">
                   <TrendingUp className="h-4 w-4" />
-                  Taking you to your portfolio...
+                  {t('done.subtitle')}
                 </p>
               </motion.div>
             )}

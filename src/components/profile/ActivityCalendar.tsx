@@ -1,17 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import {
-  format,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  addDays,
-  addMonths,
-  subMonths,
-  isSameDay,
-  isSameMonth,
-  isToday as isTodayFns
-} from 'date-fns';
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, addMonths, subMonths, isSameDay, isSameMonth, isToday as isTodayFns } from 'date-fns';
+import { format } from '@/lib/dateFormat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {

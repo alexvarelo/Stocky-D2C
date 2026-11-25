@@ -24,7 +24,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useState, useMemo } from "react";
 import { FollowersDrawer } from '@/components/profile/FollowersDrawer';
 import { useUsersByIds } from "@/api/user/useUsersByIds";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { EditProfileButton } from "@/components/profile/EditProfileButton";
 
 interface UserProfile {

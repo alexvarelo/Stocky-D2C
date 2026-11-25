@@ -8,6 +8,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { getLocale } from "@/lib/locale";
 
 interface InstrumentNewsSentimentCardProps {
     ticker: string;
@@ -179,7 +180,7 @@ export const InstrumentNewsSentimentCard = ({ ticker }: InstrumentNewsSentimentC
                                                 </h4>
                                                 <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
                                                     <span className="truncate mr-2">{article.source.name}</span>
-                                                    <span className="flex-shrink-0">{new Date(article.publishedAt).toLocaleDateString()}</span>
+                                                    <span className="flex-shrink-0">{new Date(article.publishedAt).toLocaleDateString(getLocale())}</span>
                                                 </div>
                                             </div>
                                             <ExternalLink className="h-3 w-3 text-slate-400 group-hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all" />

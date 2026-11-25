@@ -3,12 +3,15 @@ import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import type { Portfolio } from "@/api/portfolio/usePortfolios";
+import { useTranslation } from "react-i18next";
+import { formatPercentage } from "@/lib/formatters";
 
 interface PortfolioBreakdownListProps {
     portfolios: Portfolio[];
 }
 
 export const PortfolioBreakdownList = ({ portfolios }: PortfolioBreakdownListProps) => {
+    const { t } = useTranslation('dashboard');
     if (portfolios.length === 0) return null;
 
     const sorted = [...portfolios].sort((a, b) => (b.total_value || 0) - (a.total_value || 0));
@@ -34,7 +37,7 @@ export const PortfolioBreakdownList = ({ portfolios }: PortfolioBreakdownListPro
                         <div className="min-w-0">
                             <p className="truncate font-semibold">{portfolio.name}</p>
                             <p className="text-xs text-muted-foreground">
-                                {portfolio.holdings_count || 0} holding{portfolio.holdings_count === 1 ? "" : "s"}
+                                {t('wealth.holdings', { count: portfolio.holdings_count || 0 })}
                             </p>
                         </div>
                         <div className="flex shrink-0 items-center gap-3">
@@ -42,7 +45,7 @@ export const PortfolioBreakdownList = ({ portfolios }: PortfolioBreakdownListPro
                                 <p className="font-semibold">{formatCurrency(value)}</p>
                                 <p className={`text-xs font-medium ${isPositive ? "text-success" : "text-danger"}`}>
                                     {isPositive ? "+" : ""}
-                                    {returnPct.toFixed(2)}%
+                                    {formatPercentage(returnPct)}
                                 </p>
                             </div>
                             <ChevronRight className="h-4 w-4 text-muted-foreground" />

@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import {
   CalendarIcon,
   Loader2,
@@ -39,6 +39,7 @@ import { StockSearch } from "@/components/stock/StockSearch";
 import { usePortfolios } from "@/api/portfolio/usePortfolios";
 import { useAuth } from "@/lib/auth";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { getLocale } from "@/lib/locale";
 
 const transactionSchema = z.object({
   portfolio_id: z.string().uuid().optional(),
@@ -114,7 +115,7 @@ export function TransactionForm({
   // The instrument's real listing currency (e.g. EUR for a Madrid-listed
   // stock), not assumed to be USD — resolved from the price lookup.
   const currency = priceData?.data?.currency || "USD";
-  const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency });
+  const currencyFormatter = new Intl.NumberFormat(getLocale(), { style: "currency", currency });
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -432,7 +433,7 @@ export function TransactionForm({
                                     </div>
                                     {watchTransactionType === "SELL" && instrumentHolding && (
                                       <div className="text-right">
-                                        <p className="text-sm font-medium">Available: {instrumentHolding.quantity.toLocaleString()}</p>
+                                        <p className="text-sm font-medium">Available: {instrumentHolding.quantity.toLocaleString(getLocale())}</p>
                                       </div>
                                     )}
                                   </div>
@@ -553,7 +554,7 @@ export function TransactionForm({
                 )}
                 {watchTransactionType === "SELL" && selectedHolding && (
                   <div className="text-xs text-muted-foreground mt-1">
-                    Available: {selectedHolding.quantity.toLocaleString()}
+                    Available: {selectedHolding.quantity.toLocaleString(getLocale())}
                   </div>
                 )}
               </div>

@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { getLocale } from "@/lib/locale";
 
 export interface StockCardProps {
     symbol: string;
@@ -40,7 +41,7 @@ export function StockCard({
 
                 <div className="space-y-1">
                     <span className="text-2xl font-bold">
-                        {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(price)}
+                        {new Intl.NumberFormat(getLocale(), { style: 'currency', currency }).format(price)}
                     </span>
                     <div className={cn(
                         "flex items-center gap-1 text-sm font-medium",

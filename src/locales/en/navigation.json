@@ -1,0 +1,22 @@
+{
+  "links": {
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "portfolios": "Portfolios",
+    "watchlists": "Watchlists",
+    "discover": "Discovery",
+    "strategies": "Strategies",
+    "learn": "Learn",
+    "academy": "Academy"
+  },
+  "mainNav": "Main navigation",
+  "user": "User",
+  "account": "Account",
+  "accountMenu": "Account menu",
+  "myProfile": "My Profile",
+  "settings": "Settings",
+  "signOut": "Sign out",
+  "appearance": "Appearance",
+  "expandSidebar": "Expand sidebar",
+  "collapseSidebar": "Collapse sidebar"
+}

@@ -5,6 +5,7 @@ import { formatCurrency, formatPercentage } from "@/lib/formatters";
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { useTranslation } from "react-i18next";
 
 interface TopMoversProps {
     holdings: PortfolioHolding[];
@@ -13,6 +14,7 @@ interface TopMoversProps {
 }
 
 export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProps) => {
+    const { t } = useTranslation('portfolio');
     const movers = [...holdings]
         .sort((a, b) => Math.abs(b.today_change_percent || 0) - Math.abs(a.today_change_percent || 0))
         .slice(0, 5);
@@ -21,7 +23,7 @@ export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProp
         return (
             <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
                 <CardHeader className="pb-2 px-0">
-                    <CardTitle className="text-lg font-medium">Top Movers (24h)</CardTitle>
+                    <CardTitle className="text-lg font-medium">{t('detail.topMovers')}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3 bg-card/50 border border-border/50 rounded-3xl p-6 shadow-sm">
                     {[...Array(5)].map((_, i) => (
@@ -43,10 +45,10 @@ export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProp
         return (
             <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
                 <CardHeader className="pb-2 px-0">
-                    <CardTitle className="text-lg font-medium">Top Movers (24h)</CardTitle>
+                    <CardTitle className="text-lg font-medium">{t('detail.topMovers')}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-1 flex items-center justify-center min-h-[200px] text-muted-foreground text-sm bg-card/50 rounded-3xl border border-border/50">
-                    No data available
+                    {t('detail.noData')}
                 </CardContent>
             </Card>
         );
@@ -55,7 +57,7 @@ export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProp
     return (
         <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
             <CardHeader className="pb-2 px-0">
-                <CardTitle className="text-lg font-medium">Top Movers (24h)</CardTitle>
+                <CardTitle className="text-lg font-medium">{t('detail.topMovers')}</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-3 bg-card/50 border border-border/50 rounded-3xl p-6 shadow-sm">
                 {movers.map((holding) => {

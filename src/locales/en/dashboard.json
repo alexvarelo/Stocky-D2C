@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "portfolios": "Your Portfolios",
+    "allocation": "Allocation",
+    "activity": "Activity",
+    "community": "From the community"
+  },
+  "wealth": {
+    "total": "Total Wealth",
+    "gainedOn": "gained on {{invested}} invested",
+    "lostOn": "lost on {{invested}} invested",
+    "holdings_one": "{{count}} holding",
+    "holdings_other": "{{count}} holdings",
+    "portfolios_one": "{{count}} portfolio",
+    "portfolios_other": "{{count}} portfolios"
+  },
+  "insight": {
+    "topGainer": "Today your biggest performer is {{symbol}}, up {{change}}",
+    "topLoser": "Your biggest mover today is {{symbol}}, down {{change}}",
+    "largest": "Your largest holding is {{symbol}}, worth {{value}}",
+    "assetCount_one": "You hold {{count}} asset right now",
+    "assetCount_other": "You hold {{count}} assets right now",
+    "fallback": "Tracking your portfolio in real time"
+  },
+  "thesisReminder": {
+    "title_one": "{{count}} thesis is ready for review",
+    "title_other": "{{count}} theses are ready for review",
+    "dismiss": "Dismiss reminder",
+    "due": "due {{date}}"
+  }
+}

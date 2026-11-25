@@ -6,6 +6,7 @@ import { fmtPct } from "@/components/scenarios/format";
 import { ConfirmDeleteButton, ErrorBox } from "@/components/scenarios/shared";
 import { useDeleteSavedStrategy, useSavedStrategies, type SavedStrategy } from "@/hooks/useSavedStrategies";
 import { TEMPLATES } from "./templates";
+import { getLocale } from "@/lib/locale";
 
 export function SavedStrategiesList({ onLoad }: { onLoad: (_s: SavedStrategy) => void }) {
   const { data, isLoading, isError, refetch } = useSavedStrategies();
@@ -29,7 +30,7 @@ export function SavedStrategiesList({ onLoad }: { onLoad: (_s: SavedStrategy) =>
                   <Badge variant="secondary" className="font-normal">{TEMPLATES.find((t) => t.id === s.strategy)?.name ?? s.strategy}</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground truncate">
-                  {new Date(s.created_at).toLocaleDateString()}
+                  {new Date(s.created_at).toLocaleDateString(getLocale())}
                   {m ? ` · total return ${fmtPct(m.total_return, 1, true)} (past result)` : ""}
                 </p>
               </div>

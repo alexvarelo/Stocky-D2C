@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "portfolios": "Tus carteras",
+    "allocation": "Distribución",
+    "activity": "Actividad",
+    "community": "De la comunidad"
+  },
+  "wealth": {
+    "total": "Patrimonio total",
+    "gainedOn": "ganados sobre {{invested}} invertidos",
+    "lostOn": "perdidos sobre {{invested}} invertidos",
+    "holdings_one": "{{count}} posición",
+    "holdings_other": "{{count}} posiciones",
+    "portfolios_one": "{{count}} cartera",
+    "portfolios_other": "{{count}} carteras"
+  },
+  "insight": {
+    "topGainer": "Hoy tu valor con mejor rendimiento es {{symbol}}, que sube un {{change}}",
+    "topLoser": "Tu mayor movimiento hoy es {{symbol}}, que baja un {{change}}",
+    "largest": "Tu mayor posición es {{symbol}}, con un valor de {{value}}",
+    "assetCount_one": "Ahora mismo tienes {{count}} activo",
+    "assetCount_other": "Ahora mismo tienes {{count}} activos",
+    "fallback": "Siguiendo tu cartera en tiempo real"
+  },
+  "thesisReminder": {
+    "title_one": "{{count}} tesis lista para revisar",
+    "title_other": "{{count}} tesis listas para revisar",
+    "dismiss": "Descartar recordatorio",
+    "due": "vence el {{date}}"
+  }
+}

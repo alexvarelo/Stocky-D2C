@@ -2,6 +2,10 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import i18n from '@/i18n';
+import { Trans } from 'react-i18next';
+
+const tAuth = (key: string) => i18n.t(key, { ns: 'auth' });
 
 interface UserProfile {
   id: string;
@@ -116,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         toast({
-          title: "Sign up failed",
+          title: tAuth('toast.signUpFailed'),
           description: error.message,
           variant: "destructive",
         });
@@ -139,8 +143,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (profileError) {
           console.error('Profile creation error:', profileError);
           toast({
-            title: 'Account Created with Warning',
-            description: 'Your account was created, but there was an issue setting up your profile. Please contact support.',
+            title: tAuth('toast.profileWarningTitle'),
+            description: tAuth('toast.profileWarning'),
             variant: 'default',
           });
           return { error: profileError };
@@ -149,13 +153,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Show comprehensive success message
       toast({
-        title: 'Check Your Email',
+        title: tAuth('toast.checkEmail'),
         description: (
           <div className="space-y-1">
-            <p>We've sent a confirmation email to <span className="font-semibold">{email}</span>.</p>
-            <p>Please check your inbox and click the verification link to activate your account.</p>
+            <p>
+              <Trans
+                i18nKey="toast.confirmSent"
+                ns="auth"
+                values={{ email }}
+                components={{ strong: <span className="font-semibold" /> }}
+              />
+            </p>
+            <p>{tAuth('toast.confirmInstructions')}</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Can't find the email? Check your spam folder or request a new verification link.
+              {tAuth('toast.confirmSpam')}
             </p>
           </div>
         ),
@@ -168,8 +179,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Unexpected error during signup:', error);
       toast({
-        title: 'Unexpected Error',
-        description: 'An unexpected error occurred during signup. Please try again.',
+        title: tAuth('toast.unexpectedTitle'),
+        description: tAuth('toast.unexpected'),
         variant: 'destructive',
       });
       return { error };
@@ -184,7 +195,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       toast({
-        title: "Sign in failed",
+        title: tAuth('toast.signInFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -197,7 +208,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
-        title: "Sign out failed",
+        title: tAuth('toast.signOutFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -217,7 +228,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       toast({
-        title: "Couldn't send reset email",
+        title: tAuth('toast.resetFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -231,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       toast({
-        title: "Couldn't update password",
+        title: tAuth('toast.updatePasswordFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -250,7 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       toast({
-        title: "Couldn't sign in with Google",
+        title: tAuth('toast.googleFailed'),
         description: error.message,
         variant: "destructive",
       });

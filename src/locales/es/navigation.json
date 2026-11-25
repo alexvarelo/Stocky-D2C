@@ -1,0 +1,22 @@
+{
+  "links": {
+    "dashboard": "Inicio",
+    "home": "Inicio",
+    "portfolios": "Carteras",
+    "watchlists": "Listas",
+    "discover": "Descubrir",
+    "strategies": "Estrategias",
+    "learn": "Aprender",
+    "academy": "Academia"
+  },
+  "mainNav": "Navegación principal",
+  "user": "Usuario",
+  "account": "Cuenta",
+  "accountMenu": "Menú de la cuenta",
+  "myProfile": "Mi perfil",
+  "settings": "Ajustes",
+  "signOut": "Cerrar sesión",
+  "appearance": "Apariencia",
+  "expandSidebar": "Expandir barra lateral",
+  "collapseSidebar": "Contraer barra lateral"
+}

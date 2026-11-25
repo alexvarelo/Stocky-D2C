@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from '@/lib/dateFormat';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Flag, Sparkles } from 'lucide-react';
 import { PostComments } from './PostComments';
 import { cn } from '@/lib/utils';

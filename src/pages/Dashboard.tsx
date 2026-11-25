@@ -14,9 +14,11 @@ import { usePortfolios } from "@/api/portfolio/usePortfolios";
 import { MarketContextPanel } from "@/components/market/MarketContextPanel";
 import { WealthHero } from "@/components/dashboard/wealth/WealthHero";
 import { PortfolioBreakdownList } from "@/components/dashboard/wealth/PortfolioBreakdownList";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation('dashboard');
   const queryClient = useQueryClient();
 
   const { data: portfolios, isLoading } = usePortfolios(user?.id);
@@ -61,19 +63,19 @@ const Dashboard = () => {
         {/* Main Column - Portfolios & Holdings (9/12) */}
         <div className="xl:col-span-9 space-y-8">
           <motion.div variants={item} initial="hidden" animate="show" className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">Your Portfolios</h2>
+            <h2 className="text-xl font-semibold tracking-tight">{t('sections.portfolios')}</h2>
             <PortfolioBreakdownList portfolios={portfolios || []} />
           </motion.div>
 
           <motion.div variants={item} initial="hidden" animate="show" className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">Allocation</h2>
+            <h2 className="text-xl font-semibold tracking-tight">{t('sections.allocation')}</h2>
             <div className="h-[24rem] xl:h-[28rem]">
               <HoldingsDonutChart />
             </div>
           </motion.div>
 
           <motion.div variants={item} initial="hidden" animate="show" className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">Activity</h2>
+            <h2 className="text-xl font-semibold tracking-tight">{t('sections.activity')}</h2>
             <div>
               <ActivityCalendar userId={user?.id || ""} />
             </div>
@@ -82,7 +84,7 @@ const Dashboard = () => {
 
         {/* Sidebar - Community Feed (3/12) */}
         <div className="xl:col-span-3 space-y-4">
-          <h2 className="text-xl font-semibold tracking-tight">From the community</h2>
+          <h2 className="text-xl font-semibold tracking-tight">{t('sections.community')}</h2>
           <motion.div variants={item} initial="hidden" animate="show">
             <CreatePost
               onPostCreated={() => {

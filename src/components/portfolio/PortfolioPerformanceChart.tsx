@@ -9,7 +9,7 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { formatCurrency } from "@/lib/utils";
 
 interface PortfolioPerformanceChartProps {

@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { format, isToday } from 'date-fns';
+import { isToday } from 'date-fns';
+import { format } from '@/lib/dateFormat';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardHeader,
@@ -14,7 +16,7 @@ import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/use-toast';
 import { usePortfolioFollows } from '@/api/portfolio/usePortfolioFollows';
 import { usePortfolio } from '@/api/portfolio/portfolio';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatDecimal } from '@/lib/formatters';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CompanyLogo } from '@/components/stock/CompanyLogo';
 
@@ -79,6 +81,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation('portfolio');
   const { toast } = useToast();
   const { isFollowing, toggleFollow, isLoading: isFollowLoading, followersCount } = usePortfolioFollows(id);
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -98,16 +101,16 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
     try {
       await toggleFollow();
       toast({
-        title: isFollowing ? 'Unfollowed portfolio' : 'Following portfolio',
+        title: isFollowing ? t('card.toast.unfollowed') : t('card.toast.following'),
         description: isFollowing
-          ? `You've unfollowed ${name}`
-          : `You're now following ${name}`,
+          ? t('card.toast.unfollowedDescription', { name })
+          : t('card.toast.followingDescription', { name }),
       });
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to update follow status',
+        title: t('common:status.error'),
+        description: t('card.toast.followError'),
       });
     } finally {
       setIsProcessing(false);
@@ -136,7 +139,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
         currentValue: value,
         costBasis: cost,
         earnedLost,
-        formattedPerformance: Math.abs(pct).toFixed(2),
+        formattedPerformance: formatDecimal(Math.abs(pct)),
       };
     }
 
@@ -154,14 +157,14 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
       currentValue,
       costBasis,
       earnedLost,
-      formattedPerformance: (Math.abs(performance) * 100).toFixed(2),
+      formattedPerformance: formatDecimal(Math.abs(performance) * 100),
     };
   }, [portfolioData, totalValue, totalReturnPercentage, totalCost, hasStoredValues]);
 
   const dayChange = hasStoredValues ? todayChange ?? 0 : portfolioData?.today_change ?? 0;
   const dayChangePercent = hasStoredValues ? todayChangePercent ?? 0 : portfolioData?.today_change_percent ?? 0;
   const valuedDate = valuedAt ? new Date(valuedAt) : null;
-  const dayLabel = !hasStoredValues || !valuedDate || isToday(valuedDate) ? 'today' : `on ${format(valuedDate, 'd MMM')}`;
+  const dayLabel = !hasStoredValues || !valuedDate || isToday(valuedDate) ? t('card.today') : t('card.onDate', { date: format(valuedDate, 'd MMM') });
   const money = (n: number) => formatCurrency(n, currency);
 
   // Calculate total number of holdings
@@ -171,7 +174,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
   // Format creation date
   const formattedDate = useMemo(() => {
     try {
-      return format(new Date(created_at), 'MMM d, yyyy');
+      return format(new Date(created_at), 'PP');
     } catch (e) {
       return '';
     }
@@ -220,7 +223,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
                   className="h-8 w-8 rounded-full hover:bg-muted/80"
                   onClick={handleFollowClick}
                   disabled={isFollowLoading || isProcessing}
-                  aria-label={isFollowing ? `Unfollow ${name}` : `Follow ${name}`}
+                  aria-label={isFollowing ? t('card.unfollow', { name }) : t('card.follow', { name })}
                 >
                   {isFollowing ? (
                     <Heart className="h-4 w-4 fill-red-500 text-red-500" />
@@ -231,23 +234,23 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
               ) : (
                 <div
                   className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50 text-xs font-medium text-muted-foreground"
-                  title="Followers"
+                  title={t('card.followers')}
                 >
                   <Users className="h-3.5 w-3.5" aria-hidden />
                   <span>{followersCount || 0}</span>
-                  <span className="sr-only">followers</span>
+                  <span className="sr-only">{t('card.followers')}</span>
                 </div>
               )}
               <div
                 className="h-8 w-8 flex items-center justify-center rounded-full bg-muted/50"
-                title={is_public ? 'Public' : 'Private'}
+                title={is_public ? t('visibility.public') : t('visibility.private')}
               >
                 {is_public ? (
                   <Eye className="h-4 w-4 text-muted-foreground" aria-hidden />
                 ) : (
                   <Lock className="h-4 w-4 text-muted-foreground" aria-hidden />
                 )}
-                <span className="sr-only">{is_public ? 'Public' : 'Private'}</span>
+                <span className="sr-only">{is_public ? t('visibility.public') : t('visibility.private')}</span>
               </div>
             </div>
           </div>
@@ -261,7 +264,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
         <CardContent className="flex flex-1 flex-col gap-5">
           {/* Value on its own line so long figures never collide when the card is narrow (zoom, sidebar). */}
           <div className="space-y-1.5">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Portfolio value</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('card.value')}</p>
             {isLoadingPrices ? (
               <Skeleton className="h-8 w-36" />
             ) : (
@@ -274,7 +277,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
             ) : (
               <span className={`inline-flex flex-wrap items-center gap-x-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${todayUp ? upPill : downPill}`}>
                 {todayUp ? '+' : ''}
-                {dayChangePercent.toFixed(2)}%
+                {formatDecimal(dayChangePercent)}%
                 <span className="opacity-50" aria-hidden>•</span>
                 {money(dayChange)}
                 <span className="opacity-70">{dayLabel}</span>
@@ -283,7 +286,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
           </div>
 
           <div className="space-y-1 rounded-xl border border-border/60 bg-muted/30 px-3 py-2.5">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total return</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('card.totalReturn')}</p>
             {isLoadingPrices ? (
               <Skeleton className="h-5 w-28" />
             ) : (
@@ -303,16 +306,16 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
             <p className="flex items-start gap-1.5 text-xs text-amber-700 dark:text-amber-400">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
               <span>
-                No current price for {unpricedTickers.join(', ')}. Valued at the last known price or cost.
+                {t('card.unpriced', { tickers: unpricedTickers.join(', ') })}
               </span>
             </p>
           )}
 
           <div className="mt-auto border-t border-border/50 pt-4">
             <div className="mb-3 flex items-center justify-between text-sm">
-              <span className="font-medium text-muted-foreground">Holdings</span>
+              <span className="font-medium text-muted-foreground">{t('card.holdings')}</span>
               <span className="rounded bg-muted/50 px-2 py-0.5 text-xs font-semibold">
-                {totalHoldings} {totalHoldings === 1 ? 'asset' : 'assets'}
+                {t('card.assets', { count: totalHoldings })}
               </span>
             </div>
 
@@ -327,29 +330,29 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
                       </span>
                     </div>
                     <span className="truncate text-xs tabular-nums text-muted-foreground">
-                      {Number(holding.quantity.toFixed(4)).toLocaleString()} shares
+                      {t('common:units.shares', { count: holding.quantity })}
                     </span>
                   </div>
                 ))}
                 {holdings.length > 3 && (
                   <p className="pl-1 text-xs text-muted-foreground">
-                    +{holdings.length - 3} more
+                    {t('card.more', { count: holdings.length - 3 })}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="py-2 text-sm italic text-muted-foreground">No holdings yet</div>
+              <div className="py-2 text-sm italic text-muted-foreground">{t('card.noHoldings')}</div>
             )}
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 pt-4 text-xs text-muted-foreground">
             <span className="whitespace-nowrap">
               {hasStoredValues && valuedDate
-                ? `Prices as of ${format(valuedDate, 'd MMM, HH:mm')}`
-                : `Created ${formattedDate}`}
+                ? t('card.pricesAsOf', { date: format(valuedDate, 'd MMM, HH:mm') })
+                : t('card.created', { date: formattedDate })}
             </span>
             <span className="flex items-center whitespace-nowrap font-medium text-primary transition-transform duration-300 group-hover:translate-x-1">
-              Details <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden />
+              {t('card.details')} <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden />
             </span>
           </div>
         </CardContent>

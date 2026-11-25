@@ -16,6 +16,7 @@ import { MAX_AMOUNT, fmtMoney, fmtPct } from "./format";
 import { isAmount, loadAmount, loadHorizon, loadLookback } from "./params";
 import { ChangedHint, ErrorBox, ExcludedNote, ResultsSkeleton, SaveButton, Stat } from "./shared";
 import type { TabProps } from "./StressTab";
+import { getLocale } from "@/lib/locale";
 
 export const PATHS = 5000;
 
@@ -216,7 +217,7 @@ export function MonteCarloTab({ positions, baseCurrency, initial, onSave, saving
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              Based on {result.paths.toLocaleString()} simulated paths using {result.observations.toLocaleString()} daily observations
+              Based on {result.paths.toLocaleString(getLocale())} simulated paths using {result.observations.toLocaleString(getLocale())} daily observations
               from the last {result.lookback_used}. {SIM_EXPLAINER} Past results do not predict future results.
             </p>
             <ExcludedNote excluded={result.excluded} />

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteSavedScenario, useSavedScenarios, type SavedScenario } from "@/hooks/useSavedScenarios";
 import { fmtMoney, fmtPct } from "./format";
 import { ConfirmDeleteButton, ErrorBox } from "./shared";
+import { getLocale } from "@/lib/locale";
 
 const KIND_LABEL = { stress: "Stress", montecarlo: "Monte Carlo", whatif: "What if" } as const;
 
@@ -46,7 +47,7 @@ export function SavedScenariosList({ portfolioId, onLoad }: { portfolioId: strin
                 <Badge variant="secondary" className="font-normal">{KIND_LABEL[s.kind]}</Badge>
               </div>
               <p className="text-xs text-muted-foreground truncate">
-                {new Date(s.created_at).toLocaleDateString()} · {headline(s)}
+                {new Date(s.created_at).toLocaleDateString(getLocale())} · {headline(s)}
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={() => onLoad(s)}>

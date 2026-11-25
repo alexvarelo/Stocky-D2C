@@ -1,0 +1,139 @@
+{
+  "list": {
+    "title": "Portfolios",
+    "subtitle": "Manage and track your investment portfolios",
+    "new": "New Portfolio",
+    "tabs": {
+      "mine": "My Portfolios",
+      "following": "Following"
+    },
+    "empty": {
+      "title": "No portfolios yet",
+      "description": "Create your first portfolio to get started",
+      "cta": "Create Portfolio"
+    },
+    "emptyFollowing": {
+      "title": "Not following any portfolios",
+      "description": "Discover and follow public portfolios to see them here",
+      "cta": "Discover Portfolios"
+    }
+  },
+  "visibility": {
+    "public": "Public",
+    "private": "Private"
+  },
+  "card": {
+    "toast": {
+      "unfollowed": "Unfollowed portfolio",
+      "following": "Following portfolio",
+      "unfollowedDescription": "You've unfollowed {{name}}",
+      "followingDescription": "You're now following {{name}}",
+      "followError": "Failed to update follow status"
+    },
+    "today": "today",
+    "onDate": "on {{date}}",
+    "follow": "Follow {{name}}",
+    "unfollow": "Unfollow {{name}}",
+    "followers": "Followers",
+    "value": "Portfolio value",
+    "totalReturn": "Total return",
+    "unpriced": "No current price for {{tickers}}. Valued at the last known price or cost.",
+    "holdings": "Holdings",
+    "assets_one": "{{count}} asset",
+    "assets_other": "{{count}} assets",
+    "more": "+{{count}} more",
+    "noHoldings": "No holdings yet",
+    "pricesAsOf": "Prices as of {{date}}",
+    "created": "Created {{date}}",
+    "details": "Details"
+  },
+  "detail": {
+    "toast": {
+      "deleted": "Portfolio deleted",
+      "deletedDescription": "Your portfolio has been successfully deleted.",
+      "deleteError": "Failed to delete portfolio. Please try again."
+    },
+    "notFound": {
+      "back": "Back to Portfolios",
+      "title": "Portfolio not found",
+      "description": "The portfolio you're looking for doesn't exist or you don't have permission to view it.",
+      "cta": "View My Portfolios"
+    },
+    "scenarios": {
+      "title": "Scenarios",
+      "description": "Stress tests, simulations and what-if comparisons for this portfolio.",
+      "cta": "Explore scenarios"
+    },
+    "hero": {
+      "unfollow": "Unfollow",
+      "follow": "Follow",
+      "aiInsights": "AI Insights",
+      "moreActions": "More actions",
+      "edit": "Edit Portfolio",
+      "export": "Export Receipt",
+      "livePrice": "Live price",
+      "followers_one": "{{count}} follower",
+      "followers_other": "{{count}} followers",
+      "allTime": "All time",
+      "today": "Today"
+    },
+    "topMovers": "Top Movers (24h)",
+    "noData": "No data available",
+    "allocation": "Allocation",
+    "assets": "Assets",
+    "noHoldingsData": "No holdings data",
+    "others": "Others",
+    "evolution": "Evolution"
+  },
+  "holdings": {
+    "open": "Open {{ticker}}",
+    "avg": "Avg: {{price}}",
+    "today": "{{change}} today",
+    "ofPortfolio": "{{pct}}% of portfolio",
+    "columns": {
+      "asset": "Asset",
+      "price": "Price",
+      "value": "Value",
+      "today": "Today",
+      "return": "Return",
+      "allocation": "Allocation"
+    },
+    "empty": "This portfolio doesn't have any holdings yet.",
+    "basis": {
+      "value": "% of value",
+      "invested": "% of invested"
+    }
+  },
+  "metrics": {
+    "invested": "Total Invested",
+    "investedSub": "capital deployed",
+    "best": "Best Performer",
+    "worst": "Worst Performer",
+    "largest": "Largest Position",
+    "avg": "Avg. Position",
+    "avgSub": "per holding"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "sharesAt_one": "{{count, number}} share @ {{price}}",
+    "sharesAt_other": "{{count, number}} shares @ {{price}}",
+    "types": {
+      "BUY": "Buy",
+      "SELL": "Sell"
+    },
+    "why": "Why: {{notes}}",
+    "columns": {
+      "date": "Date",
+      "type": "Type",
+      "stock": "Stock",
+      "shares": "Shares",
+      "price": "Price",
+      "total": "Total"
+    },
+    "empty": "No transactions have been recorded for this portfolio yet."
+  },
+  "delete": {
+    "title": "Delete Portfolio",
+    "description": "Are you sure you want to delete this portfolio? This action cannot be undone."
+  }
+}

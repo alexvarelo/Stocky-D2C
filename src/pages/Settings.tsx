@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -14,22 +14,25 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 import { AvatarSelector } from '@/components/profile/AvatarSelector';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import { LanguageSelect } from '@/components/i18n/LanguageSelect';
 
-const profileFormSchema = z.object({
-  full_name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
-  }),
-  username: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
-  bio: z.string().max(160).optional(),
-  website: z.string().url().or(z.literal('')).optional(),
-});
+// Built per render language so validation messages follow the UI language.
+const makeProfileFormSchema = (t: TFunction) =>
+  z.object({
+    full_name: z.string().min(2, { message: t('settings:validation.nameMin') }),
+    username: z.string().min(2, { message: t('settings:validation.usernameMin') }),
+    bio: z.string().max(160).optional(),
+    website: z.string().url().or(z.literal('')).optional(),
+  });
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<ReturnType<typeof makeProfileFormSchema>>;
 
 const SettingsPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation('settings');
+  const profileSchema = useMemo(() => makeProfileFormSchema(t), [t]);
   interface UserProfile {
     id: string;
     full_name: string;
@@ -51,7 +54,7 @@ const SettingsPage = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       full_name: userProfile?.full_name || '',
       username: userProfile?.username || '',
@@ -130,14 +133,14 @@ const SettingsPage = () => {
       } as any));
 
       toast({
-        title: 'Profile updated',
-        description: 'Your profile has been updated successfully.',
+        title: t('toast.updated'),
+        description: t('toast.updatedDescription'),
       });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to update profile. Please try again.',
+        title: t('common:status.error'),
+        description: t('toast.error'),
         variant: 'destructive',
       });
     } finally {
@@ -154,29 +157,30 @@ const SettingsPage = () => {
     <div className="container max-w-4xl py-8">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Manage your account settings and preferences
+            {t('subtitle')}
           </p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="profile">{t('tabs.profile')}</TabsTrigger>
+            <TabsTrigger value="preferences">{t('tabs.preferences')}</TabsTrigger>
             <TabsTrigger value="account" disabled>
-              Account
+              {t('tabs.account')}
             </TabsTrigger>
             <TabsTrigger value="notifications" disabled>
-              Notifications
+              {t('tabs.notifications')}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Profile Picture</CardTitle>
+                <CardTitle>{t('avatar.title')}</CardTitle>
                 <CardDescription>
-                  Choose an avatar to represent yourself on Stocky
+                  {t('avatar.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -185,14 +189,14 @@ const SettingsPage = () => {
                     <Avatar className="h-24 w-24">
                       <AvatarImage 
                         src={selectedAvatar || userProfile?.avatar_url} 
-                        alt={userProfile?.full_name || 'User'}
+                        alt={userProfile?.full_name || t('navigation:user')}
                       />
                       <AvatarFallback>
                         {(userProfile?.full_name || 'U').charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm text-muted-foreground">
-                      Preview
+                      {t('avatar.preview')}
                     </span>
                   </div>
                   <div className="flex-1">
@@ -207,9 +211,9 @@ const SettingsPage = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
+                <CardTitle>{t('profile.title')}</CardTitle>
                 <CardDescription>
-                  Update your profile information and personal details
+                  {t('profile.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -217,7 +221,7 @@ const SettingsPage = () => {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <label htmlFor="full_name" className="text-sm font-medium">
-                        Full Name
+                        {t('profile.fullName')}
                       </label>
                       <Input
                         id="full_name"
@@ -232,7 +236,7 @@ const SettingsPage = () => {
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="username" className="text-sm font-medium">
-                        Username
+                        {t('profile.username')}
                       </label>
                       <Input
                         id="username"
@@ -249,22 +253,22 @@ const SettingsPage = () => {
 
                   <div className="space-y-2">
                     <label htmlFor="bio" className="text-sm font-medium">
-                      Bio
+                      {t('profile.bio')}
                     </label>
                     <Textarea
                       id="bio"
-                      placeholder="Tell us a little bit about yourself"
+                      placeholder={t('profile.bioPlaceholder')}
                       className="min-h-[100px]"
                       {...form.register('bio')}
                     />
                     <p className="text-xs text-muted-foreground">
-                      You can use markdown and mention other users with @
+                      {t('profile.bioHint')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="website" className="text-sm font-medium">
-                      Website
+                      {t('profile.website')}
                     </label>
                     <Input
                       id="website"
@@ -279,10 +283,22 @@ const SettingsPage = () => {
                       {isLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      Update Profile
+                      {t('profile.submit')}
                     </Button>
                   </div>
                 </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="preferences" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('common:language.label')}</CardTitle>
+                <CardDescription>{t('common:language.description')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LanguageSelect id="language" className="w-full sm:w-64" />
               </CardContent>
             </Card>
           </TabsContent>
@@ -291,3 +307,5 @@ const SettingsPage = () => {
     </div>
   );
 }
+
+export default SettingsPage;

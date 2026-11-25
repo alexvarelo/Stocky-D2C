@@ -1,4 +1,5 @@
 import React from 'react';
+import { getLocale } from "@/lib/locale";
 
 interface FormattedNumberProps {
   value: number | undefined | null;
@@ -17,7 +18,7 @@ export const FormattedNumber: React.FC<FormattedNumberProps> = ({
     return <span className={className}>N/A</span>;
   }
 
-  const formattedValue = new Intl.NumberFormat('en-US', {
+  const formattedValue = new Intl.NumberFormat(getLocale(), {
     minimumFractionDigits,
     maximumFractionDigits
   }).format(value);
@@ -40,7 +41,7 @@ export const MoneyDisplay: React.FC<MoneyDisplayProps> = ({
     return <span className={className}>N/A</span>;
   }
 
-  const formattedValue = new Intl.NumberFormat('en-US', {
+  const formattedValue = new Intl.NumberFormat(getLocale(), {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
@@ -97,7 +98,7 @@ export const LargeNumberDisplay: React.FC<LargeNumberDisplayProps> = ({
   } else if (value >= 1e3) {
     formattedValue = `${(value / 1e3).toFixed(2)}K`;
   } else {
-    formattedValue = new Intl.NumberFormat('en-US', {
+    formattedValue = new Intl.NumberFormat(getLocale(), {
       maximumFractionDigits: 2
     }).format(value);
   }

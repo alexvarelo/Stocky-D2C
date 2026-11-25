@@ -1,0 +1,53 @@
+{
+  "status": {
+    "loading": "Cargando",
+    "error": "Error",
+    "notAvailable": "N/D",
+    "saving": "Guardando…"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "continue": "Continuar",
+    "retry": "Reintentar",
+    "viewAll": "Ver todo",
+    "create": "Crear",
+    "share": "Compartir",
+    "export": "Exportar"
+  },
+  "a11y": {
+    "skipToContent": "Saltar al contenido principal",
+    "opensNewTab": "(se abre en una pestaña nueva)"
+  },
+  "chat": {
+    "openAssistant": "Abrir Stocky, el asistente de IA"
+  },
+  "language": {
+    "label": "Idioma",
+    "description": "Elige el idioma de Stocky. Los números, las fechas y las monedas también lo siguen."
+  },
+  "compliance": {
+    "educational": "Información educativa, no es asesoramiento financiero.",
+    "aiGenerated": "Generado por IA"
+  },
+  "footer": {
+    "marketData": "Datos de mercado de Yahoo Finance, pueden tener retraso",
+    "api": "API para desarrolladores",
+    "notice": "Stockfolio solo ofrece información, no asesoramiento de inversión. Invertir conlleva riesgos, incluida la pérdida del capital.",
+    "legal": "Legal",
+    "links": {
+      "terms": "Términos",
+      "privacy": "Privacidad",
+      "disclaimer": "No es asesoramiento de inversión"
+    }
+  },
+  "units": {
+    "shares_one": "{{count, number}} acción",
+    "shares_other": "{{count, number}} acciones"
+  }
+}

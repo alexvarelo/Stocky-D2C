@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortfolioHolding } from "@/api/portfolio/portfolio";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
+import { useTranslation } from "react-i18next";
 
 interface AllocationChartProps {
     holdings: PortfolioHolding[];
@@ -26,6 +27,7 @@ const COLORS = [
 const OTHERS_COLOR = "#94a3b8"; // slate-400
 
 export const AllocationChart = ({ holdings, className = "", isLoading }: AllocationChartProps) => {
+    const { t } = useTranslation('portfolio');
     const { chartData, allData } = useMemo(() => {
         if (!holdings.length) return { chartData: [], allData: [] };
 
@@ -52,7 +54,7 @@ export const AllocationChart = ({ holdings, className = "", isLoading }: Allocat
         if (otherHoldings.length > 0) {
             const otherValue = otherHoldings.reduce((sum, h) => sum + h.value, 0);
             chartData.push({
-                name: "Others",
+                name: t("detail.others"),
                 value: otherValue,
                 percentage: totalValue > 0 ? (otherValue / totalValue) * 100 : 0,
                 color: OTHERS_COLOR
@@ -66,7 +68,7 @@ export const AllocationChart = ({ holdings, className = "", isLoading }: Allocat
         return (
             <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
                 <CardHeader className="pb-2 px-0">
-                    <CardTitle className="text-lg font-medium">Allocation</CardTitle>
+                    <CardTitle className="text-lg font-medium">{t('detail.allocation')}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col bg-card/50 border border-border/50 rounded-3xl p-6 shadow-sm h-[400px]">
                     <div className="h-[200px] relative shrink-0 flex items-center justify-center">
@@ -92,10 +94,10 @@ export const AllocationChart = ({ holdings, className = "", isLoading }: Allocat
         return (
             <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
                 <CardHeader className="pb-2 px-0">
-                    <CardTitle className="text-lg font-medium">Allocation</CardTitle>
+                    <CardTitle className="text-lg font-medium">{t('detail.allocation')}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex items-center justify-center min-h-[200px] text-muted-foreground text-sm bg-card/50 rounded-3xl border border-border/50">
-                    No holdings data
+                    {t('detail.noHoldingsData')}
                 </CardContent>
             </Card>
         );
@@ -104,7 +106,7 @@ export const AllocationChart = ({ holdings, className = "", isLoading }: Allocat
     return (
         <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
             <CardHeader className="pb-2 px-0">
-                <CardTitle className="text-lg font-medium">Allocation</CardTitle>
+                <CardTitle className="text-lg font-medium">{t('detail.allocation')}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col bg-card/50 border border-border/50 rounded-3xl p-6 shadow-sm h-[400px]">
                 <div className="h-[200px] relative shrink-0">
@@ -142,7 +144,7 @@ export const AllocationChart = ({ holdings, className = "", isLoading }: Allocat
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="text-center">
                             <span className="text-3xl font-bold tracking-tighter">{allData.length}</span>
-                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest mt-1">Assets</p>
+                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest mt-1">{t('detail.assets')}</p>
                         </div>
                     </div>
                 </div>

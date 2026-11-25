@@ -4,6 +4,7 @@ import { Post } from "@/types/social";
 import { useInfinitePosts } from "@/hooks/useInfinitePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { getLocale } from "@/lib/locale";
 
 interface InstrumentPostsCarouselProps {
   ticker: string;
@@ -38,7 +39,7 @@ const PostCard = ({
           <div>
             <p className="text-sm font-medium">{post.user.name}</p>
             <p className="text-xs text-muted-foreground">
-              {new Date(post.created_at).toLocaleDateString()}
+              {new Date(post.created_at).toLocaleDateString(getLocale())}
             </p>
           </div>
         </div>

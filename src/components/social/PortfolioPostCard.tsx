@@ -24,10 +24,11 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { getLocale } from "@/lib/locale";
 
 // Format currency utility function
 const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(getLocale(), {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,

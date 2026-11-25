@@ -1,24 +1,26 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Briefcase, Eye, Compass, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface NavItem {
-    label: string;
+    key: 'home' | 'portfolios' | 'watchlists' | 'academy' | 'discover';
     icon: React.ElementType;
     path: string;
 }
 
 const navItems: NavItem[] = [
-    { label: 'Home', icon: Home, path: '/dashboard' },
-    { label: 'Portfolios', icon: Briefcase, path: '/portfolios' },
-    { label: 'Watchlists', icon: Eye, path: '/watchlists' },
-    { label: 'Academy', icon: GraduationCap, path: '/learn' },
-    { label: 'Discovery', icon: Compass, path: '/discover' },
+    { key: 'home', icon: Home, path: '/dashboard' },
+    { key: 'portfolios', icon: Briefcase, path: '/portfolios' },
+    { key: 'watchlists', icon: Eye, path: '/watchlists' },
+    { key: 'academy', icon: GraduationCap, path: '/learn' },
+    { key: 'discover', icon: Compass, path: '/discover' },
 ];
 
 export function BottomNav() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { t } = useTranslation('navigation');
 
     const isActive = (path: string) => {
         if (path === '/dashboard') {
@@ -28,7 +30,7 @@ export function BottomNav() {
     };
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-t border-border">
+        <nav aria-label={t('mainNav')} className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-t border-border">
             <div className="flex items-center justify-around h-16 px-2 pb-safe">
                 {navItems.map((item) => {
                     const Icon = item.icon;
@@ -50,7 +52,7 @@ export function BottomNav() {
                                 'text-[10px]',
                                 active ? 'font-semibold' : 'font-medium'
                             )}>
-                                {item.label}
+                                {t(`links.${item.key}`)}
                             </span>
                         </button>
                     );

@@ -22,6 +22,8 @@ import { StockyChatProvider, useStockyChat } from "@/contexts/StockyChatContext"
 
 import { motion } from "framer-motion";
 import { lazy, Suspense } from "react";
+import { useTranslation } from "react-i18next";
+import { LanguageSync } from "@/hooks/useLanguage";
 
 // Pages load on demand so the first visit doesn't download every route.
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -46,9 +48,10 @@ const ArticlePage = lazy(() => import("./pages/ArticlePage").then((m) => ({ defa
 const LegalPage = lazy(() => import("./pages/legal/LegalPage").then((m) => ({ default: m.LegalPage })));
 
 function PageFallback() {
+  const { t } = useTranslation();
   return (
     <div role="status" className="flex min-h-[40vh] items-center justify-center">
-      <span className="sr-only">Loading</span>
+      <span className="sr-only">{t("status.loading")}</span>
       <span aria-hidden="true" className="h-6 w-6 animate-spin rounded-full border-2 border-muted border-t-foreground" />
     </div>
   );
@@ -105,6 +108,7 @@ function MainLayoutShell() {
   const isChatOpen = chat?.open ?? false;
   const setIsChatOpen = (open: boolean) => chat?.setOpen(open);
   const location = useLocation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="min-h-screen flex w-full relative">
@@ -112,7 +116,7 @@ function MainLayoutShell() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-lg focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:ring-2 focus:ring-ring"
       >
-        Skip to main content
+        {t("a11y.skipToContent")}
       </a>
 
       <Navbar />
@@ -123,8 +127,9 @@ function MainLayoutShell() {
           tabIndex={-1}
           className="flex-1 px-4 py-6 sm:px-2 md:px-6 md:py-4 max-w-[2000px] mx-auto w-full focus:outline-none"
         >
-          {/* Keyed by path so one broken page doesn't leave the error up after navigating away. */}
-          <ErrorBoundary key={location.pathname}>
+          {/* Keyed by path so one broken page doesn't leave the error up after navigating away,
+              and by language so numbers and dates re-render in the new locale. */}
+          <ErrorBoundary key={`${location.pathname}:${i18n.resolvedLanguage}`}>
             <Suspense fallback={<PageFallback />}>
               <Outlet />
             </Suspense>
@@ -142,7 +147,7 @@ function MainLayoutShell() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsChatOpen(true)}
-        aria-label="Open Stocky, the AI assistant"
+        aria-label={t("chat.openAssistant")}
         aria-haspopup="dialog"
         className="fixed bottom-24 md:bottom-8 right-6 md:right-8 z-50 rounded-2xl shadow-lg shadow-gray-900/20 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
@@ -169,10 +174,11 @@ function FocusLayout() {
 function FocusLayoutShell() {
   const chat = useStockyChat();
   const location = useLocation();
+  const { i18n } = useTranslation();
 
   return (
     <div className="min-h-[100svh] w-full bg-background">
-      <ErrorBoundary key={location.pathname}>
+      <ErrorBoundary key={`${location.pathname}:${i18n.resolvedLanguage}`}>
         <Suspense fallback={<PageFallback />}>
           <Outlet />
         </Suspense>
@@ -188,6 +194,7 @@ const App = () => (
       <ThemeProvider>
         <SidebarProvider>
           <TooltipProvider>
+            <LanguageSync />
             <PostNotifications />
             <Toaster />
             <Sonner position="top-right" richColors />

@@ -1,6 +1,6 @@
 import { useGetHistoricalDataApiV1StockTickerHistoryGet } from '@/api/stock/stock';
 import type { HistoricalDataResponse } from '@/api/financialDataApi.schemas';
-import { format } from 'date-fns';
+import { format } from '@/lib/dateFormat';
 import {
   LineChart,
   Line,

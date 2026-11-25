@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { CalendarClock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useThesesDueForReview } from "@/hooks/useInvestmentTheses";
+import { useTranslation } from "react-i18next";
 
 const DISMISS_KEY = "thesis-reminder-dismissed";
 
@@ -19,6 +21,7 @@ const readDismissed = () => {
 /** Dashboard card listing active theses whose review date has arrived. Dismissible per session. */
 export function ThesisReviewReminder() {
   const { data: due } = useThesesDueForReview();
+  const { t } = useTranslation('dashboard');
   const [dismissed, setDismissed] = useState(readDismissed);
 
   if (dismissed || !due || due.length === 0) return null;
@@ -38,20 +41,20 @@ export function ThesisReviewReminder() {
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 font-medium">
             <CalendarClock className="h-4 w-4 text-amber-500" />
-            {due.length === 1 ? "1 thesis is ready for review" : `${due.length} theses are ready for review`}
+            {t('thesisReminder.title', { count: due.length })}
           </div>
-          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Dismiss reminder" onClick={dismiss}>
+          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={t('thesisReminder.dismiss')} onClick={dismiss}>
             <X className="h-4 w-4" />
           </Button>
         </div>
         <ul className="space-y-1.5 text-sm">
-          {due.map((t) => (
-            <li key={t.id} className="flex items-center justify-between gap-2">
-              <Link to={`/instrument/${t.ticker}`} className="font-semibold hover:underline">
-                {t.ticker}
+          {due.map((thesis) => (
+            <li key={thesis.id} className="flex items-center justify-between gap-2">
+              <Link to={`/instrument/${thesis.ticker}`} className="font-semibold hover:underline">
+                {thesis.ticker}
               </Link>
               <span className="text-xs text-muted-foreground">
-                due {t.review_date ? format(parseISO(t.review_date), "PP") : ""}
+                {thesis.review_date ? t('thesisReminder.due', { date: format(parseISO(thesis.review_date), "PP") }) : ""}
               </span>
             </li>
           ))}

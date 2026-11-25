@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
 import { cn } from "@/lib/utils";
+import { getLocale } from "@/lib/locale";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -23,7 +24,7 @@ const DOWN = "hsl(var(--danger))";
 
 const formatReturn = (value: number) => `${value > 0 ? "+" : value < 0 ? "−" : ""}${Math.abs(value).toFixed(2)}%`;
 const formatValue = (value: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+  new Intl.NumberFormat(getLocale(), { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 const initial = (p: TopPortfolio) => (p.user.full_name || p.user.username || "U")[0]?.toUpperCase();
 const authorName = (p: TopPortfolio) => p.user.full_name || p.user.username;
 

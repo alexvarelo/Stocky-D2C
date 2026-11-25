@@ -17,6 +17,7 @@ import { isAmount, loadAmount, loadHorizon, loadLookback, loadTradeRows } from "
 import { ChangedHint, ErrorBox, ExcludedNote, ResultsSkeleton, SaveButton } from "./shared";
 import { HorizonLookbackInputs, PATHS, SIM_EXPLAINER } from "./MonteCarloTab";
 import type { TabProps } from "./StressTab";
+import { getLocale } from "@/lib/locale";
 
 interface Params {
   sell: { ticker: string; quantity: number }[];
@@ -325,7 +326,7 @@ export function WhatIfTab({ positions, baseCurrency, initial, onSave, saving }: 
               </table>
             </div>
             <p className="text-xs text-muted-foreground">
-              Based on {result.paths.toLocaleString()} simulated paths and {result.observations.toLocaleString()} daily observations from the last{" "}
+              Based on {result.paths.toLocaleString(getLocale())} simulated paths and {result.observations.toLocaleString(getLocale())} daily observations from the last{" "}
               {result.lookback_used}. This shows how the simulated range would differ, not what you should do. Past results do not predict future results.
             </p>
             <ExcludedNote excluded={result.excluded} />

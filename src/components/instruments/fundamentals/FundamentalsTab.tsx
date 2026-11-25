@@ -22,6 +22,7 @@ import { Term } from "@/components/glossary/Term";
 import { ExplainThis, type ExplainContext } from "@/components/explain/ExplainThis";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { formatCompact, formatDecimalPercent } from "@/lib/financialFormat";
+import { getLocale } from "@/lib/locale";
 
 type Period = "annual" | "quarterly";
 
@@ -44,7 +45,7 @@ function periodLabel(end: string, period: Period) {
   if (Number.isNaN(d.getTime())) return end;
   return period === "annual"
     ? String(d.getUTCFullYear())
-    : `${d.toLocaleString("en-US", { month: "short", timeZone: "UTC" })} ${String(d.getUTCFullYear()).slice(2)}`;
+    : `${d.toLocaleString(getLocale(), { month: "short", timeZone: "UTC" })} ${String(d.getUTCFullYear()).slice(2)}`;
 }
 
 function ChartCard({
