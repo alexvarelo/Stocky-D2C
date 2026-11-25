@@ -169,37 +169,43 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
     }
   }, [created_at]);
 
+  const todayPercent = portfolioData?.today_change_percent || 0;
+  const todayUp = todayPercent >= 0;
+  const returnUp = portfolioMetrics.earnedLost >= 0;
+  const upPill = 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400';
+  const downPill = 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400';
+
   return (
-    <Card className={`hover:shadow-xl transition-all duration-300 group h-full flex flex-col border-border/50 bg-gradient-to-br from-white to-slate-50 dark:from-slate-950 dark:to-slate-900/50 ${className}`}>
-      <Link to={`/portfolio/${id}`} className="block h-full flex flex-col">
+    <Card className={`group h-full flex flex-col bg-card border-border/60 transition-[border-color,box-shadow] duration-300 hover:border-foreground/20 hover:shadow-lg ${className}`}>
+      <Link to={`/portfolio/${id}`} className="flex h-full flex-col rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <CardHeader className="pb-4">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1.5">
-              <CardTitle className="text-xl font-bold tracking-tight">{name}</CardTitle>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1.5">
+              <CardTitle className="text-xl font-bold leading-tight tracking-tight break-words">{name}</CardTitle>
               {showOwner && user_name && user_id && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Link
                     to={`/user/${user_id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-2 hover:text-primary transition-colors"
+                    className="flex min-w-0 items-center gap-2 hover:text-primary transition-colors"
                   >
                     {user_avatar_url ? (
                       <img
                         src={user_avatar_url}
                         alt={user_name}
-                        className="h-5 w-5 rounded-full ring-1 ring-border"
+                        className="h-5 w-5 shrink-0 rounded-full ring-1 ring-border"
                       />
                     ) : (
-                      <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
+                      <div className="h-5 w-5 shrink-0 rounded-full bg-muted flex items-center justify-center">
                         <User className="h-3 w-3" />
                       </div>
                     )}
-                    <span className="font-medium">{user_name}</span>
+                    <span className="truncate font-medium">{user_name}</span>
                   </Link>
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-1.5">
               {!isOwnPortfolio ? (
                 <Button
                   variant="ghost"
@@ -207,6 +213,7 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
                   className="h-8 w-8 rounded-full hover:bg-muted/80"
                   onClick={handleFollowClick}
                   disabled={isFollowLoading || isProcessing}
+                  aria-label={isFollowing ? `Unfollow ${name}` : `Follow ${name}`}
                 >
                   {isFollowing ? (
                     <Heart className="h-4 w-4 fill-red-500 text-red-500" />
@@ -215,17 +222,25 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
                   )}
                 </Button>
               ) : (
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50 text-xs font-medium text-muted-foreground">
-                  <Users className="h-3.5 w-3.5" />
+                <div
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50 text-xs font-medium text-muted-foreground"
+                  title="Followers"
+                >
+                  <Users className="h-3.5 w-3.5" aria-hidden />
                   <span>{followersCount || 0}</span>
+                  <span className="sr-only">followers</span>
                 </div>
               )}
-              <div className="h-8 w-8 flex items-center justify-center rounded-full bg-muted/50">
+              <div
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-muted/50"
+                title={is_public ? 'Public' : 'Private'}
+              >
                 {is_public ? (
-                  <Eye className="h-4 w-4 text-muted-foreground" />
+                  <Eye className="h-4 w-4 text-muted-foreground" aria-hidden />
                 ) : (
-                  <Lock className="h-4 w-4 text-muted-foreground" />
+                  <Lock className="h-4 w-4 text-muted-foreground" aria-hidden />
                 )}
+                <span className="sr-only">{is_public ? 'Public' : 'Private'}</span>
               </div>
             </div>
           </div>
@@ -236,68 +251,51 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
           )}
         </CardHeader>
 
-        <CardContent className="space-y-6 flex-1 flex flex-col">
-          <div className="grid grid-cols-2 gap-4">
-            {/* Portfolio Value and Today's Performance */}
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Portfolio Value</p>
-              <div className="space-y-1">
-                <p className="text-2xl font-bold tracking-tight">
-                  {isLoadingPrices ? (
-                    <Skeleton className="h-8 w-32" />
-                  ) : (
-                    formatCurrency(portfolioMetrics.currentValue)
-                  )}
-                </p>
-                <div className="flex items-center">
-                  {isLoadingPrices ? (
-                    <Skeleton className="h-5 w-20 rounded-full" />
-                  ) : (
-                    <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${(portfolioData?.today_change_percent || 0) >= 0
-                      ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400'
-                      : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-                      }`}>
-                      {(portfolioData?.today_change_percent || 0) >= 0 ? '+' : ''}
-                      {(portfolioData?.today_change_percent || 0).toFixed(2)}%
-                      <span className="mx-1 opacity-50">•</span>
-                      {formatCurrency(portfolioData?.today_change || 0)}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Total Return */}
-            <div className="space-y-1 text-right">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Return</p>
-              <div className="space-y-1 flex flex-col items-end">
-                <p className={`text-lg font-semibold ${!isLoadingPrices && (portfolioMetrics.earnedLost >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400')
-                  }`}>
-                  {isLoadingPrices ? (
-                    <Skeleton className="h-7 w-24" />
-                  ) : (
-                    formatCurrency(portfolioMetrics.earnedLost)
-                  )}
-                </p>
-                {isLoadingPrices ? (
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                ) : (
-                  <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${portfolioMetrics.earnedLost >= 0
-                    ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400'
-                    : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-                    }`}>
-                    {portfolioMetrics.earnedLost >= 0 ? '+' : ''}
-                    {portfolioMetrics.formattedPerformance}%
-                  </div>
-                )}
-              </div>
-            </div>
+        <CardContent className="flex flex-1 flex-col gap-5">
+          {/* Value on its own line so long figures never collide when the card is narrow (zoom, sidebar). */}
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Portfolio value</p>
+            {isLoadingPrices ? (
+              <Skeleton className="h-8 w-36" />
+            ) : (
+              <p className="text-2xl font-bold tabular-nums tracking-tight break-all">
+                {formatCurrency(portfolioMetrics.currentValue)}
+              </p>
+            )}
+            {isLoadingPrices ? (
+              <Skeleton className="h-5 w-28 rounded-full" />
+            ) : (
+              <span className={`inline-flex flex-wrap items-center gap-x-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${todayUp ? upPill : downPill}`}>
+                {todayUp ? '+' : ''}
+                {todayPercent.toFixed(2)}%
+                <span className="opacity-50" aria-hidden>•</span>
+                {formatCurrency(portfolioData?.today_change || 0)}
+                <span className="opacity-70">today</span>
+              </span>
+            )}
           </div>
 
-          <div className="pt-4 border-t border-border/50 mt-auto">
-            <div className="flex justify-between items-center text-sm mb-3">
+          <div className="space-y-1 rounded-xl border border-border/60 bg-muted/30 px-3 py-2.5">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total return</p>
+            {isLoadingPrices ? (
+              <Skeleton className="h-5 w-28" />
+            ) : (
+              <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className={`text-sm font-semibold tabular-nums ${returnUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {formatCurrency(portfolioMetrics.earnedLost)}
+                </span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${returnUp ? upPill : downPill}`}>
+                  {returnUp ? '+' : '−'}
+                  {portfolioMetrics.formattedPerformance}%
+                </span>
+              </span>
+            )}
+          </div>
+
+          <div className="mt-auto border-t border-border/50 pt-4">
+            <div className="mb-3 flex items-center justify-between text-sm">
               <span className="font-medium text-muted-foreground">Holdings</span>
-              <span className="font-semibold bg-muted/50 px-2 py-0.5 rounded text-xs">
+              <span className="rounded bg-muted/50 px-2 py-0.5 text-xs font-semibold">
                 {totalHoldings} {totalHoldings === 1 ? 'asset' : 'assets'}
               </span>
             </div>
@@ -305,32 +303,34 @@ export const PortfolioCard: React.FC<PortfolioCardProps> = ({
             {hasHoldings ? (
               <div className="space-y-2">
                 {holdings.slice(0, 3).map((holding, index) => (
-                  <div key={`${holding.ticker}-${index}`} className="flex justify-between items-center text-sm group/holding">
-                    <div className="flex items-center gap-2">
+                  <div key={`${holding.ticker}-${index}`} className="group/holding flex items-center justify-between gap-3 text-sm">
+                    <div className="flex min-w-0 items-center gap-2">
                       <CompanyLogo ticker={holding.ticker} size={18} />
-                      <span className="font-medium bg-muted/30 px-1.5 py-0.5 rounded text-xs group-hover/holding:bg-muted/60 transition-colors">
+                      <span className="truncate rounded bg-muted/30 px-1.5 py-0.5 text-xs font-medium transition-colors group-hover/holding:bg-muted/60">
                         {holding.ticker}
                       </span>
                     </div>
-                    <span className="text-muted-foreground text-xs">{holding.quantity} shares</span>
+                    <span className="truncate text-xs tabular-nums text-muted-foreground">
+                      {Number(holding.quantity.toFixed(4)).toLocaleString()} shares
+                    </span>
                   </div>
                 ))}
                 {holdings.length > 3 && (
-                  <p className="text-xs text-muted-foreground pl-1">
+                  <p className="pl-1 text-xs text-muted-foreground">
                     +{holdings.length - 3} more
                   </p>
                 )}
               </div>
             ) : (
-              <div className="text-sm text-muted-foreground italic py-2">No holdings yet</div>
+              <div className="py-2 text-sm italic text-muted-foreground">No holdings yet</div>
             )}
           </div>
 
-          <div className="pt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/50">
-            <span>Created {formattedDate}</span>
-            <div className="flex items-center text-primary font-medium group-hover:translate-x-1 transition-transform duration-300">
-              Details <ArrowRight className="ml-1 h-3.5 w-3.5" />
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 pt-4 text-xs text-muted-foreground">
+            <span className="whitespace-nowrap">Created {formattedDate}</span>
+            <span className="flex items-center whitespace-nowrap font-medium text-primary transition-transform duration-300 group-hover:translate-x-1">
+              Details <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden />
+            </span>
           </div>
         </CardContent>
       </Link>

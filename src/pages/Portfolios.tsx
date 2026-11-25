@@ -41,7 +41,7 @@ const Portfolios = () => {
           <div className="h-8 bg-muted rounded w-1/4 mb-2"></div>
           <div className="h-4 bg-muted rounded w-1/2"></div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))]">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="h-48 bg-muted rounded animate-pulse"></div>
           ))}
@@ -122,7 +122,7 @@ const Portfolios = () => {
 
           <TabsContent value="my-portfolios" className="mt-6">
             {isLoading ? (
-              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))]">
                 {[1, 2, 3].map((i) => (
                   <Skeleton key={i} className="h-64 w-full rounded-lg" />
                 ))}
@@ -146,11 +146,11 @@ const Portfolios = () => {
               </Card>
             ) : (
               <motion.div
-                className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                className="grid gap-4 sm:gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))]"
                 variants={container}
               >
                 {portfolios?.map((portfolio) => (
-                  <motion.div key={portfolio.id} variants={item}>
+                  <motion.div key={portfolio.id} variants={item} className="h-full">
                     <PortfolioCard
                       {...portfolio}
                       user_id={user?.id}
@@ -167,7 +167,7 @@ const Portfolios = () => {
 
           <TabsContent value="following" className="mt-6">
             {isLoadingFollowed ? (
-              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))]">
                 {[1, 2, 3].map((i) => (
                   <Skeleton key={i} className="h-64 w-full rounded-lg" />
                 ))}
@@ -191,7 +191,7 @@ const Portfolios = () => {
                 </CardHeader>
               </Card>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))]">
                 {followedPortfolios?.map((portfolio) => (
                   <PortfolioCard
                     is_default={false}
