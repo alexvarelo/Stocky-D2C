@@ -75,7 +75,7 @@ export const TopMovers = ({ holdings, className = "", isLoading }: TopMoversProp
                                         {holding.ticker}
                                     </Link>
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        {formatCurrency(holding.current_price || 0)}
+                                        {formatCurrency(holding.current_price || 0, holding.currency)}
                                     </div>
                                 </div>
                             </div>
