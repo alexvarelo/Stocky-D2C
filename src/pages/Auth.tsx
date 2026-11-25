@@ -174,8 +174,8 @@ const Auth = () => {
 
       {/* Right Panel - Auth Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 relative">
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-          <LanguageSelect className="h-9 w-[130px]" />
+        <div className="absolute top-3 right-3 sm:top-6 sm:right-6">
+          <LanguageSelect className="h-8 w-[110px] text-xs sm:h-9 sm:w-[130px] sm:text-sm" />
         </div>
         <div className="w-full max-w-md space-y-10">
           {/* Mobile Logo */}
