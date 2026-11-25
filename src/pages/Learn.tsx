@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, GraduationCap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { AcademyIcon } from "@/components/learn/AcademyIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -15,9 +16,11 @@ export default function Learn() {
   return (
     <div className="mx-auto w-full max-w-[960px] space-y-6 pb-10">
       <header className="space-y-1">
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-          <GraduationCap className="h-6 w-6 text-muted-foreground" aria-hidden />
-          Learn
+        <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight">
+          <AcademyIcon size={40} />
+          <span>
+            Stocky <span className="text-primary">Academy</span>
+          </span>
         </h1>
         <p className="text-sm text-muted-foreground">
           Short lessons with live examples and a quick quiz. They explain how things work and never tell you what to buy or sell.

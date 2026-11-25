@@ -40,6 +40,15 @@ export type TrackId =
   | "macro-market"
   | "risk-psychology";
 
+/** Animated illustrations a lesson step can show beside its text. */
+export type LessonVisualId = "ownership-grid" | "ownership-bar" | "business-vs-price" | "total-return";
+
+export interface LessonStepExtra {
+  /** Headline for the step; the section name then becomes the small label above it. */
+  title?: string;
+  visual?: LessonVisualId;
+}
+
 export interface QuizQuestion {
   id: string;
   prompt: string;
@@ -66,6 +75,17 @@ export interface Lesson {
   };
   /** Ids that must exist in glossary.ts */
   glossaryIds: string[];
+  /**
+   * Optional per-step extras for the step-by-step reader. Keys: "intro", "what-<n>", "read-<n>",
+   * "mistake" (n is the 0-based chunk of that section). Lessons without extras still split into steps.
+   */
+  steps?: Partial<Record<string, LessonStepExtra>>;
+  /** Optional question shown before the "Common mistake" text; the text is the feedback. */
+  mistakeCheck?: {
+    prompt: string;
+    options: string[];
+    correctIndex: number;
+  };
   quiz: [QuizQuestion, QuizQuestion, QuizQuestion];
 }
 

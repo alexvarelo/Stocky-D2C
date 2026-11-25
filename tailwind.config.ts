@@ -144,6 +144,23 @@ export default {
 						height: '0'
 					}
 				},
+				'lesson-draw': {
+					from: { strokeDashoffset: '420' },
+					to: { strokeDashoffset: '0' },
+				},
+				'lesson-grow-x': {
+					from: { transform: 'scaleX(0)' },
+					to: { transform: 'scaleX(1)' },
+				},
+				'lesson-grow-y': {
+					from: { transform: 'scaleY(0)' },
+					to: { transform: 'scaleY(1)' },
+				},
+				'lesson-pop': {
+					'0%': { opacity: '0', transform: 'scale(0.4)' },
+					'70%': { transform: 'scale(1.12)' },
+					'100%': { opacity: '1', transform: 'scale(1)' },
+				},
 				marquee: {
 					'0%': { transform: 'translateX(0)' },
 					'100%': { transform: 'translateX(calc(-100% - var(--gap)))' },
@@ -154,6 +171,10 @@ export default {
 				},
 			},
 			animation: {
+				'lesson-draw': 'lesson-draw 1.4s ease-out both',
+				'lesson-grow-x': 'lesson-grow-x 0.9s cubic-bezier(.2,.8,.2,1) both',
+				'lesson-grow-y': 'lesson-grow-y 0.8s cubic-bezier(.2,.8,.2,1) both',
+				'lesson-pop': 'lesson-pop 0.5s cubic-bezier(.2,.8,.2,1) both',
 				marquee: 'marquee var(--duration, 40s) linear infinite',
 				'marquee-vertical': 'marquee-vertical var(--duration, 40s) linear infinite',
 				'accordion-down': 'accordion-down 0.2s ease-out',

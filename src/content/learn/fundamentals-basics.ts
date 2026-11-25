@@ -38,6 +38,17 @@ Companies named in this course are illustrations only and are not recommendation
       caption: "See the price of one share of an example company, its total market value and the number of shares they imply.",
     },
     glossaryIds: ["market-cap", "total-return", "eps"],
+    steps: {
+      intro: { visual: "ownership-grid" },
+      "what-0": { title: "A share is a slice of ownership", visual: "ownership-bar" },
+      "read-0": { title: "The business and the price are two different things", visual: "business-vs-price" },
+      "read-1": { title: "Total return has two parts", visual: "total-return" },
+    },
+    mistakeCheck: {
+      prompt: "Share A costs 10. Share B costs 500. Which is cheaper?",
+      options: ["A is cheaper", "B is cheaper", "You cannot tell from the price"],
+      correctIndex: 2,
+    },
     quiz: [
       {
         id: "what-is-a-stock-q1",
