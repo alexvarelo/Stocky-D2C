@@ -771,6 +771,16 @@ export interface MarketDataResponse {
   last_updated: string;
 }
 
+/**
+ * Static plain-language description of the indicator
+ */
+export type MarketIndicatorDescription = string | null;
+
+/**
+ * Date (YYYY-MM-DD) of this indicator's last close
+ */
+export type MarketIndicatorAsOf = string | null;
+
 export type MarketIndicatorValue = number | null;
 
 /**
@@ -779,7 +789,7 @@ export type MarketIndicatorValue = number | null;
 export type MarketIndicatorChange1d = number | null;
 
 /**
- * 0-100, share of the last ~252 sessions with a value at or below today's
+ * 0-100 mid-rank percentile over the last ~252 sessions: share of other sessions below today's value plus half of those equal to it
  */
 export type MarketIndicatorPercentile1y = number | null;
 
@@ -797,10 +807,14 @@ export interface MarketIndicator {
   symbol: string;
   /** index | percent */
   unit: string;
+  /** Static plain-language description of the indicator */
+  description?: MarketIndicatorDescription;
+  /** Date (YYYY-MM-DD) of this indicator's last close */
+  as_of?: MarketIndicatorAsOf;
   value?: MarketIndicatorValue;
   /** Percent change vs previous close (for us10y: change in percentage points) */
   change_1d?: MarketIndicatorChange1d;
-  /** 0-100, share of the last ~252 sessions with a value at or below today's */
+  /** 0-100 mid-rank percentile over the last ~252 sessions: share of other sessions below today's value plus half of those equal to it */
   percentile_1y?: MarketIndicatorPercentile1y;
   /** Last ~60 closes */
   sparkline?: number[];

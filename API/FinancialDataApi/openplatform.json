@@ -3411,6 +3411,30 @@
             "title": "Unit",
             "description": "index | percent"
           },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "Static plain-language description of the indicator"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of",
+            "description": "Date (YYYY-MM-DD) of this indicator's last close"
+          },
           "value": {
             "anyOf": [
               {
@@ -3444,7 +3468,7 @@
               }
             ],
             "title": "Percentile 1Y",
-            "description": "0-100, share of the last ~252 sessions with a value at or below today's"
+            "description": "0-100 mid-rank percentile over the last ~252 sessions: share of other sessions below today's value plus half of those equal to it"
           },
           "sparkline": {
             "items": {
