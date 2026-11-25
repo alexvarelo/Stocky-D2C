@@ -120,11 +120,6 @@ export const PortfolioHero = ({
 
     return (
         <div className="relative w-full mb-8">
-            {/* Background Gradient Mesh - Subtle & Premium */}
-            <div className="absolute inset-0 -z-10 overflow-hidden rounded-3xl opacity-20 dark:opacity-10 pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/30 via-transparent to-transparent blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-2/3 h-2/3 bg-gradient-to-tl from-blue-500/20 via-transparent to-transparent blur-3xl" />
-            </div>
 
             <div className="flex flex-col gap-4 md:gap-6">
                 {/* Top Navigation Bar */}
@@ -203,15 +198,15 @@ export const PortfolioHero = ({
 
                 {/* Main Hero Content */}
                 {/* Main Hero Content */}
-                <div className="flex flex-col gap-4 md:gap-8">
+                <div className="flex flex-col gap-4 lg:gap-8">
                     {/* Top Row: Name & Valuation */}
-                    <div className="flex justify-between items-start gap-4">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                         {/* Left: Name */}
                         <div className="space-y-2 flex-1 min-w-0">
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-2xl md:text-4xl font-bold tracking-tight truncate"
+                                className="text-2xl lg:text-4xl font-bold leading-tight tracking-tight break-words"
                             >
                                 {name}
                             </motion.h1>
@@ -220,7 +215,7 @@ export const PortfolioHero = ({
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 }}
-                                    className="text-muted-foreground text-sm md:text-lg leading-relaxed hidden md:block"
+                                    className="text-muted-foreground text-sm lg:text-lg leading-relaxed hidden lg:block"
                                 >
                                     {description}
                                 </motion.p>
@@ -231,7 +226,7 @@ export const PortfolioHero = ({
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="hidden md:flex items-center gap-3 text-sm text-muted-foreground pt-2"
+                                className="hidden lg:flex flex-wrap items-center gap-3 text-sm text-muted-foreground pt-2"
                             >
                                 {isPublic !== undefined && (
                                     <div className={`
@@ -259,7 +254,7 @@ export const PortfolioHero = ({
                         </div>
 
                         {/* Right: Valuation */}
-                        <div className="flex flex-col items-end shrink-0">
+                        <div className="flex flex-col items-start lg:items-end lg:shrink-0">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -267,9 +262,9 @@ export const PortfolioHero = ({
                                 className="flex items-baseline gap-1"
                             >
                                 {isLoadingPrices ? (
-                                    <Skeleton className="h-8 w-32 md:h-12 md:w-48" />
+                                    <Skeleton className="h-8 w-32 lg:h-12 lg:w-48" />
                                 ) : (
-                                    <span className={`text-2xl md:text-5xl font-bold tracking-tight rounded px-1 -mx-1 tabular-nums transition-colors duration-700 ${priceFlashClass(flash)}`}>
+                                    <span className={`text-3xl lg:text-5xl font-bold tracking-tight rounded px-1 -mx-1 tabular-nums transition-colors duration-700 ${priceFlashClass(flash)}`}>
                                         {formatCurrency(animatedValue, currency)}
                                     </span>
                                 )}
@@ -285,7 +280,7 @@ export const PortfolioHero = ({
                             </motion.div>
 
                             {/* Desktop Stats (Hidden on Mobile) */}
-                            <div className="hidden md:flex flex-col items-end space-y-1.5 mt-2">
+                            <div className="hidden lg:flex flex-col items-end space-y-1.5 mt-2">
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -294,7 +289,7 @@ export const PortfolioHero = ({
                                     {isLoadingPrices ? (
                                         <Skeleton className="h-6 w-48" />
                                     ) : (
-                                        <div className="flex items-center gap-1.5 text-sm">
+                                        <div className="flex flex-wrap items-center gap-1.5 text-sm">
                                             {isPositive ? <TrendingUp className="h-4 w-4 text-success" /> : <TrendingDown className="h-4 w-4 text-danger" />}
                                             <span className={`font-semibold tabular-nums ${isPositive ? "text-success" : "text-danger"}`}>
                                                 {isPositive ? "+" : ""}{formatCurrency(totalReturn, currency)}
@@ -316,7 +311,7 @@ export const PortfolioHero = ({
                                     {isLoadingPrices ? (
                                         <Skeleton className="h-5 w-40" />
                                     ) : (
-                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/90">
+                                        <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground/90">
                                             {isTodayPositive ? <TrendingUp className="h-3.5 w-3.5 text-success" /> : <TrendingDown className="h-3.5 w-3.5 text-danger" />}
                                             <span className={`font-medium tabular-nums ${isTodayPositive ? "text-success" : "text-danger"}`}>
                                                 {isTodayPositive ? "+" : ""}{formatCurrency(todayChange, currency)}
@@ -339,15 +334,15 @@ export const PortfolioHero = ({
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-muted-foreground text-sm leading-relaxed md:hidden"
+                            className="text-muted-foreground text-sm leading-relaxed lg:hidden"
                         >
                             {description}
                         </motion.p>
                     )}
 
                     {/* Mobile Stats Row (Visible only on Mobile) */}
-                    <div className="flex flex-col gap-1 md:hidden">
-                        <div className="flex items-center gap-1.5 text-sm">
+                    <div className="flex flex-col gap-1 lg:hidden">
+                        <div className="flex flex-wrap items-center gap-1.5 text-sm">
                             {isPositive ? <TrendingUp className="h-3.5 w-3.5 text-success" /> : <TrendingDown className="h-3.5 w-3.5 text-danger" />}
                             <span className={`font-semibold tabular-nums ${isPositive ? "text-success" : "text-danger"}`}>
                                 {isPositive ? "+" : ""}{formatCurrency(totalReturn, currency)}
@@ -359,7 +354,7 @@ export const PortfolioHero = ({
                             <span className="text-muted-foreground">All time</span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/90">
+                        <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground/90">
                             {isTodayPositive ? <TrendingUp className="h-3 w-3 text-success" /> : <TrendingDown className="h-3 w-3 text-danger" />}
                             <span className={`font-medium tabular-nums ${isTodayPositive ? "text-success" : "text-danger"}`}>
                                 {isTodayPositive ? "+" : ""}{formatCurrency(todayChange, currency)}
@@ -377,7 +372,7 @@ export const PortfolioHero = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="flex md:hidden items-center gap-3 text-xs text-muted-foreground flex-wrap"
+                        className="flex lg:hidden items-center gap-3 text-xs text-muted-foreground flex-wrap"
                     >
                         {isPublic !== undefined && (
                             <div className={`
