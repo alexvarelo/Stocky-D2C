@@ -77,7 +77,7 @@ export default function WatchlistDetail() {
           <div className="flex gap-2 w-full sm:w-auto">
             {items.length >= 2 && (
               <Button asChild variant="outline" size="sm" className="gap-2">
-                <Link to={`/compare?tickers=${items.slice(0, 6).map((i: WatchlistItem) => i.ticker).join(',')}`}>
+                <Link to={`/compare?tickers=${encodeURIComponent(items.slice(0, 6).map((i: WatchlistItem) => i.ticker).join(','))}`}>
                   <GitCompare className="h-4 w-4" />
                   Compare
                 </Link>

@@ -39,12 +39,17 @@ interface Group {
   rows: MetricRow[];
 }
 
+/** yfinance reports London market caps in pounds even when the price is quoted in pence. */
+function capCurrency(currency?: string | null) {
+  return currency === "GBp" || currency === "GBX" ? "GBP" : currency;
+}
+
 const GROUPS: Group[] = [
   {
     title: "Price & size",
     rows: [
       { label: "Price", get: (r) => r.price, format: (v, r) => fmtMoney(v, r.currency) },
-      { label: "Market cap", termId: "market-cap", get: (r) => r.market_cap, format: (v, r) => fmtCap(v, r.currency) },
+      { label: "Market cap", termId: "market-cap", get: (r) => r.market_cap, format: (v, r) => fmtCap(v, capCurrency(r.currency)) },
       { label: "Market cap (base currency)", termId: "market-cap", get: (r) => r.market_cap_usd, format: (v, _r, base) => fmtCap(v, base ?? "USD") },
     ],
   },
@@ -229,8 +234,8 @@ export default function Compare() {
                                 key={r.ticker}
                                 className={cn(
                                   "px-3 py-2 text-right tabular-nums",
-                                  v != null && v === best && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-                                  v != null && v === worst && "bg-red-500/10 text-red-600 dark:text-red-400",
+                                  v != null && v === best && "font-semibold text-foreground",
+                                  v != null && v === worst && "italic",
                                   v == null && "text-muted-foreground",
                                 )}
                               >
@@ -249,6 +254,9 @@ export default function Compare() {
         </Card>
       )}
 
+      <p className="text-xs text-muted-foreground">
+        Bold marks the highest and italics the lowest value in this set; it is not a ranking or recommendation. Past performance does not predict future returns.
+      </p>
       <EducationalDisclaimer />
     </div>
   );
