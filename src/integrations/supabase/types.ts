@@ -779,6 +779,39 @@ export type Database = {
           },
         ]
       }
+      lesson_progress: {
+        Row: {
+          attempts: number
+          completed_at: string
+          created_at: string
+          id: string
+          lesson_id: string
+          score: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          score?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          score?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_scenarios: {
         Row: {
           created_at: string

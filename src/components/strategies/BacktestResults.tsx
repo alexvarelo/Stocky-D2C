@@ -5,6 +5,7 @@ import type { BacktestMetrics, BacktestResponse } from "@/api/financialDataApi.s
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ExplainThis } from "@/components/explain/ExplainThis";
 import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { fmtMoney, fmtNum, fmtPct } from "@/components/scenarios/format";
@@ -42,8 +43,17 @@ export function BacktestResults({ result, onSave, saving }: Props) {
       <CardContent className="p-4 sm:p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 className="font-semibold">
-              <Term id="backtest">Backtest</Term> result{tpl ? ` · ${tpl.name}` : ""}
+            <h3 className="flex items-center gap-1 font-semibold">
+              <span>
+                <Term id="backtest">Backtest</Term> result{tpl ? ` · ${tpl.name}` : ""}
+              </span>
+              <ExplainThis
+                context={{
+                  label: `backtest of the ${tpl?.name ?? result.strategy} strategy against buy and hold`,
+                  value: `strategy total return ${fmtPct(result.metrics.strategy.total_return, 1, true)} vs buy and hold ${fmtPct(result.metrics.benchmark.total_return, 1, true)}`,
+                  detail: `${result.start_date} to ${result.end_date}`,
+                }}
+              />
             </h3>
             <p className="text-xs text-muted-foreground">
               {result.start_date} to {result.end_date}. This strategy would have produced the values below; past results do not predict future results.

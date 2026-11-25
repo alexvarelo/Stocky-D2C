@@ -54,6 +54,8 @@ interface Conversation {
 interface StockyChatProps {
     open: boolean;
     onOpenChange: (_open: boolean) => void;
+    /** Text to prefill in the input (never sent automatically). A new nonce refills it. */
+    draft?: { text: string; nonce: number } | null;
 }
 
 interface ChartSeries {
@@ -205,7 +207,7 @@ function useVisualViewportBox(active: boolean) {
     return box;
 }
 
-export function StockyChat({ open, onOpenChange }: StockyChatProps) {
+export function StockyChat({ open, onOpenChange, draft }: StockyChatProps) {
     const { user } = useAuth();
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
@@ -231,6 +233,22 @@ export function StockyChat({ open, onOpenChange }: StockyChatProps) {
             inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 160)}px`;
         }
     };
+
+    // Prefill (not send) a question handed over by an "Explain this" button.
+    const appliedDraftRef = useRef<number>(0);
+    useEffect(() => {
+        if (!draft || draft.nonce === appliedDraftRef.current) return;
+        appliedDraftRef.current = draft.nonce;
+        setInput(draft.text);
+        const t = setTimeout(() => {
+            const el = inputRef.current;
+            if (!el) return;
+            el.style.height = 'inherit';
+            el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+            el.focus();
+        }, 150);
+        return () => clearTimeout(t);
+    }, [draft]);
 
     const { isSupported: isVoiceSupported, isListening: isVoiceListening, toggle: toggleVoice } = useSpeechRecognition({
         onResult: (transcript) => {

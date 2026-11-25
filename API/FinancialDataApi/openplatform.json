@@ -1510,6 +1510,43 @@
         ]
       }
     },
+    "/api/v1/market/context": {
+      "get": {
+        "tags": [
+          "market"
+        ],
+        "summary": "Market context indicators",
+        "description": "VIX, US 10y yield (percent), US dollar index and S&P 500 (with distance to its 50/200-day averages), each with its 1-year percentile (0-100). Cached 15 min. Failed indicators return null values plus a note. Educational information, not financial advice.",
+        "operationId": "market_context_api_v1_market_context_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketContextResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health check",
@@ -3144,6 +3181,80 @@
         ],
         "title": "LargestPosition"
       },
+      "MarketBreadth": {
+        "properties": {
+          "pct_above_sma200": {
+            "type": "number",
+            "title": "Pct Above Sma200"
+          },
+          "percentile_1y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentile 1Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pct_above_sma200"
+        ],
+        "title": "MarketBreadth"
+      },
+      "MarketContextResponse": {
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of",
+            "description": "Date (YYYY-MM-DD) of the latest data point"
+          },
+          "indicators": {
+            "items": {
+              "$ref": "#/components/schemas/MarketIndicator"
+            },
+            "type": "array",
+            "title": "Indicators"
+          },
+          "breadth": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarketBreadth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "indicators"
+        ],
+        "title": "MarketContextResponse"
+      },
       "MarketData": {
         "properties": {
           "symbol": {
@@ -3279,6 +3390,125 @@
         ],
         "title": "MarketDataResponse",
         "description": "Schema for market data response"
+      },
+      "MarketIndicator": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "vix | us10y | dxy | sp500"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "symbol": {
+            "type": "string",
+            "title": "Symbol"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit",
+            "description": "index | percent"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "Static plain-language description of the indicator"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of",
+            "description": "Date (YYYY-MM-DD) of this indicator's last close"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "change_1d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change 1D",
+            "description": "Percent change vs previous close (for us10y: change in percentage points)"
+          },
+          "percentile_1y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentile 1Y",
+            "description": "0-100 mid-rank percentile over the last ~252 sessions: share of other sessions below today's value plus half of those equal to it"
+          },
+          "sparkline": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Sparkline",
+            "description": "Last ~60 closes"
+          },
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SmaDistance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reading": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reading",
+            "description": "Neutral, purely descriptive sentence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "symbol",
+          "unit"
+        ],
+        "title": "MarketIndicator"
       },
       "MonteCarloRequest": {
         "properties": {
@@ -4556,6 +4786,36 @@
         ],
         "title": "SearchResult",
         "description": "Schema for search results"
+      },
+      "SmaDistance": {
+        "properties": {
+          "sma50_distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma50 Distance",
+            "description": "Percent distance of the last close to its 50-day SMA"
+          },
+          "sma200_distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sma200 Distance",
+            "description": "Percent distance of the last close to its 200-day SMA"
+          }
+        },
+        "type": "object",
+        "title": "SmaDistance"
       },
       "StockInfo": {
         "properties": {

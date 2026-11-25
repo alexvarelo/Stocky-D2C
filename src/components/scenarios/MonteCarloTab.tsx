@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ExplainThis } from "@/components/explain/ExplainThis";
 import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { apiErrorMessage } from "@/lib/apiError";
@@ -155,8 +156,15 @@ export function MonteCarloTab({ positions, baseCurrency, initial, onSave, saving
         <Card className="rounded-3xl border-border/50">
           <CardContent className="p-4 sm:p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="font-semibold">
+              <h3 className="flex items-center gap-1 font-semibold">
                 Simulated value over {result.horizon_years} {result.horizon_years === 1 ? "year" : "years"}
+                <ExplainThis
+                  context={{
+                    label: "Monte Carlo simulation of portfolio value",
+                    value: `median final value ${fmtMoney(result.final.p50, cur)}, 5th to 95th percentile ${fmtMoney(result.final.p5, cur)} to ${fmtMoney(result.final.p95, cur)}`,
+                    detail: `over ${result.horizon_years} years; probability of ending below money put in ${fmtPct(result.prob_loss, 0)}`,
+                  }}
+                />
               </h3>
               {onSave && (
               <SaveButton

@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { MarketContextPanel } from "@/components/market/MarketContextPanel";
 import { WorldMarkets } from "@/components/discover/world/WorldMarkets";
 
 // The community tab pulls in the leaderboard and its tables; load it on demand.
@@ -57,7 +58,10 @@ export default function DiscoverPage() {
 
       <div id="discover-panel" role="tabpanel" aria-labelledby={`discover-tab-${tab}`}>
         {tab === "markets" ? (
-          <WorldMarkets />
+          <div className="space-y-4">
+            <MarketContextPanel />
+            <WorldMarkets />
+          </div>
         ) : (
           <Suspense
             fallback={

@@ -15,6 +15,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { ExplainThis } from "@/components/explain/ExplainThis";
 import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { useStockTechnicalsApiV1StockTickerTechnicalsGet } from "@/api/technicals/technicals";
@@ -190,7 +191,17 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
       <Card>
         <CardHeader className="space-y-3 pb-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <CardTitle className="text-lg">Technical analysis</CardTitle>
+            <CardTitle className="flex items-center gap-1 text-lg">
+              Technical analysis
+              <ExplainThis
+                context={{
+                  label: "price chart with moving averages",
+                  ticker,
+                  value: close != null ? `last close ${fmtNum(close)}${cur ? ` ${cur}` : ""}` : undefined,
+                  detail: `period ${period}`,
+                }}
+              />
+            </CardTitle>
             <div className="flex gap-1" role="group" aria-label="Period">
               {PERIODS.map((p) => (
                 <Button
@@ -280,8 +291,11 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
 
           {/* Volume */}
           <div className="h-20 w-full">
-            <p className="px-1 text-[11px] text-muted-foreground sm:px-0">
+            <p className="flex items-center gap-1 px-1 text-[11px] text-muted-foreground sm:px-0">
               <Term id="volume">Volume</Term>
+              <ExplainThis
+                context={{ label: "volume chart", ticker, value: `20-day average volume ${fmtCompact(latest.avg_volume_20)}` }}
+              />
             </p>
             <ResponsiveContainer width="100%" height="85%">
               <ComposedChart data={rows} syncId={SYNC_ID} margin={MARGIN}>
@@ -295,8 +309,11 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
 
           {/* RSI */}
           <div className="h-32 w-full">
-            <p className="px-1 text-[11px] text-muted-foreground sm:px-0">
+            <p className="flex items-center gap-1 px-1 text-[11px] text-muted-foreground sm:px-0">
               <Term id="rsi">RSI (14)</Term>
+              <ExplainThis
+                context={{ label: "RSI (14)", ticker, value: fmtNum(rsi, 1) }}
+              />
             </p>
             <ResponsiveContainer width="100%" height="85%">
               <ComposedChart data={rows} syncId={SYNC_ID} margin={MARGIN}>
@@ -313,8 +330,15 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
 
           {/* MACD */}
           <div className="h-36 w-full">
-            <p className="px-1 text-[11px] text-muted-foreground sm:px-0">
+            <p className="flex items-center gap-1 px-1 text-[11px] text-muted-foreground sm:px-0">
               <Term id="macd">MACD (12, 26, 9)</Term>
+              <ExplainThis
+                context={{
+                  label: "MACD (12, 26, 9)",
+                  ticker,
+                  value: `MACD ${fmtNum(latest.macd)} vs signal ${fmtNum(latest.macd_signal)}`,
+                }}
+              />
             </p>
             <ResponsiveContainer width="100%" height="88%">
               <ComposedChart data={rows} syncId={SYNC_ID} margin={MARGIN}>

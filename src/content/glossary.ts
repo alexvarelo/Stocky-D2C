@@ -457,6 +457,16 @@ export const GLOSSARY: GlossaryEntry[] = [
     related: ["beta", "total-return", "rebalancing"],
   },
   {
+    id: "sp500",
+    term: "S&P 500",
+    abbr: "S&P 500",
+    category: "market",
+    short: "An index of 500 large US companies, weighted by market value. It is widely used as a gauge of the US stock market.",
+    example: "If the S&P 500 goes from 5,000 to 5,250 points, the index rose 5%, before dividends.",
+    pitfall: "It is dominated by its largest companies, so it does not represent every part of the market or the whole economy.",
+    related: ["benchmark", "vix", "market-breadth"],
+  },
+  {
     id: "vix",
     term: "CBOE Volatility Index",
     abbr: "VIX",

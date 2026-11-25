@@ -682,6 +682,29 @@ export interface LargestPosition {
   weight: number;
 }
 
+export type MarketBreadthPercentile1y = number | null;
+
+export interface MarketBreadth {
+  pct_above_sma200: number;
+  percentile_1y?: MarketBreadthPercentile1y;
+}
+
+/**
+ * Date (YYYY-MM-DD) of the latest data point
+ */
+export type MarketContextResponseAsOf = string | null;
+
+export type MarketContextResponseBreadth = MarketBreadth | null;
+
+export interface MarketContextResponse {
+  /** Date (YYYY-MM-DD) of the latest data point */
+  as_of?: MarketContextResponseAsOf;
+  indicators: MarketIndicator[];
+  breadth?: MarketContextResponseBreadth;
+  notes?: string[];
+  disclaimer?: string;
+}
+
 /**
  * Current price
  */
@@ -746,6 +769,58 @@ export interface MarketDataResponse {
   active: MarketData[];
   /** Last update timestamp */
   last_updated: string;
+}
+
+/**
+ * Static plain-language description of the indicator
+ */
+export type MarketIndicatorDescription = string | null;
+
+/**
+ * Date (YYYY-MM-DD) of this indicator's last close
+ */
+export type MarketIndicatorAsOf = string | null;
+
+export type MarketIndicatorValue = number | null;
+
+/**
+ * Percent change vs previous close (for us10y: change in percentage points)
+ */
+export type MarketIndicatorChange1d = number | null;
+
+/**
+ * 0-100 mid-rank percentile over the last ~252 sessions: share of other sessions below today's value plus half of those equal to it
+ */
+export type MarketIndicatorPercentile1y = number | null;
+
+export type MarketIndicatorExtra = SmaDistance | null;
+
+/**
+ * Neutral, purely descriptive sentence
+ */
+export type MarketIndicatorReading = string | null;
+
+export interface MarketIndicator {
+  /** vix | us10y | dxy | sp500 */
+  key: string;
+  label: string;
+  symbol: string;
+  /** index | percent */
+  unit: string;
+  /** Static plain-language description of the indicator */
+  description?: MarketIndicatorDescription;
+  /** Date (YYYY-MM-DD) of this indicator's last close */
+  as_of?: MarketIndicatorAsOf;
+  value?: MarketIndicatorValue;
+  /** Percent change vs previous close (for us10y: change in percentage points) */
+  change_1d?: MarketIndicatorChange1d;
+  /** 0-100 mid-rank percentile over the last ~252 sessions: share of other sessions below today's value plus half of those equal to it */
+  percentile_1y?: MarketIndicatorPercentile1y;
+  /** Last ~60 closes */
+  sparkline?: number[];
+  extra?: MarketIndicatorExtra;
+  /** Neutral, purely descriptive sentence */
+  reading?: MarketIndicatorReading;
 }
 
 export type MonteCarloRequestLookback = typeof MonteCarloRequestLookback[keyof typeof MonteCarloRequestLookback];
@@ -1362,6 +1437,23 @@ export interface SearchResult {
   regular_market_volume?: SearchResultRegularMarketVolume;
   /** Average daily volume (3 months) */
   average_daily_volume_3_month?: SearchResultAverageDailyVolume3Month;
+}
+
+/**
+ * Percent distance of the last close to its 50-day SMA
+ */
+export type SmaDistanceSma50Distance = number | null;
+
+/**
+ * Percent distance of the last close to its 200-day SMA
+ */
+export type SmaDistanceSma200Distance = number | null;
+
+export interface SmaDistance {
+  /** Percent distance of the last close to its 50-day SMA */
+  sma50_distance?: SmaDistanceSma50Distance;
+  /** Percent distance of the last close to its 200-day SMA */
+  sma200_distance?: SmaDistanceSma200Distance;
 }
 
 export type StockInfoAdditionalDataAnyOf = { [key: string]: unknown };
