@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Briefcase, Eye, Compass } from 'lucide-react';
+import { Home, Briefcase, Eye, Compass, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -12,6 +12,7 @@ const navItems: NavItem[] = [
     { label: 'Home', icon: Home, path: '/dashboard' },
     { label: 'Portfolios', icon: Briefcase, path: '/portfolios' },
     { label: 'Watchlists', icon: Eye, path: '/watchlists' },
+    { label: 'Academy', icon: GraduationCap, path: '/learn' },
     { label: 'Discovery', icon: Compass, path: '/discover' },
 ];
 
@@ -38,7 +39,7 @@ export function BottomNav() {
                             key={item.path}
                             onClick={() => navigate(item.path)}
                             className={cn(
-                                'flex flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-xl transition-colors min-w-[64px]',
+                                'flex flex-col items-center justify-center gap-1 px-2 py-1.5 rounded-xl transition-colors min-w-[60px]',
                                 active
                                     ? 'bg-muted text-foreground'
                                     : 'text-muted-foreground hover:text-foreground'
