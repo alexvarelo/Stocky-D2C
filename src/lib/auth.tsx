@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -38,9 +38,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { toast } = useToast();
 
+  // Which user's profile is already loaded. Supabase re-fires auth events on token refresh and
+  // when the tab regains focus; those refetch quietly instead of putting the app back into a
+  // loading state, which would unmount the current page and lose its state and scroll position.
+  const loadedProfileFor = useRef<string | null>(null);
+
   // Fetch user profile from public.users
   const fetchUserProfile = async (userId: string) => {
-    setProfileLoading(true);
+    const quiet = loadedProfileFor.current === userId;
+    if (!quiet) setProfileLoading(true);
     const { data, error } = await supabase
       .from('users')
       .select('id, username, full_name, email, avatar_url, bio, website')
@@ -48,9 +54,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single();
     if (!error && data) {
       setUserProfile(data);
-    } else {
+      loadedProfileFor.current = userId;
+    } else if (!quiet) {
+      // A failed background refresh keeps the profile we already have.
       setUserProfile(null);
     }
+    setProfileLoading(false);
+  };
+
+  const clearProfile = () => {
+    loadedProfileFor.current = null;
+    setUserProfile(null);
     setProfileLoading(false);
   };
 
@@ -63,8 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user?.id) {
           fetchUserProfile(session.user.id);
         } else {
-          setUserProfile(null);
-          setProfileLoading(false);
+          clearProfile();
         }
         setLoading(false);
       }
@@ -77,8 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user?.id) {
         fetchUserProfile(session.user.id);
       } else {
-        setUserProfile(null);
-        setProfileLoading(false);
+        clearProfile();
       }
       setLoading(false);
     });
