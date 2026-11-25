@@ -77,7 +77,7 @@ export function PeRatioWidget({ ticker }: WidgetProps) {
   const eps = pe && price ? price / pe : null;
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <Reading label={<Term id="pe-ratio">P/E</Term>} value={pe == null ? "N/A" : pe.toFixed(1)} />
         <Reading label="Price" value={fmtNum(price)} note={p.currency ?? undefined} />
         <Reading label={<Term id="eps">EPS (implied)</Term>} value={eps == null ? "N/A" : eps.toFixed(2)} />
@@ -104,7 +104,7 @@ export function MarginsWidget({ ticker }: WidgetProps) {
         }));
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <Reading label={<Term id="gross-margin">Gross</Term>} value={formatDecimalPercent(l.gross_margin)} />
               <Reading label={<Term id="operating-margin">Operating</Term>} value={formatDecimalPercent(l.operating_margin)} />
               <Reading label={<Term id="net-margin">Net</Term>} value={formatDecimalPercent(l.net_margin)} />
@@ -136,16 +136,21 @@ export function FreeCashFlowWidget({ ticker }: WidgetProps) {
     <FinFrame ticker={ticker}>
       {(items, cur) => {
         const l = latest(items);
-        const data = items.map((i) => ({ label: yearLabel(i.period_end), fcf: i.free_cash_flow ?? null }));
+        const data = items.map((i) => ({
+          label: yearLabel(i.period_end),
+          fcf: i.free_cash_flow ?? null,
+          net: i.net_income ?? null,
+        }));
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <Reading label="Operating cash flow" value={formatCompact(l.operating_cash_flow, cur)} />
               <Reading label="Capex" value={formatCompact(l.capex, cur)} />
               <Reading label={<Term id="free-cash-flow">Free cash flow</Term>} value={formatCompact(l.free_cash_flow, cur)} />
+              <Reading label="Net income" value={formatCompact(l.net_income, cur)} />
             </div>
-            <ChartTitle explain={{ label: "free cash flow chart", ticker, value: formatCompact(l.free_cash_flow, cur) }}>
-              <Term id="free-cash-flow">Free cash flow</Term> by year
+            <ChartTitle explain={{ label: "free cash flow against net income chart", ticker, value: `free cash flow ${formatCompact(l.free_cash_flow, cur)}, net income ${formatCompact(l.net_income, cur)}` }}>
+              <Term id="free-cash-flow">Free cash flow</Term> vs net income by year
             </ChartTitle>
             <Box>
               <BarChart data={data} margin={CHART_MARGIN}>
@@ -153,12 +158,14 @@ export function FreeCashFlowWidget({ ticker }: WidgetProps) {
                 <XAxis dataKey="label" {...CHART_AXIS} />
                 <YAxis {...CHART_AXIS} width={48} tickFormatter={(v: number) => formatCompact(v)} />
                 <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatCompact(v, cur)} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
                 <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" />
                 <Bar dataKey="fcf" name="Free cash flow" radius={[3, 3, 0, 0]}>
                   {data.map((d, i) => (
                     <Cell key={i} fill={(d.fcf ?? 0) < 0 ? C.negative : C.positive} />
                   ))}
                 </Bar>
+                <Bar dataKey="net" name="Net income" fill={C.primary} radius={[3, 3, 0, 0]} />
               </BarChart>
             </Box>
           </div>
@@ -169,6 +176,7 @@ export function FreeCashFlowWidget({ ticker }: WidgetProps) {
 }
 
 export function NetDebtWidget({ ticker }: WidgetProps) {
+  const { metric: leverage } = useHealthMetric(ticker, "net_debt_to_ebitda");
   return (
     <FinFrame ticker={ticker}>
       {(items, cur) => {
@@ -177,7 +185,7 @@ export function NetDebtWidget({ ticker }: WidgetProps) {
         const nd = l.net_debt;
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <Reading label="Cash" value={formatCompact(l.cash, cur)} />
               <Reading label="Total debt" value={formatCompact(l.total_debt, cur)} />
               <Reading
@@ -185,6 +193,13 @@ export function NetDebtWidget({ ticker }: WidgetProps) {
                 value={formatCompact(nd, cur)}
                 note={nd == null ? undefined : nd < 0 ? "Cash is larger than debt" : "Debt is larger than cash"}
               />
+              {leverage && (
+                <Reading
+                  label={<Term id="net-debt-ebitda">Net debt / EBITDA</Term>}
+                  value={formatHealthValue(leverage)}
+                  note={leverage.explanation}
+                />
+              )}
             </div>
             <ChartTitle explain={{ label: "cash versus total debt chart", ticker, value: `net debt ${formatCompact(nd, cur)}` }}>
               Cash vs total debt by year
@@ -215,7 +230,7 @@ function useHealthMetric(ticker: string, key: string) {
 
 export function CashRunwayWidget({ ticker }: WidgetProps) {
   const { metric, isLoading, isError } = useHealthMetric(ticker, "cash_runway_months");
-  const { items } = useAnnual(ticker);
+  const { items, fin } = useAnnual(ticker);
   if (isLoading) return <WidgetLoading />;
   if (isError || !metric) return <WidgetError message="Cash runway is not available for this ticker." />;
   const l = items.length ? latest(items) : undefined;
@@ -223,7 +238,7 @@ export function CashRunwayWidget({ ticker }: WidgetProps) {
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
         <Reading label={<Term id="cash-runway">Cash runway</Term>} value={formatHealthValue(metric)} />
-        <Reading label="Cash" value={formatCompact(l?.cash)} note="Latest annual statement" />
+        <Reading label="Cash" value={formatCompact(l?.cash, fin?.currency)} note="Latest annual statement" />
       </div>
       <p className="text-xs text-muted-foreground">{metric.explanation}</p>
     </div>
@@ -252,7 +267,7 @@ export function DilutionWidget({ ticker }: WidgetProps) {
               <BarChart data={data} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
                 <XAxis dataKey="label" {...CHART_AXIS} />
-                <YAxis {...CHART_AXIS} width={48} domain={["auto", "auto"]} tickFormatter={(v: number) => formatCompact(v)} />
+                <YAxis {...CHART_AXIS} width={48} domain={[0, "auto"]} tickFormatter={(v: number) => formatCompact(v)} />
                 <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatCompact(v)} />
                 <Bar dataKey="shares" name="Shares" fill={C.primary} radius={[3, 3, 0, 0]} />
               </BarChart>
@@ -261,5 +276,78 @@ export function DilutionWidget({ ticker }: WidgetProps) {
         );
       }}
     </FinFrame>
+  );
+}
+
+export function IncomeStatementWidget({ ticker }: WidgetProps) {
+  return (
+    <FinFrame ticker={ticker}>
+      {(items, cur) => {
+        const l = latest(items);
+        const data = items.map((i) => ({
+          label: yearLabel(i.period_end),
+          revenue: i.revenue ?? null,
+          operating: i.operating_income ?? null,
+          net: i.net_income ?? null,
+        }));
+        return (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <Reading label="Revenue" value={formatCompact(l.revenue, cur)} note="Latest annual statement" />
+              <Reading label="Operating income" value={formatCompact(l.operating_income, cur)} />
+              <Reading label={<Term id="net-margin">Net income</Term>} value={formatCompact(l.net_income, cur)} note={`Net margin ${formatDecimalPercent(l.net_margin)}`} />
+            </div>
+            <ChartTitle explain={{ label: "revenue, operating income and net income chart", ticker, value: `latest revenue ${formatCompact(l.revenue, cur)}, net income ${formatCompact(l.net_income, cur)}` }}>
+              Revenue, operating income and net income by year
+            </ChartTitle>
+            <Box>
+              <BarChart data={data} margin={CHART_MARGIN}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
+                <XAxis dataKey="label" {...CHART_AXIS} />
+                <YAxis {...CHART_AXIS} width={48} tickFormatter={(v: number) => formatCompact(v)} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatCompact(v, cur)} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" />
+                <Bar dataKey="revenue" name="Revenue" fill={C.primary} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="operating" name="Operating income" fill={C.amber} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="net" name="Net income" fill={C.positive} radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </Box>
+          </div>
+        );
+      }}
+    </FinFrame>
+  );
+}
+
+export function QualityScoresWidget({ ticker }: WidgetProps) {
+  const altman = useHealthMetric(ticker, "altman_z");
+  const piotroski = useHealthMetric(ticker, "piotroski_f");
+  if (altman.isLoading || piotroski.isLoading) return <WidgetLoading />;
+  if (altman.isError || (!altman.metric && !piotroski.metric)) {
+    return <WidgetError message="Quality scores are not available for this ticker (they need full financial statements)." />;
+  }
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {altman.metric && (
+          <Reading
+            label={<Term id="altman-z-score">Altman Z-score</Term>}
+            value={altman.metric.value == null ? "N/A" : altman.metric.value.toFixed(2)}
+            note={altman.metric.explanation}
+          />
+        )}
+        {piotroski.metric && (
+          <Reading
+            label={<Term id="piotroski-f-score">Piotroski F-score</Term>}
+            value={formatHealthValue(piotroski.metric)}
+            note={piotroski.metric.explanation}
+          />
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Both scores are simple summaries of the financial statements. They describe past accounts and do not predict future results.
+      </p>
+    </div>
   );
 }

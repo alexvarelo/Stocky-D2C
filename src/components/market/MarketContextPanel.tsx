@@ -13,7 +13,23 @@ const TERM_BY_KEY: Record<string, string> = {
   vix: "vix",
   us10y: "treasury-10y",
   dxy: "us-dollar-index",
+  sp500: "sp500",
 };
+
+/** One-line description per indicator. Used when the API does not send `description` yet. */
+const DESCRIPTION_BY_KEY: Record<string, string> = {
+  vix: "Volatility the options market expects for the S&P 500 over the next 30 days.",
+  us10y: "Yield on 10-year US government bonds, a reference for borrowing costs.",
+  dxy: "Value of the US dollar against a basket of major currencies.",
+  sp500: "Index of 500 large US companies, a common gauge of the US stock market.",
+};
+
+/** Optional fields the API may add (additive); read safely so this works before and after regenerating the client. */
+type IndicatorExtras = { description?: string | null; as_of?: string | null };
+
+function indicatorDescription(ind: MarketIndicator): string | null {
+  return (ind as MarketIndicator & IndicatorExtras).description ?? DESCRIPTION_BY_KEY[ind.key] ?? null;
+}
 
 export function formatIndicatorValue(ind: Pick<MarketIndicator, "value" | "unit">): string {
   if (ind.value == null || Number.isNaN(ind.value)) return "N/A";
@@ -82,20 +98,23 @@ export function PercentileBar({ value, label }: { value: number; label: string }
   );
 }
 
-function IndicatorCard({ ind }: { ind: MarketIndicator }) {
+function IndicatorCard({ ind, ctxAsOf }: { ind: MarketIndicator; ctxAsOf?: string | null }) {
   const termId = TERM_BY_KEY[ind.key];
   const change = formatChange(ind);
   const value = formatIndicatorValue(ind);
   const sma = ind.extra;
+  const description = indicatorDescription(ind);
+  const asOf = (ind as MarketIndicator & IndicatorExtras).as_of;
   const name = termId ? <Term id={termId}>{ind.label}</Term> : ind.label;
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-2xl border border-border/50 bg-card/50 p-3">
+    <div className="flex min-w-0 flex-col gap-1.5 rounded-2xl border border-border/50 bg-card/50 p-2.5 sm:gap-2 sm:p-3">
       <div className="flex items-start justify-between gap-1">
         <p className="min-w-0 text-xs text-muted-foreground">{name}</p>
         <ExplainThis
-          className="-mr-1 -mt-1"
+          className="-mr-1.5 -mt-1.5"
           context={{
             label: ind.label,
+            noun: "indicator",
             value: `${value}${change ? ` (${change} on the day)` : ""}${
               ind.percentile_1y != null ? `, 1-year percentile ${Math.round(ind.percentile_1y)}` : ""
             }`,
@@ -103,7 +122,7 @@ function IndicatorCard({ ind }: { ind: MarketIndicator }) {
         />
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-xl font-semibold tabular-nums">{value}</span>
+        <span className="text-lg font-semibold tabular-nums sm:text-xl">{value}</span>
         {change && (
           <span
             className={cn(
@@ -115,23 +134,25 @@ function IndicatorCard({ ind }: { ind: MarketIndicator }) {
           </span>
         )}
       </div>
-      {ind.sparkline && ind.sparkline.length > 1 && <Sparkline values={ind.sparkline} />}
+      {description && <p className="text-[11px] leading-snug text-muted-foreground">{description}</p>}
+      {ind.sparkline && ind.sparkline.length > 1 && <Sparkline values={ind.sparkline} className="h-5 sm:h-7" />}
       {ind.percentile_1y != null && <PercentileBar value={ind.percentile_1y} label={`${ind.label} 1-year percentile`} />}
       {sma && (sma.sma50_distance != null || sma.sma200_distance != null) && (
         <p className="text-[11px] text-muted-foreground tabular-nums">
           vs <Term id="sma">SMA</Term>50 {fmtPctDist(sma.sma50_distance)} · SMA200 {fmtPctDist(sma.sma200_distance)}
         </p>
       )}
-      {ind.reading && <p className="text-xs text-muted-foreground">{ind.reading}</p>}
+      {ind.reading && <p className="hidden text-xs text-muted-foreground sm:block">{ind.reading}</p>}
+      {asOf && asOf !== ctxAsOf && <p className="text-[10px] text-muted-foreground">As of {asOf}</p>}
     </div>
   );
 }
 
 function PanelSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-busy="true">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4" aria-busy="true">
       {[0, 1, 2, 3].map((i) => (
-        <Skeleton key={i} className="h-40 rounded-2xl" />
+        <Skeleton key={i} className="h-32 rounded-2xl sm:h-40" />
       ))}
     </div>
   );
@@ -165,9 +186,9 @@ export function MarketContextPanel({ className }: { className?: string }) {
           <PanelSkeleton />
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
               {ctx.indicators.map((ind) => (
-                <IndicatorCard key={ind.key} ind={ind} />
+                <IndicatorCard key={ind.key} ind={ind} ctxAsOf={ctx.as_of} />
               ))}
             </div>
             {ctx.breadth && (

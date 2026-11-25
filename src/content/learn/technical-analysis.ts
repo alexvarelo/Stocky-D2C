@@ -36,7 +36,7 @@ Seeing trends everywhere. Random price series naturally produce streaks that loo
     liveExample: {
       id: "moving-averages",
       ticker: "AAPL",
-      caption: "See how price sits relative to its moving averages over different ranges.",
+      caption: "See how price sits relative to its 50 and 200-day moving averages over the last year.",
     },
     glossaryIds: ["sma", "support-resistance", "volume"],
     quiz: [
@@ -117,9 +117,9 @@ The live example shows the 50 and 200-day averages for an example ticker, which 
 
 Believing the 50 or 200-day lines act as magic barriers. Price often passes through them, and their influence, to the extent there is any, is partly because many participants watch them. Another mistake is choosing the length that best fits past data, which tends to fail on new data.`,
     liveExample: {
-      id: "moving-averages",
+      id: "sma-ema",
       ticker: "AAPL",
-      caption: "Overlay 50 and 200-day SMA and EMA on an example chart.",
+      caption: "Compare the 50 and 200-day simple averages with the faster 12 and 26-day exponential averages on an example chart.",
     },
     glossaryIds: ["sma", "ema", "ma-crossover"],
     quiz: [
@@ -200,7 +200,7 @@ Treating a cross as an instruction to act. It is a description of the relationsh
     liveExample: {
       id: "moving-averages",
       ticker: "SPY",
-      caption: "Find the dates when the 50-day and 200-day averages crossed on an example chart.",
+      caption: "See where the 50-day and 200-day averages cross on an example one-year chart, and whether a crossover happened recently.",
     },
     glossaryIds: ["ma-crossover", "sma", "ema"],
     quiz: [
@@ -674,7 +674,7 @@ Switching time frames until you find the one that confirms what you already beli
     liveExample: {
       id: "moving-averages",
       ticker: "SPY",
-      caption: "Switch between daily, weekly and monthly views of an example chart.",
+      caption: "See a one-year daily view of an example chart. Other timeframes show different patterns; the Technicals tab of any stock lets you change the period.",
     },
     glossaryIds: ["volatility", "rsi", "sma"],
     quiz: [
@@ -750,6 +750,11 @@ Example tickers in this course are illustrations and not recommendations.
 ## Common mistake
 
 Looking for certainty. Adding more indicators to a chart can create a feeling of precision while the underlying uncertainty remains. Another mistake is ignoring costs and taxes of frequent trading, which can erase the small edge a rule appears to have. Be skeptical of anyone promising a pattern that always works.`,
+    liveExample: {
+      id: "rsi",
+      ticker: "AAPL",
+      caption: "See how the RSI of an example ticker can stay above 70 or below 30 for long stretches. A single indicator is not a forecast.",
+    },
     glossaryIds: ["rsi", "macd", "bollinger-bands", "sma", "volatility"],
     quiz: [
       {

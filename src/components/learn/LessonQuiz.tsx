@@ -1,9 +1,37 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CheckCircle2, RotateCcw, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Lesson } from "@/content/learn";
 import { cn } from "@/lib/utils";
+
+/** Small deterministic PRNG (mulberry32) seeded from a string, so option order is stable across renders. */
+function seededRandom(seed: string) {
+  let h = 1779033703 ^ seed.length;
+  for (let i = 0; i < seed.length; i++) {
+    h = Math.imul(h ^ seed.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  let a = h >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Option indices in a shuffled but deterministic order (per question id). */
+function shuffledOrder(questionId: string, length: number): number[] {
+  const order = Array.from({ length }, (_, i) => i);
+  const rnd = seededRandom(questionId);
+  for (let i = length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
 
 interface Props {
   lesson: Lesson;
@@ -15,6 +43,9 @@ export function LessonQuiz({ lesson, onComplete }: Props) {
   const [answers, setAnswers] = useState<(number | null)[]>([null, null, null]);
   const [submitted, setSubmitted] = useState(false);
   const [attempt, setAttempt] = useState(0);
+
+  // order[qi][displayPosition] = original option index. Answers are stored as original indices.
+  const orders = useMemo(() => lesson.quiz.map((q) => shuffledOrder(q.id, q.options.length)), [lesson]);
 
   const score = lesson.quiz.reduce((n, q, i) => n + (answers[i] === q.correctIndex ? 1 : 0), 0);
   const allAnswered = answers.every((a) => a !== null);
@@ -44,7 +75,8 @@ export function LessonQuiz({ lesson, onComplete }: Props) {
                 {qi + 1}. {q.prompt}
               </legend>
               <div className="space-y-1.5">
-                {q.options.map((opt, oi) => {
+                {orders[qi].map((oi) => {
+                  const opt = q.options[oi];
                   const isPicked = picked === oi;
                   const isCorrect = submitted && oi === q.correctIndex;
                   const isWrong = submitted && isPicked && oi !== q.correctIndex;

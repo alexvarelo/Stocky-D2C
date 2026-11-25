@@ -14,7 +14,14 @@ interface StockyChatContextValue {
   openWithDraft: (_text: string) => void;
 }
 
+interface StockyChatActions {
+  /** Opens the chat and prefills the input. It never sends the message. */
+  openWithDraft: (_text: string) => void;
+}
+
 const StockyChatContext = createContext<StockyChatContextValue | null>(null);
+/** Stable actions only: consumers (e.g. ExplainThis buttons) do not re-render when the chat opens or closes. */
+const StockyChatActionsContext = createContext<StockyChatActions | null>(null);
 
 export function StockyChatProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -26,11 +33,23 @@ export function StockyChatProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(() => ({ open, setOpen, draft, openWithDraft }), [open, draft, openWithDraft]);
-  return <StockyChatContext.Provider value={value}>{children}</StockyChatContext.Provider>;
+  const actions = useMemo(() => ({ openWithDraft }), [openWithDraft]);
+  return (
+    <StockyChatActionsContext.Provider value={actions}>
+      <StockyChatContext.Provider value={value}>{children}</StockyChatContext.Provider>
+    </StockyChatActionsContext.Provider>
+  );
 }
 
 /** Returns null outside the provider, so callers can hide chat-dependent UI. */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useStockyChat() {
   return useContext(StockyChatContext);
+}
+
+
+/** Returns null outside the provider. Does not change when the chat opens or closes. */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useStockyChatActions() {
+  return useContext(StockyChatActionsContext);
 }

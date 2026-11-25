@@ -32,6 +32,11 @@ For example, if a company with 100 million shares trades at 20 per share, the ma
 A common mistake is treating the share price as a measure of how "cheap" or "expensive" a company is. A 10 share is not automatically cheaper than a 500 share. The price per share depends on how many shares exist, which the company can change through splits or new issues. To compare companies you need to look at value relative to earnings, sales or assets, not at the raw price.
 
 Companies named in this course are illustrations only and are not recommendations.`,
+    liveExample: {
+      id: "price-snapshot",
+      ticker: "AAPL",
+      caption: "See the price of one share of an example company, its total market value and the number of shares they imply.",
+    },
     glossaryIds: ["market-cap", "total-return", "eps"],
     quiz: [
       {
@@ -107,9 +112,9 @@ Confusing market cap with what a company is "worth" in an absolute sense. Market
 
 Tickers mentioned are illustrations, not recommendations.`,
     liveExample: {
-      id: "pe-ratio",
+      id: "price-snapshot",
       ticker: "AAPL",
-      caption: "See the market cap and valuation of an example ticker next to its earnings.",
+      caption: "See the share price and market cap of an example ticker, and the number of shares they imply.",
     },
     glossaryIds: ["market-cap", "enterprise-value", "price-to-sales"],
     quiz: [
@@ -180,14 +185,14 @@ For this reason, the average of yearly returns can be misleading. Two investment
 
 Costs and taxes also compound, but against you. A small yearly fee reduces the base that grows in every following year.
 
-The illustration below uses hypothetical rates. Historical returns are not a guarantee, and past performance does not predict future results.
+The calculator below uses hypothetical rates that you choose. Historical returns are not a guarantee, and past performance does not predict future results.
 
 ## Common mistake
 
 Assuming a historical average return will repeat smoothly. Markets can go through long flat or negative periods, and the order of returns matters, especially when you add or withdraw money. Another mistake is ignoring the effect of large losses: protecting against deep drawdowns matters because the math of recovery is asymmetric.`,
     liveExample: {
       id: "compound-growth",
-      caption: "Change the rate, time and contributions to see how compounding and costs play out.",
+      caption: "An illustration with your own assumptions, not market data: change the rate, time, contributions and yearly fee to see how compounding and costs play out.",
     },
     glossaryIds: ["cagr", "annual-return", "total-return"],
     quiz: [
@@ -255,6 +260,11 @@ Dividends may also be taxed differently depending on your country, so check the 
 ## Common mistake
 
 Judging a stock only by its yield. A high dividend yield can be a warning sign as well as a feature, and a company with no dividend can still deliver strong returns through growth. Compare dividends with free cash flow and the payout ratio before drawing conclusions. Examples are illustrations, not recommendations.`,
+    liveExample: {
+      id: "dividend-yield",
+      ticker: "KO",
+      caption: "See the dividend yield an example company reports today, and the yearly dividend per share it implies. Some companies pay nothing.",
+    },
     glossaryIds: ["dividend-yield", "payout-ratio", "ex-dividend-date"],
     quiz: [
       {
@@ -324,6 +334,11 @@ Tickers or indices cited in this course are illustrations only.
 ## Common mistake
 
 Assuming that "diversified" automatically means "low risk", or that a fund with many holdings is spread out evenly. Check what is inside: a fund can be concentrated in one sector or in a handful of companies. Another mistake is comparing funds only by past performance, when costs, structure and what they hold are more informative, and past performance does not predict future results.`,
+    liveExample: {
+      id: "etf-vs-stock",
+      ticker: "TSLA",
+      caption: "Compare the volatility and largest fall of one example stock with SPY, a fund that tracks the S&P 500.",
+    },
     glossaryIds: ["benchmark", "diversification", "total-return"],
     quiz: [
       {
@@ -394,14 +409,14 @@ Diversification reduces the risk specific to a single company, such as a failed 
 
 There is also a cost: a diversified portfolio will not capture the full gain of the single best performer. That is a trade-off, not a flaw.
 
-Use the live example to see how concentrated an example portfolio is. It is an illustration and not personal advice.
+Use the calculator to see how the number of holdings and their correlation change volatility under assumptions you choose. It is an illustration and not personal advice.
 
 ## Common mistake
 
 Confusing number of holdings with diversification. Owning many positions that all react to the same factor, such as interest rates or one technology theme, gives less protection than it appears. Another mistake is thinking diversification guarantees no losses. It reduces the odds that one event does major damage; it does not eliminate risk.`,
     liveExample: {
       id: "diversification",
-      caption: "Check how concentrated your holdings are by weight and effective number of positions.",
+      caption: "An illustration with your own assumptions, not market data: see how portfolio volatility changes with the number of equal-sized holdings and how correlated they are.",
     },
     glossaryIds: ["diversification", "correlation", "concentration-hhi", "effective-positions"],
     quiz: [
@@ -480,7 +495,7 @@ The figures here are hypothetical examples, not predictions.
 Ignoring costs because they look small in percentage terms or are not shown as a separate bill. Many fees are deducted inside the fund price, so you never see an invoice. Another mistake is looking only at the headline fee and overlooking spreads, currency charges and taxes.`,
     liveExample: {
       id: "compound-growth",
-      caption: "Compare growth with and without a yearly fee to see the long-term effect.",
+      caption: "An illustration with your own assumptions, not market data: set a yearly fee and compare the balance with and without it.",
     },
     glossaryIds: ["annual-return", "cagr", "total-return"],
     quiz: [
@@ -557,7 +572,7 @@ Zooming into a short window and drawing big conclusions. A few days of data can 
     liveExample: {
       id: "volume",
       ticker: "MSFT",
-      caption: "Switch the range and interval on an example chart and see how the picture changes.",
+      caption: "See an example stock's volume and average volume over the last year. The Technicals tab of any stock lets you change the period.",
     },
     glossaryIds: ["volume", "volatility", "max-drawdown"],
     quiz: [

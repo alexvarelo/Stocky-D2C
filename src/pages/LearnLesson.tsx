@@ -52,7 +52,12 @@ export default function LearnLesson() {
         </p>
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">{lesson.title}</h1>
-          {done && <CheckCircle2 className="mt-1.5 h-5 w-5 shrink-0 text-emerald-500" aria-label="Completed" />}
+          {done && (
+            <span className="mt-1.5 flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+              {progress[lesson.id]?.score != null && <span className="tabular-nums">Best score {progress[lesson.id].score} / 3</span>}
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-label="Completed" />
+            </span>
+          )}
         </div>
         <p className="text-sm text-muted-foreground">{lesson.summary}</p>
       </header>
@@ -76,7 +81,7 @@ export default function LearnLesson() {
 
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <span>Still unclear? Ask Stocky to explain it.</span>
-        <ExplainThis context={{ label: `the lesson "${lesson.title}"` }} />
+        <ExplainThis context={{ label: `the lesson "${lesson.title}"`, noun: "lesson" }} />
       </div>
 
       <LessonQuiz

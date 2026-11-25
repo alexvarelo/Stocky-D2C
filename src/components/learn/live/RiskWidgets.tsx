@@ -83,11 +83,27 @@ export function DrawdownWidget({ ticker }: WidgetProps) {
   if (isError || rows.length < 2) return <WidgetError />;
   const worst = Math.min(...rows.map((r) => r.dd));
   const current = rows[rows.length - 1].dd;
+  const troughIdx = rows.findIndex((r) => r.dd === worst);
+  let peakIdx = troughIdx;
+  while (peakIdx > 0 && rows[peakIdx].dd < 0) peakIdx--;
+  const recoveryIdx = worst < 0 ? rows.findIndex((r, i) => i > troughIdx && r.dd >= 0) : -1;
+  const days = (a: string, b: string) => Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000);
+  const recoveryNote =
+    worst >= 0
+      ? undefined
+      : recoveryIdx >= 0
+        ? `Fell for ${days(rows[peakIdx].date, rows[troughIdx].date)} days, then took ${days(rows[troughIdx].date, rows[recoveryIdx].date)} days to get back to the old high`
+        : `Fell for ${days(rows[peakIdx].date, rows[troughIdx].date)} days; not back at the old high yet`;
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <Reading label={<Term id="max-drawdown">Max drawdown (1 year)</Term>} value={`${worst.toFixed(1)}%`} note={describeDrawdown(worst / 100)} />
         <Reading label="Currently below its peak by" value={`${Math.abs(current).toFixed(1)}%`} />
+        <Reading
+          label="Recovery"
+          value={worst >= 0 ? "N/A" : recoveryIdx >= 0 ? `${days(rows[troughIdx].date, rows[recoveryIdx].date)} days` : "Not yet"}
+          note={recoveryNote}
+        />
       </div>
       <ChartTitle explain={{ label: "drawdown chart", ticker, value: `max drawdown ${worst.toFixed(1)}%` }}>
         Fall from the previous high over the last year
@@ -140,6 +156,34 @@ export function CorrelationWidget({ ticker }: WidgetProps) {
           <ExplainThis context={{ label: `correlation between ${ticker} and ${other}`, value: corr.toFixed(2) }} />
         </div>
       )}
+    </div>
+  );
+}
+
+/** Volatility of one stock next to SPY (a broad index fund), both from the same risk endpoint. */
+export function EtfVsStockWidget({ ticker }: WidgetProps) {
+  const stock = useSingleRisk([ticker]);
+  const index = useSingleRisk(["SPY"]);
+  if (stock.isLoading || index.isLoading) return <WidgetLoading />;
+  const sv = stock.data?.volatility_annual;
+  const iv = index.data?.volatility_annual;
+  if (sv == null || iv == null) return <WidgetError message="Not enough price history to compare these two." />;
+  const sd = stock.data?.max_drawdown;
+  const id = index.data?.max_drawdown;
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        <Reading label={<Term id="volatility">{ticker} volatility</Term>} value={fmtPct(sv)} note="Annualised, 1 year" />
+        <Reading label={<Term id="volatility">SPY volatility</Term>} value={fmtPct(iv)} note="S&P 500 index fund" />
+        <Reading label={<Term id="max-drawdown">{ticker} max drawdown</Term>} value={sd == null ? "N/A" : fmtPct(sd)} />
+        <Reading label={<Term id="max-drawdown">SPY max drawdown</Term>} value={id == null ? "N/A" : fmtPct(id)} />
+      </div>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs text-muted-foreground">
+          An index fund holds hundreds of companies, so the swings of any single one are partly offset by the others. One year of data is a small sample, and a single stock can sometimes be calmer than the index.
+        </p>
+        <ExplainThis context={{ label: `volatility of ${ticker} compared with the S&P 500 index fund SPY`, noun: "comparison", value: `${fmtPct(sv)} versus ${fmtPct(iv)}` }} />
+      </div>
     </div>
   );
 }

@@ -109,14 +109,14 @@ Diversification reduces the risk specific to individual holdings, but it cannot 
 
 Past correlations do not predict future ones, and the live example is only a snapshot of history.
 
-The example portfolio and tickers are for illustration only and are not personal advice.
+The example tickers are for illustration only and are not personal advice.
 
 ## Common mistake
 
 Believing that holding many assets automatically means being diversified. If they are highly correlated, the portfolio behaves like a single bet. Another mistake is assuming that today's low correlation will hold in a crisis. Reviewing correlations periodically, and particularly looking at how they behaved in previous downturns, gives a more cautious picture.`,
     liveExample: {
       id: "correlation",
-      caption: "View the correlation between the holdings of an example portfolio.",
+      caption: "View the correlation between two tickers of your choice over the last year (SPY by default).",
     },
     glossaryIds: ["correlation", "diversification", "effective-positions", "concentration-hhi"],
     quiz: [
@@ -193,7 +193,7 @@ Looking only at returns and ignoring the path. Two investments can end with the 
     liveExample: {
       id: "drawdown",
       ticker: "SPY",
-      caption: "See the maximum drawdown and recovery time of an example ticker.",
+      caption: "See the maximum drawdown over the last year and how many days the price took to get back to its old high.",
     },
     glossaryIds: ["max-drawdown", "volatility", "sharpe-ratio", "sortino-ratio"],
     quiz: [
@@ -256,6 +256,11 @@ Past performance does not predict future results, and examples here are not advi
 ## Common mistake
 
 Averaging down to "get back to even". This links the decision to your entry price, which is irrelevant to the company's prospects. Another mistake is doing it without limits, so that a single idea ends up dominating the portfolio. Setting maximum position sizes in advance helps avoid this.`,
+    liveExample: {
+      id: "drawdown",
+      ticker: "SPY",
+      caption: "See how far an example ticker fell from its previous high over the last year and how long it took to recover. A fall can go further than expected, and adding to a position raises exposure to it.",
+    },
     glossaryIds: ["dollar-cost-averaging", "concentration-hhi", "rebalancing"],
     quiz: [
       {
@@ -329,6 +334,11 @@ Past performance does not predict future results, and a good outcome does not pr
 ## Common mistake
 
 Thinking biases only affect other people. Experienced professionals are also subject to them. Another mistake is treating a bad outcome as proof that the decision was wrong. Separating decision quality from results, which include chance, is a key part of learning.`,
+    liveExample: {
+      id: "volatility",
+      ticker: "TSLA",
+      caption: "See how large the yearly swings of an example ticker are. Bigger swings test emotional discipline more often.",
+    },
     glossaryIds: ["rebalancing", "dollar-cost-averaging", "diversification"],
     quiz: [
       {

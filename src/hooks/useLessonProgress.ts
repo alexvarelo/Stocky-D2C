@@ -38,12 +38,16 @@ export function useSaveQuizResult() {
   return useMutation({
     mutationFn: async ({ lessonId, score }: QuizResult) => {
       if (!user?.id) throw new Error("Sign in to save your progress.");
-      const { data: existing } = await supabase
+      const cached = queryClient.getQueryData<Record<string, LessonProgressRow>>([KEY, user.id])?.[lessonId];
+      const { data: fetched, error: selectError } = await supabase
         .from("lesson_progress")
         .select("score, attempts")
         .eq("user_id", user.id)
         .eq("lesson_id", lessonId)
         .maybeSingle();
+      // Never overwrite the best score / attempt count if we could not read them.
+      if (selectError) throw selectError;
+      const existing = fetched ?? (cached ? { score: cached.score, attempts: cached.attempts } : null);
       const best = Math.max(existing?.score ?? 0, score);
       const { error } = await supabase.from("lesson_progress").upsert(
         {

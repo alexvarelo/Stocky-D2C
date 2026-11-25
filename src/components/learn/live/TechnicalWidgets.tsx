@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Area,
   Bar,
@@ -27,8 +27,6 @@ import {
   type WidgetProps,
 } from "./shared";
 
-const MAX_POINTS = 130;
-
 function useTechnicals(ticker: string) {
   const q = useStockTechnicalsApiV1StockTickerTechnicalsGet(
     ticker,
@@ -38,7 +36,7 @@ function useTechnicals(ticker: string) {
   const tech = q.data?.data as TechnicalsResponse | undefined;
   const rows = useMemo<(TechnicalPoint & { bb?: [number, number] | null })[]>(
     () =>
-      (tech?.series ?? []).slice(-MAX_POINTS).map((p) => ({
+      (tech?.series ?? []).map((p) => ({
         ...p,
         bb: p.bb_lower != null && p.bb_upper != null ? [p.bb_lower, p.bb_upper] : null,
       })),
@@ -109,7 +107,8 @@ export function RsiWidget({ ticker }: WidgetProps) {
   );
 }
 
-export function MovingAveragesWidget({ ticker }: WidgetProps) {
+export function MovingAveragesWidget({ ticker, withEma = false }: WidgetProps & { withEma?: boolean }) {
+  const [showEma, setShowEma] = useState(withEma);
   return (
     <Frame ticker={ticker}>
       {(tech, rows) => {
@@ -130,8 +129,12 @@ export function MovingAveragesWidget({ ticker }: WidgetProps) {
             <ChartTitle
               explain={{ label: "price with 50 and 200 day moving averages", ticker, value: `last close ${fmtNum(l.close)}` }}
             >
-              Close, <Term id="sma">SMA</Term> 50 and 200
+              Close, <Term id="sma">SMA</Term> 50 and 200{showEma && <>, <Term id="ema">EMA</Term> 12 and 26</>}
             </ChartTitle>
+            <label className="flex min-h-6 items-center gap-2 text-xs text-muted-foreground">
+              <input type="checkbox" className="h-4 w-4 accent-primary" checked={showEma} onChange={(e) => setShowEma(e.target.checked)} />
+              Also show 12 and 26-day exponential averages (EMA)
+            </label>
             <Box>
               <ComposedChart data={rows} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
@@ -141,6 +144,8 @@ export function MovingAveragesWidget({ ticker }: WidgetProps) {
                 <Line dataKey="close" name="Close" stroke="#10b981" strokeWidth={2} dot={false} isAnimationActive={false} />
                 <Line dataKey="sma50" name="SMA 50" stroke="#3b82f6" strokeWidth={1.25} dot={false} connectNulls isAnimationActive={false} />
                 <Line dataKey="sma200" name="SMA 200" stroke="#a855f7" strokeWidth={1.25} dot={false} connectNulls isAnimationActive={false} />
+                {showEma && <Line dataKey="ema12" name="EMA 12" stroke="#f59e0b" strokeWidth={1.25} strokeDasharray="4 3" dot={false} connectNulls isAnimationActive={false} />}
+                {showEma && <Line dataKey="ema26" name="EMA 26" stroke="#ef4444" strokeWidth={1.25} strokeDasharray="4 3" dot={false} connectNulls isAnimationActive={false} />}
               </ComposedChart>
             </Box>
           </div>
@@ -149,6 +154,8 @@ export function MovingAveragesWidget({ ticker }: WidgetProps) {
     </Frame>
   );
 }
+
+export const SmaEmaWidget = (props: WidgetProps) => <MovingAveragesWidget {...props} withEma />;
 
 export function MacdWidget({ ticker }: WidgetProps) {
   return (
@@ -282,11 +289,11 @@ export function SupportResistanceWidget({ ticker }: WidgetProps) {
             <div className="grid grid-cols-2 gap-2">
               <Reading
                 label={<Term id="support-resistance">Support levels</Term>}
-                value={support.length ? support.map((v) => fmtNum(v, 0)).join(", ") : "None found"}
+                value={support.length ? support.map((v) => fmtNum(v, 2)).join(", ") : "None found"}
               />
               <Reading
                 label={<Term id="support-resistance">Resistance levels</Term>}
-                value={resistance.length ? resistance.map((v) => fmtNum(v, 0)).join(", ") : "None found"}
+                value={resistance.length ? resistance.map((v) => fmtNum(v, 2)).join(", ") : "None found"}
               />
             </div>
             <ChartTitle explain={{ label: "price chart with support and resistance levels", ticker, value: `last close ${fmtNum(tech.latest.close)}` }}>
@@ -300,10 +307,10 @@ export function SupportResistanceWidget({ ticker }: WidgetProps) {
                 <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v)} />
                 <Line dataKey="close" name="Close" stroke="#10b981" strokeWidth={2} dot={false} isAnimationActive={false} />
                 {support.map((y) => (
-                  <ReferenceLine key={`s${y}`} y={y} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
+                  <ReferenceLine key={`s${y}`} y={y} ifOverflow="extendDomain" stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
                 ))}
                 {resistance.map((y) => (
-                  <ReferenceLine key={`r${y}`} y={y} stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
+                  <ReferenceLine key={`r${y}`} y={y} ifOverflow="extendDomain" stroke="#94a3b8" strokeDasharray="4 4" strokeOpacity={0.7} />
                 ))}
               </ComposedChart>
             </Box>

@@ -1,11 +1,13 @@
 import { Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useStockyChat } from "@/contexts/StockyChatContext";
+import { useStockyChatActions } from "@/contexts/StockyChatContext";
 import { cn } from "@/lib/utils";
 
 export interface ExplainContext {
   /** What is being shown, e.g. "RSI (14)" or "Revenue vs Net income chart". */
   label: string;
+  /** What kind of thing is shown ("chart", "indicator", "calculator", "lesson"...). Defaults to "chart/metric". */
+  noun?: string;
   ticker?: string;
   /** Current value as already formatted for display. */
   value?: string;
@@ -13,8 +15,8 @@ export interface ExplainContext {
   detail?: string;
 }
 
-export function buildExplainPrompt({ label, ticker, value, detail }: ExplainContext): string {
-  const parts = [`Explain what this chart/metric shows: ${label}`];
+export function buildExplainPrompt({ label, noun, ticker, value, detail }: ExplainContext): string {
+  const parts = [`Explain what this ${noun ?? "chart/metric"} shows: ${label}`];
   if (ticker) parts[0] += ` for ${ticker}`;
   if (value) parts.push(`current value ${value}`);
   if (detail) parts.push(detail);
@@ -28,7 +30,7 @@ interface ExplainThisProps {
 
 /** Small icon button that opens Stocky with a neutral, prefilled question. Do not nest it inside another button. */
 export function ExplainThis({ context, className }: ExplainThisProps) {
-  const chat = useStockyChat();
+  const chat = useStockyChatActions();
   if (!chat) return null;
   return (
     <Tooltip>
@@ -38,7 +40,7 @@ export function ExplainThis({ context, className }: ExplainThisProps) {
           aria-label={`Explain this: ${context.label}`}
           onClick={() => chat.openWithDraft(buildExplainPrompt(context))}
           className={cn(
-            "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "inline-flex h-7 min-h-6 w-7 min-w-6 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             className,
           )}
         >

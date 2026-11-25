@@ -782,7 +782,7 @@ export type Database = {
       lesson_progress: {
         Row: {
           attempts: number
-          completed_at: string | null
+          completed_at: string
           created_at: string
           id: string
           lesson_id: string

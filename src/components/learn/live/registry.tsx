@@ -1,17 +1,27 @@
 import type { ComponentType } from "react";
 import type { LiveExampleId } from "@/content/learn";
 import type { WidgetProps } from "./shared";
-import { BollingerWidget, MacdWidget, MovingAveragesWidget, RsiWidget, SupportResistanceWidget, VolumeWidget } from "./TechnicalWidgets";
+import { BollingerWidget, MacdWidget, MovingAveragesWidget, RsiWidget, SmaEmaWidget, SupportResistanceWidget, VolumeWidget } from "./TechnicalWidgets";
 import {
   CashRunwayWidget,
   DilutionWidget,
   FreeCashFlowWidget,
+  IncomeStatementWidget,
   MarginsWidget,
   NetDebtWidget,
   PeRatioWidget,
+  QualityScoresWidget,
 } from "./FinancialWidgets";
-import { DollarIndexWidget, MarketBreadthWidget, Treasury10yWidget, VixWidget, YieldCurveWidget } from "./MarketWidgets";
-import { BetaWidget, CorrelationWidget, DrawdownWidget, VolatilityWidget } from "./RiskWidgets";
+import {
+  DollarIndexWidget,
+  MarketBreadthWidget,
+  Sp500TrendWidget,
+  Treasury10yWidget,
+  VixWidget,
+  YieldCurveWidget,
+} from "./MarketWidgets";
+import { BetaWidget, CorrelationWidget, DrawdownWidget, EtfVsStockWidget, VolatilityWidget } from "./RiskWidgets";
+import { DividendYieldWidget, PriceSnapshotWidget, ValueGrowthCompareWidget } from "./StockWidgets";
 import { CompoundGrowthWidget, DiversificationWidget } from "./Calculators";
 
 export interface LiveWidgetDef {
@@ -42,6 +52,14 @@ export const LIVE_WIDGETS: Record<LiveExampleId, LiveWidgetDef> = {
   "yield-curve": { Component: YieldCurveWidget, usesTicker: false },
   "dollar-index": { Component: DollarIndexWidget, usesTicker: false },
   "market-breadth": { Component: MarketBreadthWidget, usesTicker: false },
+  "sma-ema": { Component: SmaEmaWidget, usesTicker: true },
+  "price-snapshot": { Component: PriceSnapshotWidget, usesTicker: true },
+  "dividend-yield": { Component: DividendYieldWidget, usesTicker: true },
+  "etf-vs-stock": { Component: EtfVsStockWidget, usesTicker: true },
+  "income-statement": { Component: IncomeStatementWidget, usesTicker: true },
+  "value-growth-compare": { Component: ValueGrowthCompareWidget, usesTicker: true },
+  "quality-scores": { Component: QualityScoresWidget, usesTicker: true },
+  "sp500-trend": { Component: Sp500TrendWidget, usesTicker: false },
   "compound-growth": { Component: CompoundGrowthWidget, usesTicker: false },
   diversification: { Component: DiversificationWidget, usesTicker: false },
 };

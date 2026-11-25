@@ -57,7 +57,7 @@ export function ChartTitle({ children, explain }: { children: ReactNode; explain
   return (
     <div className="flex items-center gap-1 text-xs text-muted-foreground">
       <span>{children}</span>
-      <ExplainThis className="h-5 w-5" context={explain} />
+      <ExplainThis context={explain} />
     </div>
   );
 }

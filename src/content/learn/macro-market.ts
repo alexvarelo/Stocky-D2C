@@ -106,6 +106,10 @@ This lesson is educational and does not suggest any position on inflation protec
 ## Common mistake
 
 Ignoring inflation when comparing returns, or assuming one specific asset is always an inflation hedge. Results vary by period and country, and past behavior does not predict future results. Another mistake is confusing a fall in the inflation rate (disinflation) with a fall in prices (deflation): prices are still rising, only more slowly.`,
+    liveExample: {
+      id: "treasury-10y",
+      caption: "See the 10-year US Treasury yield, which reflects investors' expectations for inflation and interest rates among other things. It is a nominal yield and not an inflation measure itself.",
+    },
     glossaryIds: ["annual-return", "cagr", "treasury-10y"],
     quiz: [
       {
@@ -247,14 +251,14 @@ The curve also affects banks, which typically borrow short and lend long, so a f
 
 For example, if the 2-year yield is 4.5% and the 10-year is 4.0%, the 10y-2y spread is -0.5 percentage points, which is an inversion.
 
-The live example shows the current spread and its history, for information only.
+The live example shows the 10-year yield (the spread itself needs short-term yields, which are not available yet), for information only.
 
 ## Common mistake
 
 Using an inversion as a timing signal for the stock market. Stocks have risen and fallen in many ways after inversions, and past episodes do not predict the next. Another mistake is mixing definitions: different spreads (10y-2y, 10y-3m) can differ in sign at the same time.`,
     liveExample: {
       id: "yield-curve",
-      caption: "Compare short and long-term yields and see whether the curve is normal or inverted.",
+      caption: "See the 10-year US Treasury yield and where it sits in its one-year range. Shorter maturities are not available yet, so the curve itself cannot be drawn.",
     },
     glossaryIds: ["yield-curve", "treasury-10y"],
     quiz: [
@@ -392,14 +396,14 @@ Breadth should be read with context: the size of the index components, the secto
 
 Breadth is a description of participation, not a reliable signal by itself. Past patterns do not predict future results.
 
-The live example shows the share of S&P 500 stocks above their 200-day average where available, as a piece of information and not a call to act.
+The live example shows how far the S&P 500 index is from its 200-day average, since breadth data is not available yet. It is a piece of information and not a call to act.
 
 ## Common mistake
 
 Equating an index's level with the health of the "average" stock. The headline index and the typical stock can behave differently. Another mistake is using weak breadth as a prediction that a fall is imminent, when it has often persisted without one.`,
     liveExample: {
-      id: "market-breadth",
-      caption: "See how many S&P 500 stocks trade above their 200-day average.",
+      id: "sp500-trend",
+      caption: "See how far the S&P 500 sits from its 200 and 50-day averages. Breadth across individual stocks is not available yet, so this shows only the index itself.",
     },
     glossaryIds: ["market-breadth", "sma", "benchmark"],
     quiz: [

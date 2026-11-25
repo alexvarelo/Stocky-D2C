@@ -294,7 +294,6 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
             <p className="flex items-center gap-1 px-1 text-[11px] text-muted-foreground sm:px-0">
               <Term id="volume">Volume</Term>
               <ExplainThis
-                className="h-5 w-5"
                 context={{ label: "volume chart", ticker, value: `20-day average volume ${fmtCompact(latest.avg_volume_20)}` }}
               />
             </p>
@@ -313,7 +312,6 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
             <p className="flex items-center gap-1 px-1 text-[11px] text-muted-foreground sm:px-0">
               <Term id="rsi">RSI (14)</Term>
               <ExplainThis
-                className="h-5 w-5"
                 context={{ label: "RSI (14)", ticker, value: fmtNum(rsi, 1) }}
               />
             </p>
@@ -335,7 +333,6 @@ export default function TechnicalTab({ ticker, currency }: TechnicalTabProps) {
             <p className="flex items-center gap-1 px-1 text-[11px] text-muted-foreground sm:px-0">
               <Term id="macd">MACD (12, 26, 9)</Term>
               <ExplainThis
-                className="h-5 w-5"
                 context={{
                   label: "MACD (12, 26, 9)",
                   ticker,

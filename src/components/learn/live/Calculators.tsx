@@ -32,21 +32,27 @@ export function CompoundGrowthWidget() {
   const [monthly, setMonthly] = useState(100);
   const [rate, setRate] = useState(6);
   const [years, setYears] = useState(20);
+  const [fee, setFee] = useState(0);
 
-  const { rows, final, invested } = useMemo(() => {
+  const { rows, final, invested, finalNoFee } = useMemo(() => {
     const s = clamp(start, 0, 1e9);
     const m = clamp(monthly, 0, 1e7);
     const r = clamp(rate, -50, 50) / 100;
+    const f = clamp(fee, 0, 10) / 100;
     const y = Math.round(clamp(years, 1, 60));
     const mr = Math.pow(1 + r, 1 / 12) - 1;
+    // The yearly fee is taken off the return each year (a simple net-return approximation).
+    const mrNet = Math.pow(Math.max(1 + r - f, 0.0001), 1 / 12) - 1;
     let bal = s;
-    const out = [{ year: 0, balance: s, invested: s }];
+    let gross = s;
+    const out = [{ year: 0, balance: s, noFee: s, invested: s }];
     for (let mo = 1; mo <= y * 12; mo++) {
-      bal = bal * (1 + mr) + m;
-      if (mo % 12 === 0) out.push({ year: mo / 12, balance: Math.round(bal), invested: s + m * mo });
+      bal = bal * (1 + mrNet) + m;
+      gross = gross * (1 + mr) + m;
+      if (mo % 12 === 0) out.push({ year: mo / 12, balance: Math.round(bal), noFee: Math.round(gross), invested: s + m * mo });
     }
-    return { rows: out, final: bal, invested: s + m * y * 12 };
-  }, [start, monthly, rate, years]);
+    return { rows: out, final: bal, invested: s + m * y * 12, finalNoFee: gross };
+  }, [start, monthly, rate, years, fee]);
 
   return (
     <div className="space-y-3">
@@ -58,13 +64,15 @@ export function CompoundGrowthWidget() {
         <NumberField id="cg-monthly" label="Added each month" value={monthly} onChange={setMonthly} step={10} />
         <NumberField id="cg-rate" label="Assumed yearly return (%)" value={rate} onChange={setRate} step={0.5} />
         <NumberField id="cg-years" label="Years" value={years} onChange={setYears} />
+        <NumberField id="cg-fee" label="Yearly fee (%)" value={fee} onChange={setFee} step={0.1} />
       </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Reading label="Money put in" value={money(invested)} />
         <Reading label="Growth" value={money(final - invested)} />
         <Reading label={<Term id="cagr">End value</Term>} value={money(final)} />
+        <Reading label="Cost of the fee" value={money(finalNoFee - final)} note="Versus no fee" />
       </div>
-      <ChartTitle explain={{ label: "compound growth calculator", value: `end value ${money(final)} from ${money(invested)} invested`, detail: `assuming ${rate}% a year over ${years} years` }}>
+      <ChartTitle explain={{ label: "compound growth calculator", noun: "calculator", value: `end value ${money(final)} from ${money(invested)} invested`, detail: `assuming ${rate}% a year over ${years} years and a ${fee}% yearly fee` }}>
         Balance vs money put in
       </ChartTitle>
       <div className="h-48 w-full">
@@ -75,6 +83,9 @@ export function CompoundGrowthWidget() {
             <YAxis {...CHART_AXIS} width={52} tickFormatter={(v: number) => new Intl.NumberFormat(undefined, { notation: "compact" }).format(v)} />
             <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => money(v)} labelFormatter={(l) => `Year ${l}`} />
             <Line dataKey="balance" name="Balance" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} isAnimationActive={false} />
+            {fee > 0 && (
+              <Line dataKey="noFee" name="Balance without fee" stroke="hsl(var(--primary))" strokeOpacity={0.5} strokeDasharray="2 3" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+            )}
             <Line dataKey="invested" name="Money put in" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 3" strokeWidth={1.5} dot={false} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
@@ -112,7 +123,7 @@ export function DiversificationWidget() {
         <Reading label="1 holding" value={`${rows[0].volatility.toFixed(1)}%`} />
         <Reading label={<Term id="diversification">30 holdings</Term>} value={`${floor.toFixed(1)}%`} note="Part of the risk remains however many you hold" />
       </div>
-      <ChartTitle explain={{ label: "diversification calculator: portfolio volatility against number of holdings", detail: `assuming ${vol}% volatility per holding and ${corr} correlation` }}>
+      <ChartTitle explain={{ label: "diversification calculator: portfolio volatility against number of holdings", noun: "calculator", detail: `assuming ${vol}% volatility per holding and ${corr} correlation` }}>
         Portfolio volatility vs number of holdings
       </ChartTitle>
       <div className="h-44 w-full">

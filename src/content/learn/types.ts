@@ -22,6 +22,14 @@ export type LiveExampleId =
   | "yield-curve"
   | "dollar-index"
   | "market-breadth"
+  | "sma-ema"
+  | "price-snapshot"
+  | "dividend-yield"
+  | "etf-vs-stock"
+  | "income-statement"
+  | "value-growth-compare"
+  | "quality-scores"
+  | "sp500-trend"
   | "compound-growth"
   | "diversification";
 

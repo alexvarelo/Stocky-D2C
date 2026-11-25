@@ -67,3 +67,31 @@ export function MarketBreadthWidget() {
     </div>
   );
 }
+
+/** S&P 500 level and its distance to the 50 and 200-day averages (breadth data is not available yet). */
+export function Sp500TrendWidget() {
+  const { ctx, isLoading, isError } = useCtx();
+  if (isLoading) return <WidgetLoading />;
+  const ind = ctx?.indicators.find((i) => i.key === "sp500");
+  if (isError || !ind || ind.value == null) return <WidgetError message="S&P 500 data is not available right now." />;
+  const d200 = ind.extra?.sma200_distance;
+  const d50 = ind.extra?.sma50_distance;
+  const fmtDist = (v: number | null | undefined) => (v == null ? "N/A" : `${v > 0 ? "+" : ""}${v.toFixed(1)}%`);
+  const value = formatIndicatorValue(ind);
+  return (
+    <div className="space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
+          <Reading label={<Term id="sp500">S&amp;P 500</Term>} value={value} note={ctx?.as_of ? `As of ${ctx.as_of}` : undefined} />
+          <Reading label={<Term id="sma">Distance to SMA 200</Term>} value={fmtDist(d200)} note="Index vs its 200-day average" />
+          <Reading label={<Term id="sma">Distance to SMA 50</Term>} value={fmtDist(d50)} />
+        </div>
+        <ExplainThis context={{ label: "S&P 500 distance to its 200-day average", noun: "indicator", value: `${value}, ${fmtDist(d200)} versus the 200-day average` }} />
+      </div>
+      {ind.sparkline && ind.sparkline.length > 1 && <Sparkline values={ind.sparkline} className="h-12" />}
+      <p className="text-xs text-muted-foreground">
+        This looks at the index itself. Breadth (how many individual stocks sit above their own 200-day average) is not available yet, so this shows only whether the index as a whole is above or below its average.
+      </p>
+    </div>
+  );
+}

@@ -38,6 +38,11 @@ Figures here are hypothetical and companies named elsewhere are only illustratio
 ## Common mistake
 
 Focusing only on revenue growth or only on net income. Fast sales growth with no path to profit carries different risks than slow growth with high profitability. Another error is treating accounting profit as cash: net income includes non-cash items, which is why you also study the cash flow statement.`,
+    liveExample: {
+      id: "income-statement",
+      ticker: "MSFT",
+      caption: "See revenue, operating income and net income by year for an example company.",
+    },
     glossaryIds: ["eps", "revenue-growth", "net-margin"],
     quiz: [
       {
@@ -190,7 +195,7 @@ Treating a single high FCF year as the norm. Capital spending cycles can make on
     liveExample: {
       id: "free-cash-flow",
       ticker: "AAPL",
-      caption: "Compare free cash flow with net income over time for an example company.",
+      caption: "Compare free cash flow with net income, year by year, for an example company.",
     },
     glossaryIds: ["free-cash-flow", "fcf-yield", "share-dilution"],
     quiz: [
@@ -264,7 +269,7 @@ Looking only at total debt without considering cash, earnings or maturity. A lar
     liveExample: {
       id: "net-debt",
       ticker: "KO",
-      caption: "See debt, cash and net debt relative to earnings for an example company.",
+      caption: "See debt, cash, net debt and net debt relative to EBITDA for an example company.",
     },
     glossaryIds: ["net-debt", "net-debt-ebitda", "interest-coverage", "debt-to-equity", "current-ratio"],
     quiz: [
@@ -331,7 +336,7 @@ Other multiples, like price to sales or price to book, fit cases where earnings 
 
 A low multiple does not mean a bargain and a high multiple does not mean an overpriced company. A low P/E can be a "value trap" if earnings are about to fall, and a high P/E can be reasonable if earnings grow fast. Multiples summarize market expectations, they do not predict outcomes.
 
-The live example shows an example ticker's current multiple next to its own history, as an illustration only.
+The live example shows an example ticker's current multiple and the earnings per share it implies, as an illustration only.
 
 ## Common mistake
 
@@ -339,7 +344,7 @@ Comparing P/E ratios across industries or business models without adjusting. Ban
     liveExample: {
       id: "pe-ratio",
       ticker: "AAPL",
-      caption: "Compare the current P/E of an example company with its own history.",
+      caption: "See the current P/E of an example company and the earnings per share it implies. Try other tickers to compare multiples.",
     },
     glossaryIds: ["pe-ratio", "ev-ebitda", "enterprise-value", "peg-ratio", "price-to-sales"],
     quiz: [
@@ -412,6 +417,11 @@ Neither style is better in itself, and this lesson does not suggest one over the
 ## Common mistake
 
 Equating growth with quality and value with bargain. Rapid growth can be unprofitable or require constant funding, and low multiples can reflect weak businesses. Another mistake is switching style after a short period of better results, which is often chasing recent performance.`,
+    liveExample: {
+      id: "value-growth-compare",
+      ticker: "NVDA",
+      caption: "Compare valuation multiples and growth for two example tickers. Pick any second ticker to explore.",
+    },
     glossaryIds: ["peg-ratio", "revenue-growth", "price-to-book"],
     quiz: [
       {
@@ -490,7 +500,8 @@ Example tickers are illustrations only, and this is not a view on any company.
 Looking at the market cap or the cash balance alone. A company can have a large cash pile and a short runway if burn is high. Another error is ignoring potential dilution from convertibles, warrants and stock compensation, which do not appear in the current share count.`,
     liveExample: {
       id: "cash-runway",
-      caption: "Estimate runway from cash and burn for an example small-cap company.",
+      ticker: "CLSK",
+      caption: "See the cash runway estimated from cash and burn for an example small-cap company, as an illustration only.",
     },
     glossaryIds: ["cash-runway", "share-dilution", "atm-offering", "convertible-note", "free-cash-flow"],
     quiz: [
@@ -558,6 +569,11 @@ Combine them with the underlying statements. If a score looks weak, check whethe
 ## Common mistake
 
 Treating the thresholds as precise predictions. A company in the "safe zone" can still run into trouble, and one in the "distress zone" can recover. Scores indicate patterns found in past data, not certainty about the future. Another mistake is applying a model to a type of company it was not designed for.`,
+    liveExample: {
+      id: "quality-scores",
+      ticker: "AAPL",
+      caption: "See the Altman Z-score and Piotroski F-score computed from the financial statements of an example company.",
+    },
     glossaryIds: ["altman-z-score", "piotroski-f-score", "current-ratio", "roa"],
     quiz: [
       {
