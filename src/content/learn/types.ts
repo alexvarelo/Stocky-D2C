@@ -41,7 +41,7 @@ export type TrackId =
   | "risk-psychology";
 
 /** Animated illustrations a lesson step can show beside its text. */
-export type LessonVisualId = "ownership-grid" | "ownership-bar" | "business-vs-price" | "total-return";
+export type LessonVisualId = "ownership-grid" | "ownership-bar" | "business-vs-price" | "total-return" | "beta-amplify";
 
 export interface LessonStepExtra {
   /** Headline for the step; the section name then becomes the small label above it. */

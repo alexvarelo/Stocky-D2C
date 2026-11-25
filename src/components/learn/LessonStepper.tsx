@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronLeft } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, CheckCircle2, ListOrdered, MessageCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Term } from "@/components/glossary/Term";
-import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
-import { ExplainThis } from "@/components/explain/ExplainThis";
+import { EducationalDisclaimer, EDUCATIONAL_DISCLAIMER_TEXT } from "@/components/compliance/EducationalDisclaimer";
+import { ExplainThis, buildExplainPrompt } from "@/components/explain/ExplainThis";
+import { useStockyChatActions } from "@/contexts/StockyChatContext";
 import { getGlossaryEntry } from "@/content/glossary";
 import type { Lesson, Track } from "@/content/learn";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,16 @@ const RISE =
   "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 motion-safe:fill-mode-both";
 const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
 
+/** Arrow keys must keep their normal job inside form controls, radio groups and editable text. */
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return true;
+  return !!target.closest('[role="radiogroup"], [role="dialog"], [role="listbox"], [role="menu"], [role="slider"]');
+}
+
+const stepTitle = (s: LessonStep, lesson: Lesson) => ("title" in s ? s.title : s.kind === "intro" ? lesson.title : s.label);
+
 interface Props {
   lesson: Lesson;
   track: Track;
@@ -32,138 +44,166 @@ interface Props {
   onQuizComplete: (_score: number) => void;
 }
 
+/**
+ * Full-screen lesson reader ("focus mode"): a fixed top bar (exit, lesson, steps, Ask Stocky), a
+ * scrolling step in the middle and a fixed bottom bar with Back and Continue.
+ */
 export function LessonStepper({ lesson, track, index: lessonIndex, siblings, done, bestScore, onQuizComplete }: Props) {
   const steps = useMemo(() => buildLessonSteps(lesson), [lesson]);
   const [params, setParams] = useSearchParams();
   const requested = Number.parseInt(params.get("step") ?? "1", 10);
   const current = Number.isFinite(requested) ? Math.min(Math.max(requested - 1, 0), steps.length - 1) : 0;
   const step = steps[current];
+  const chat = useStockyChatActions();
 
   const [furthest, setFurthest] = useState(current);
   const [checkPick, setCheckPick] = useState<number | null>(null);
+  const [outlineOpen, setOutlineOpen] = useState(false);
+  const [moreBelow, setMoreBelow] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
-
-  useEffect(() => {
-    setFurthest((f) => Math.max(f, current));
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    // Move focus to the new step's heading so screen readers announce it, and start the step from the
-    // top of the page (the progress bar sits under the app's fixed header on phones).
-    headingRef.current?.focus({ preventScroll: true });
-    // An instant jump: the new step's content animates in, so a scroll animation would only add noise.
-    if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: "auto" });
-  }, [current]);
-
-  const goTo = (i: number) => {
-    const next = Math.min(Math.max(i, 0), steps.length - 1);
-    setParams((p) => {
-      const copy = new URLSearchParams(p);
-      copy.set("step", String(next + 1));
-      return copy;
-    }, { replace: true });
-  };
 
   const nextLesson = siblings[lessonIndex + 1];
   const isLast = current === steps.length - 1;
   const blocked = step.kind === "mistake" && !!step.check && checkPick === null;
   const primaryLabel = step.kind === "intro" ? "Start lesson" : blocked ? "Pick an answer" : "Continue";
+  const trackPath = `/learn/${track.id}`;
+
+  const goTo = useCallback(
+    (i: number) => {
+      const next = Math.min(Math.max(i, 0), steps.length - 1);
+      setParams(
+        (p) => {
+          const copy = new URLSearchParams(p);
+          copy.set("step", String(next + 1));
+          return copy;
+        },
+        { replace: true },
+      );
+    },
+    [setParams, steps.length],
+  );
+
+  const updateMoreBelow = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setMoreBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 24);
+  }, []);
+
+  useEffect(() => {
+    setFurthest((f) => Math.max(f, current));
+    // Each step starts at its top. The content animates in, so the jump is instant.
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    const t = window.setTimeout(updateMoreBelow, 600);
+    if (firstRender.current) {
+      firstRender.current = false;
+    } else {
+      // Announce the new step to screen readers.
+      headingRef.current?.focus({ preventScroll: true });
+    }
+    return () => window.clearTimeout(t);
+  }, [current, updateMoreBelow]);
+
+  useEffect(() => {
+    window.addEventListener("resize", updateMoreBelow);
+    return () => window.removeEventListener("resize", updateMoreBelow);
+  }, [updateMoreBelow]);
+
+  // ← and → move between steps on a keyboard.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || outlineOpen) return;
+      if (isTypingTarget(e.target)) return;
+      if (e.key === "ArrowRight" && !isLast && !blocked) {
+        e.preventDefault();
+        goTo(current + 1);
+      } else if (e.key === "ArrowLeft" && current > 0) {
+        e.preventDefault();
+        goTo(current - 1);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [blocked, current, goTo, isLast, outlineOpen]);
+
+  const askStocky = () =>
+    chat?.openWithDraft(
+      buildExplainPrompt({ label: `"${stepTitle(step, lesson)}" from the lesson "${lesson.title}"`, noun: "lesson step" }),
+    );
 
   return (
-    <article className="mx-auto w-full max-w-[1100px]">
-      <div className="lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10">
-        <aside className="hidden lg:block" aria-label="Lesson outline">
-          <div className="sticky top-6 space-y-6">
-            <Link to="/learn" className="flex items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              <AcademyIcon size={32} />
-              <span className="font-semibold tracking-tight">
-                Stocky <span className="text-primary">Academy</span>
-              </span>
+    <div className="flex h-[100dvh] flex-col bg-background text-foreground">
+      <header className="shrink-0 border-b border-border/60">
+        <div className="flex h-16 items-center gap-2 px-3 sm:gap-4 sm:px-6">
+          <Button asChild variant="secondary" size="sm" className="h-11 w-11 shrink-0 gap-2 px-0 sm:w-auto sm:px-4">
+            <Link to={trackPath} aria-label={`Exit lesson, back to ${track.title}`}>
+              <X className="h-5 w-5" aria-hidden />
+              <span className="hidden sm:inline">Exit</span>
             </Link>
-            <div className="space-y-1">
-              <Link to={`/learn/${track.id}`} className="text-xs text-muted-foreground hover:text-foreground">
+          </Button>
+
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-3">
+            <AcademyIcon size={28} className="hidden sm:block" />
+            <div className="min-w-0 text-center sm:text-left">
+              <p className="truncate text-[15px] font-semibold leading-tight">{lesson.title}</p>
+              <p className="truncate text-xs text-muted-foreground">
                 {track.title} · Lesson {lessonIndex + 1} of {siblings.length}
-              </Link>
-              <p className="font-semibold leading-snug">{lesson.title}</p>
-              <p className="text-xs text-muted-foreground">{lesson.minutes} min</p>
+              </p>
             </div>
-            <ol className="space-y-1">
-              {steps.map((s, i) => {
-                const isCurrent = i === current;
-                const reachable = i <= furthest;
-                const seen = reachable && !isCurrent;
-                return (
-                  <li key={s.key}>
-                    <button
-                      type="button"
-                      onClick={() => reachable && goTo(i)}
-                      disabled={!reachable}
-                      aria-current={isCurrent ? "step" : undefined}
-                      className={cn(
-                        "flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors",
-                        isCurrent ? "bg-primary/15 text-foreground" : reachable ? "text-foreground/80 hover:bg-muted" : "text-muted-foreground/60",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold",
-                          isCurrent && "border-primary bg-primary text-primary-foreground",
-                          seen && "border-success text-success",
-                          !reachable && "border-border",
-                        )}
-                        aria-hidden
-                      >
-                        {seen ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                      </span>
-                      <span className="min-w-0 truncate">{s.label}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
           </div>
-        </aside>
 
-        <div className="min-w-0">
-          <header className="space-y-3 lg:hidden">
-            <div className="flex items-center justify-between gap-3">
-              <Link
-                to={`/learn/${track.id}`}
-                aria-label={`Back to ${track.title}`}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-foreground"
-              >
-                <ChevronLeft className="h-5 w-5" aria-hidden />
-              </Link>
-              <div className="min-w-0 text-center">
-                <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                  <AcademyIcon size={16} />
-                  Academy · {track.title}
-                </p>
-                <p className="truncate text-sm font-semibold">{lesson.title}</p>
-              </div>
-              <span className="w-11 text-right text-xs tabular-nums text-muted-foreground">
-                {current + 1} / {steps.length}
-              </span>
-            </div>
-            <div
-              className="flex gap-1"
-              role="progressbar"
-              aria-label="Lesson progress"
-              aria-valuemin={1}
-              aria-valuemax={steps.length}
-              aria-valuenow={current + 1}
+          <Button variant="secondary" size="sm" className="hidden h-11 shrink-0 gap-2 px-4 sm:inline-flex" onClick={() => setOutlineOpen(true)}>
+            <ListOrdered className="h-4 w-4" aria-hidden />
+            Steps
+          </Button>
+          {chat && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={askStocky}
+              className="h-11 w-11 shrink-0 gap-2 bg-primary/15 px-0 text-primary hover:bg-primary/25 sm:w-auto sm:px-4"
+              aria-label="Ask Stocky about this step"
             >
-              {steps.map((s, i) => (
-                <div key={s.key} className="h-1 flex-1 overflow-hidden rounded-full bg-border">
-                  <div className="h-full bg-primary transition-[width] duration-500" style={{ width: i <= current ? "100%" : "0%" }} />
-                </div>
-              ))}
-            </div>
-          </header>
+              <MessageCircle className="h-4 w-4" aria-hidden />
+              <span className="hidden sm:inline">Ask Stocky</span>
+            </Button>
+          )}
+        </div>
 
-          <section key={step.key} aria-labelledby="lesson-step-heading" className="min-h-[calc(100svh-330px)] py-6 md:min-h-[55vh] lg:py-2">
+        <div className="flex items-center gap-3 px-3 pb-3 sm:px-6 sm:pb-0">
+          <div
+            className="flex flex-1 gap-1"
+            role="progressbar"
+            aria-label="Lesson progress"
+            aria-valuemin={1}
+            aria-valuemax={steps.length}
+            aria-valuenow={current + 1}
+          >
+            {steps.map((s, i) => (
+              <div key={s.key} className="h-1 flex-1 overflow-hidden rounded-full bg-border sm:h-[3px] sm:rounded-none">
+                <div className="h-full bg-primary transition-[width] duration-500" style={{ width: i <= current ? "100%" : "0%" }} />
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setOutlineOpen(true)}
+            className="-my-2 min-h-11 shrink-0 rounded-full px-2 text-xs tabular-nums text-muted-foreground hover:text-foreground sm:hidden"
+            aria-label={`Step ${current + 1} of ${steps.length}. Show all steps`}
+          >
+            {current + 1}/{steps.length}
+          </button>
+        </div>
+      </header>
+
+      <div className="relative min-h-0 flex-1">
+        <div ref={scrollRef} onScroll={updateMoreBelow} className="h-full overflow-y-auto overscroll-contain">
+          <section
+            key={step.key}
+            aria-labelledby="lesson-step-heading"
+            className="mx-auto w-full max-w-[1120px] px-5 pb-10 pt-6 sm:px-8 md:px-12 md:pt-12"
+          >
             <StepContent
               step={step}
               lesson={lesson}
@@ -176,38 +216,112 @@ export function LessonStepper({ lesson, track, index: lessonIndex, siblings, don
               onQuizComplete={onQuizComplete}
             />
           </section>
-
-          <div className="sticky bottom-16 z-10 -mx-4 border-t border-border/60 bg-background/95 px-4 pb-4 pt-3 backdrop-blur md:bottom-0 md:mx-0 md:px-0">
-            {/* Right padding keeps the buttons clear of the floating "Ask Stocky" chat button. */}
-            <div className="flex items-center gap-3 pr-[72px] md:pr-24">
-              {current > 0 && (
-                <Button variant="secondary" size="icon" className="h-12 w-12 shrink-0" onClick={() => goTo(current - 1)} aria-label="Previous step">
-                  <ArrowLeft className="h-5 w-5" aria-hidden />
-                </Button>
-              )}
-              {isLast ? (
-                <Button asChild className="flex-1 gap-2 md:flex-none">
-                  {nextLesson ? (
-                    <Link to={lessonPath(nextLesson)}>
-                      <span className="truncate">Next: {nextLesson.title}</span>
-                      <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
-                    </Link>
-                  ) : (
-                    <Link to="/learn">Back to Academy</Link>
-                  )}
-                </Button>
-              ) : (
-                <Button className="flex-1 gap-2 md:ml-auto md:flex-none md:px-10" onClick={() => goTo(current + 1)} disabled={blocked}>
-                  {primaryLabel}
-                  {!blocked && <ArrowRight className="h-4 w-4" aria-hidden />}
-                </Button>
-              )}
-            </div>
-            <EducationalDisclaimer className="mt-2 justify-center md:justify-end" />
-          </div>
         </div>
+        {/* Hint that the step continues below the fold. */}
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-background to-transparent transition-opacity duration-300",
+            moreBelow ? "opacity-100" : "opacity-0",
+          )}
+          aria-hidden
+        />
       </div>
-    </article>
+
+      <footer className="shrink-0 border-t border-border/60 bg-background px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8 md:px-12">
+        <div className="mx-auto flex w-full max-w-[1120px] items-center gap-3">
+          <Button
+            variant="secondary"
+            onClick={() => goTo(current - 1)}
+            aria-label="Previous step"
+            className={cn("h-12 w-12 shrink-0 gap-2 px-0 md:w-auto md:px-6", current === 0 && "max-md:hidden md:invisible")}
+          >
+            <ArrowLeft className="h-5 w-5" aria-hidden />
+            <span className="hidden md:inline">Back</span>
+          </Button>
+
+          <div className="hidden min-w-0 flex-1 flex-col items-center text-center md:flex">
+            <span className="text-sm font-semibold tabular-nums">
+              Step {current + 1} of {steps.length}
+            </span>
+            <span className="text-[11px] text-muted-foreground">{EDUCATIONAL_DISCLAIMER_TEXT} · Use ← → to move</span>
+          </div>
+
+          {isLast ? (
+            <Button asChild className="h-12 min-w-0 flex-1 gap-2 md:flex-none md:px-8">
+              {nextLesson ? (
+                <Link to={lessonPath(nextLesson)}>
+                  <span className="truncate">Next: {nextLesson.title}</span>
+                  <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+                </Link>
+              ) : (
+                <Link to="/learn">Back to Academy</Link>
+              )}
+            </Button>
+          ) : (
+            <Button className="h-12 flex-1 gap-2 md:flex-none md:px-8" onClick={() => goTo(current + 1)} disabled={blocked}>
+              {primaryLabel}
+              {!blocked && <ArrowRight className="h-4 w-4" aria-hidden />}
+            </Button>
+          )}
+        </div>
+        <EducationalDisclaimer className="mt-2 justify-center md:hidden" />
+      </footer>
+
+      <Sheet open={outlineOpen} onOpenChange={setOutlineOpen}>
+        <SheetContent side="right" className="w-[320px] max-w-[85vw] space-y-6">
+          <SheetHeader className="space-y-3 text-left">
+            <Link to="/learn" className="flex items-center gap-2.5" onClick={() => setOutlineOpen(false)}>
+              <AcademyIcon size={32} />
+              <span className="font-semibold tracking-tight">
+                Stocky <span className="text-primary">Academy</span>
+              </span>
+            </Link>
+            <SheetTitle className="text-base">{lesson.title}</SheetTitle>
+            <SheetDescription>
+              {track.title} · {lesson.minutes} min
+            </SheetDescription>
+          </SheetHeader>
+          <ol className="space-y-1">
+            {steps.map((s, i) => {
+              const isCurrent = i === current;
+              const reachable = i <= furthest;
+              const seen = reachable && !isCurrent;
+              return (
+                <li key={s.key}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!reachable) return;
+                      goTo(i);
+                      setOutlineOpen(false);
+                    }}
+                    disabled={!reachable}
+                    aria-current={isCurrent ? "step" : undefined}
+                    className={cn(
+                      "flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors",
+                      isCurrent ? "bg-primary/15 text-foreground" : reachable ? "text-foreground/80 hover:bg-muted" : "text-muted-foreground/60",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold",
+                        isCurrent && "border-primary bg-primary text-primary-foreground",
+                        seen && "border-success text-success",
+                        !reachable && "border-border",
+                      )}
+                      aria-hidden
+                    >
+                      {seen ? <Check className="h-3.5 w-3.5" /> : i + 1}
+                    </span>
+                    <span className="min-w-0 truncate">{s.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </SheetContent>
+      </Sheet>
+    </div>
   );
 }
 

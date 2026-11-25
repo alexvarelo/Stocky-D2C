@@ -136,7 +136,43 @@ function TotalReturn() {
   );
 }
 
+function BetaAmplify() {
+  const bars = [
+    { label: "Market", value: "+10%", height: 96, color: "hsl(var(--muted-foreground) / 0.45)", delay: 200 },
+    { label: "Stock (beta 1.5)", value: "+15%", height: 144, color: BRAND, delay: 450 },
+  ];
+  return (
+    <figure className="space-y-4 rounded-3xl bg-muted/60 p-5">
+      <p className="text-xs text-muted-foreground">The lesson’s example: the market rises 10%</p>
+      <div className="flex h-[190px] items-end justify-center gap-10 border-b border-border" aria-hidden>
+        {bars.map((b) => (
+          <div key={b.label} className="flex flex-col items-center gap-2">
+            <span className="text-lg font-bold tabular-nums motion-safe:animate-lesson-pop" style={{ animationDelay: `${b.delay + 400}ms` }}>
+              {b.value}
+            </span>
+            <div
+              className="w-16 origin-bottom rounded-t-lg motion-safe:animate-lesson-grow-y"
+              style={{ height: b.height, background: b.color, animationDelay: `${b.delay}ms` }}
+            />
+          </div>
+        ))}
+      </div>
+      <figcaption className="space-y-1">
+        <div className="flex justify-center gap-10 text-xs text-muted-foreground">
+          {bars.map((b) => (
+            <span key={b.label} className="w-24 text-center">
+              {b.label}
+            </span>
+          ))}
+        </div>
+        <span className="block text-[11px] text-muted-foreground">Illustrative. Past behaviour, not a forecast.</span>
+      </figcaption>
+    </figure>
+  );
+}
+
 export const LESSON_VISUALS: Record<LessonVisualId, ComponentType> = {
+  "beta-amplify": BetaAmplify,
   "ownership-grid": OwnershipGrid,
   "ownership-bar": OwnershipBar,
   "business-vs-price": BusinessVsPrice,
