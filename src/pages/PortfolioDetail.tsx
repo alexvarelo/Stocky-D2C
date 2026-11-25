@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePortfolio, useDeletePortfolio } from "@/api/portfolio/portfolio";
+import { holdingCostBasis, holdingMarketValue } from "@/lib/portfolioValue";
 import { usePortfolioFollows } from "@/api/portfolio/usePortfolioFollows";
 import { usePortfolioTransactions } from "@/api/transaction/usePortfolioTransactions";
 import { useToast } from "@/components/ui/use-toast";
@@ -94,15 +95,16 @@ export const PortfolioDetail = () => {
   // from the live-merged holdings so the page doesn't mix a stale stored
   // total with fresher per-holding prices. Otherwise fall back to the stored
   // values (or the static holdings calculation) as before.
+  // All totals are in the portfolio's base currency (see lib/portfolioValue).
   const totalValue = hasLiveTick
-    ? (holdingsWithLivePrices?.reduce((sum, h) => sum + ((h.current_price || 0) * h.quantity), 0) || 0)
+    ? (holdingsWithLivePrices?.reduce((sum, h) => sum + holdingMarketValue(h), 0) || 0)
     : (portfolio?.total_value ?? (portfolio?.holdings?.reduce(
-      (sum, h) => sum + ((h.current_price || 0) * h.quantity),
+      (sum, h) => sum + holdingMarketValue(h),
       0
     ) || 0));
 
   const totalInvested = portfolio?.holdings?.reduce(
-    (sum, h) => sum + h.total_invested,
+    (sum, h) => sum + holdingCostBasis(h),
     0
   ) || 0;
 

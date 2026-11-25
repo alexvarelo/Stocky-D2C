@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { holdingCostBasis, holdingMarketValue } from "@/lib/portfolioValue";
 import {
   Table,
   TableBody,
@@ -406,11 +407,13 @@ export const PortfolioHoldings = ({
   };
 
   // Total portfolio value/invested for percentage calculations - basis picks which one the Allocation column is against.
+  // Totals and allocation are in the portfolio's base currency; each row's own figures stay
+  // in the currency the stock is quoted in.
   const totalValue = holdings.reduce(
-    (sum, holding) => sum + (isLoadingPrices ? holding.total_invested : (holding.current_price || 0) * holding.quantity),
+    (sum, holding) => sum + (isLoadingPrices ? holdingCostBasis(holding) : holdingMarketValue(holding)),
     0
   );
-  const totalInvested = holdings.reduce((sum, holding) => sum + holding.total_invested, 0);
+  const totalInvested = holdings.reduce((sum, holding) => sum + holdingCostBasis(holding), 0);
   const allocationTotal = allocationBasis === "value" ? totalValue : totalInvested;
 
   const rows: Row[] = useMemo(() => {
@@ -419,7 +422,7 @@ export const PortfolioHoldings = ({
       const pnl = marketValue - holding.total_invested;
       const pnlPercentage = holding.total_invested > 0 ? (pnl / holding.total_invested) * 100 : 0;
       const todayChangePercent = holding.today_change_percent || 0;
-      const basisValue = allocationBasis === "value" ? marketValue : holding.total_invested;
+      const basisValue = allocationBasis === "value" ? holdingMarketValue(holding) : holdingCostBasis(holding);
       const allocation = allocationTotal > 0 ? (basisValue / allocationTotal) * 100 : 0;
 
       return { holding, marketValue, pnl, pnlPercentage, todayChangePercent, allocation };
@@ -437,7 +440,7 @@ export const PortfolioHoldings = ({
           diff = (a.holding.current_price || 0) - (b.holding.current_price || 0);
           break;
         case "value":
-          diff = a.marketValue - b.marketValue;
+          diff = holdingMarketValue(a.holding) - holdingMarketValue(b.holding);
           break;
         case "today":
           diff = a.todayChangePercent - b.todayChangePercent;

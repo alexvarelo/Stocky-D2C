@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { holdingMarketValue } from "@/lib/portfolioValue";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,17 +29,17 @@ export const AllocationChart = ({ holdings, className = "", isLoading }: Allocat
     const { chartData, allData } = useMemo(() => {
         if (!holdings.length) return { chartData: [], allData: [] };
 
-        const totalValue = holdings.reduce((sum, h) => sum + ((h.current_price || 0) * h.quantity), 0);
+        const totalValue = holdings.reduce((sum, h) => sum + holdingMarketValue(h), 0);
 
         const sortedHoldings = [...holdings].sort((a, b) =>
-            ((b.current_price || 0) * b.quantity) - ((a.current_price || 0) * a.quantity)
+            holdingMarketValue(b) - holdingMarketValue(a)
         );
 
         // Prepare data for all holdings (for the list)
         const allData = sortedHoldings.map((h, index) => ({
             name: h.ticker,
-            value: (h.current_price || 0) * h.quantity,
-            percentage: totalValue > 0 ? ((h.current_price || 0) * h.quantity / totalValue) * 100 : 0,
+            value: holdingMarketValue(h),
+            percentage: totalValue > 0 ? (holdingMarketValue(h) / totalValue) * 100 : 0,
             color: index < 5 ? COLORS[index % COLORS.length] : OTHERS_COLOR
         }));
 

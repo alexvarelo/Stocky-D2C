@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { holdingMarketValue } from "@/lib/portfolioValue";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortfolioHolding } from "@/api/portfolio/portfolio";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
@@ -13,7 +14,7 @@ interface KeyMetricsProps {
 }
 
 export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading }: KeyMetricsProps) => {
-    const totalValue = holdings.reduce((sum, h) => sum + ((h.current_price || 0) * h.quantity), 0);
+    const totalValue = holdings.reduce((sum, h) => sum + holdingMarketValue(h), 0);
     const avgPosition = holdings.length > 0 ? totalValue / holdings.length : 0;
     // Hooks must run unconditionally, so these are computed before the loading/empty early returns.
     const animatedTotalInvested = useAnimatedNumber(totalInvested);
@@ -49,7 +50,7 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
     const worstPerformer = [...holdings].sort((a, b) => (a.change_percent || 0) - (b.change_percent || 0))[0];
 
     const largestHolding = [...holdings].sort((a, b) =>
-        ((b.current_price || 0) * b.quantity) - ((a.current_price || 0) * a.quantity)
+        holdingMarketValue(b) - holdingMarketValue(a)
     )[0];
 
     const metrics = [
@@ -83,7 +84,7 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
         {
             label: "Largest Position",
             value: largestHolding?.ticker,
-            subValue: formatPercentage(totalValue > 0 ? (((largestHolding?.current_price || 0) * largestHolding?.quantity) / totalValue) * 100 : 0),
+            subValue: formatPercentage(totalValue > 0 ? ((largestHolding ? holdingMarketValue(largestHolding) : 0) / totalValue) * 100 : 0),
             icon: PieChart,
             color: "text-sky-500",
             bg: "bg-sky-500/10",

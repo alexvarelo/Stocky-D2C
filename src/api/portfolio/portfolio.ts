@@ -2,11 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMultipleStockPricesApiV1StockTickersPricesGet } from "../stock/stock";
 import { useToast } from "@/components/ui/use-toast";
+import { normalisePence } from "@/lib/portfolioValue";
 
 interface PriceData {
   current: number;
   change?: number;
   changePercent?: number;
+  currency?: string;
 }
 
 export interface PortfolioHolding {
@@ -20,6 +22,8 @@ export interface PortfolioHolding {
   today_change?: number;
   today_change_percent?: number;
   today_value_change?: number;
+  /** Multiply native-currency amounts by this to get the portfolio's base currency. */
+  fx_rate?: number;
 }
 
 interface PortfolioBase {
@@ -113,13 +117,13 @@ export const usePortfolio = (portfolioId: string, includePrices = true) => {
       if (!tickers.length) return {};
       const { data, error } = await supabase
         .from("ticker_prices")
-        .select("ticker, price, last_updated")
+        .select("ticker, price, currency, last_updated")
         .in("ticker", tickers);
 
       if (error) return {};
 
-      const map: Record<string, number> = {};
-      data?.forEach(d => { map[d.ticker] = d.price; });
+      const map: Record<string, { price: number; currency?: string }> = {};
+      data?.forEach(d => { map[d.ticker] = { price: d.price, currency: d.currency ?? undefined }; });
       return map;
     },
     enabled: tickers.length > 0,
@@ -147,10 +151,13 @@ export const usePortfolio = (portfolioId: string, includePrices = true) => {
         if (Array.isArray(pricesResponse?.data)) {
           pricesResponse.data.forEach((priceData) => {
             if (priceData?.symbol) {
+              const { price, currency } = normalisePence(priceData.current_price || 0, priceData.currency);
+              const scale = price !== (priceData.current_price || 0) ? 0.01 : 1;
               pricesMap[priceData.symbol] = {
-                current: priceData.current_price || 0,
-                change: priceData.change,
+                current: price,
+                change: priceData.change != null ? priceData.change * scale : undefined,
                 changePercent: priceData.change_percent,
+                currency,
               };
             }
           });
@@ -165,6 +172,40 @@ export const usePortfolio = (portfolioId: string, includePrices = true) => {
     staleTime: 60 * 1000, // 1 minute for prices
     refetchInterval: 60 * 1000, // Auto-refresh prices every minute
   });
+
+  // 2b. FX rates into the portfolio's base currency. A holding's currency is the one its
+  // quote comes in (live, then stored), since that's what the price and average cost were
+  // entered in; the holdings.currency column is only the last resort.
+  const baseCurrency = storedValue?.currency || "USD";
+  const currencyOf = (ticker: string, fallback?: string) =>
+    livePrices?.[ticker]?.currency || storedPrices?.[ticker]?.currency || fallback || "USD";
+  const foreignCurrencies = [
+    ...new Set((basicPortfolio?.holdings ?? []).map((h) => currencyOf(h.ticker, h.currency))),
+  ]
+    .filter((c) => c !== baseCurrency)
+    .sort();
+  const { data: fxRates } = useQuery<Record<string, number>>({
+    queryKey: ["fx-rates", baseCurrency, foreignCurrencies],
+    queryFn: async () => {
+      const rates: Record<string, number> = {};
+      try {
+        const res = await getMultipleStockPricesApiV1StockTickersPricesGet(
+          foreignCurrencies.map((c) => `${c}${baseCurrency}=X`).join(",")
+        );
+        (Array.isArray(res?.data) ? res.data : []).forEach((q) => {
+          const from = q?.symbol?.slice(0, 3);
+          if (from && q.current_price) rates[from] = q.current_price;
+        });
+      } catch (error) {
+        console.error("Error fetching FX rates:", error);
+      }
+      return rates;
+    },
+    enabled: foreignCurrencies.length > 0,
+    staleTime: 10 * 60 * 1000,
+  });
+  const fxRateFor = (currency: string) =>
+    currency === baseCurrency ? 1 : fxRates?.[currency] ?? 1;
 
   // 3. Merge data
   if (!basicPortfolio) {
@@ -185,7 +226,9 @@ export const usePortfolio = (portfolioId: string, includePrices = true) => {
   const holdingsWithPrices = basicPortfolio.holdings.map((holding) => {
     // Priority: Live Price -> Stored Price -> Average Price (fallback)
     const livePriceData = livePrices?.[holding.ticker];
-    const storedPrice = storedPrices?.[holding.ticker];
+    const storedPrice = storedPrices?.[holding.ticker]?.price;
+    const currency = currencyOf(holding.ticker, holding.currency);
+    const fxRate = fxRateFor(currency);
 
     // Determine the price to use
     let currentPrice = 0;
@@ -208,12 +251,15 @@ export const usePortfolio = (portfolioId: string, includePrices = true) => {
       (currentValue / (1 + todayChangePercent / 100))
       : 0;
 
-    totalTodayChange += todayValueChange;
-    totalInvested += investedValue;
-    calculatedTotalValue += currentValue;
+    // Totals are kept in the base currency; the holding's own figures stay native.
+    totalTodayChange += todayValueChange * fxRate;
+    totalInvested += investedValue * fxRate;
+    calculatedTotalValue += currentValue * fxRate;
 
     return {
       ...holding,
+      currency,
+      fx_rate: fxRate,
       current_price: currentPrice,
       change_percent:
         holding.average_price > 0
