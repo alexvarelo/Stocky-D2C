@@ -18,6 +18,7 @@ import {
   Briefcase,
   Star,
   Compass,
+  LineChart,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react';
@@ -29,6 +30,7 @@ const NAV_LINKS = [
   { href: '/portfolios', label: 'Portfolios', icon: Briefcase },
   { href: '/watchlists', label: 'Watchlists', icon: Star },
   { href: '/discover', label: 'Discovery', icon: Compass },
+  { href: '/strategies', label: 'Strategies', icon: LineChart },
 ];
 
 export const Navbar = () => {

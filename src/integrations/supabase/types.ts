@@ -779,6 +779,83 @@ export type Database = {
           },
         ]
       }
+      saved_scenarios: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          params: Json
+          portfolio_id: string | null
+          result_summary: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          name: string
+          params?: Json
+          portfolio_id?: string | null
+          result_summary?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+          params?: Json
+          portfolio_id?: string | null
+          result_summary?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_scenarios_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_strategies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          params: Json
+          result_summary: Json | null
+          strategy: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          params?: Json
+          result_summary?: Json
+          strategy: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          params?: Json
+          result_summary?: Json
+          strategy?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stock_notes: {
         Row: {
           body: string

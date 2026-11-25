@@ -1310,6 +1310,206 @@
         }
       }
     },
+    "/api/v1/scenarios/stress": {
+      "post": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Stress test a portfolio",
+        "description": "Applies historical crises (2008, COVID 2020, 2022) and market shocks to the current positions, using each position's own history or a beta proxy. Educational information, not financial advice.",
+        "operationId": "stress_api_v1_scenarios_stress_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StressResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request or no usable price data"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/scenarios/montecarlo": {
+      "post": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Monte Carlo projection",
+        "description": "Joint bootstrap of daily returns (keeps correlations); fan-chart percentiles, probability of loss and of a 20% drawdown. Educational information, not financial advice.",
+        "operationId": "montecarlo_api_v1_scenarios_montecarlo_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonteCarloRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonteCarloResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request or no usable price data"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/scenarios/whatif": {
+      "post": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "What-if comparison",
+        "description": "Runs the same Monte Carlo (same seed and bootstrap days) on the current and a modified portfolio. Educational information, not financial advice.",
+        "operationId": "whatif_api_v1_scenarios_whatif_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WhatIfRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatIfResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request or no usable price data"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/strategies/backtest": {
+      "post": {
+        "tags": [
+          "strategies"
+        ],
+        "summary": "Backtest a predefined strategy",
+        "description": "Backtests DCA, periodic rebalancing, RSI or SMA-cross strategies against a buy-and-hold benchmark with the same cash flows. Trades at daily closes in base currency; signals execute the next day. Educational information, not financial advice.",
+        "operationId": "backtest_strategy_api_v1_strategies_backtest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BacktestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request or missing price data"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health check",
@@ -1332,6 +1532,346 @@
   },
   "components": {
     "schemas": {
+      "BacktestMetrics": {
+        "properties": {
+          "final_value": {
+            "type": "number",
+            "title": "Final Value"
+          },
+          "total_invested": {
+            "type": "number",
+            "title": "Total Invested"
+          },
+          "total_return": {
+            "type": "number",
+            "title": "Total Return",
+            "description": "final_value / total_invested - 1 (money-in vs money-out)"
+          },
+          "cagr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cagr",
+            "description": "Time-weighted annualised return: daily returns chained excluding external cash flows, annualised over calendar days (365.25). Not money-weighted."
+          },
+          "max_drawdown": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Drawdown",
+            "description": "Most negative peak-to-trough fraction of the time-weighted return index (unaffected by contributions)"
+          },
+          "volatility_annual": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volatility Annual",
+            "description": "Std of daily time-weighted returns * sqrt(252)"
+          },
+          "trades": {
+            "type": "integer",
+            "title": "Trades"
+          },
+          "time_in_market": {
+            "type": "number",
+            "title": "Time In Market",
+            "description": "Fraction of days with a non-zero invested position"
+          }
+        },
+        "type": "object",
+        "required": [
+          "final_value",
+          "total_invested",
+          "total_return",
+          "trades",
+          "time_in_market"
+        ],
+        "title": "BacktestMetrics"
+      },
+      "BacktestMetricsPair": {
+        "properties": {
+          "strategy": {
+            "$ref": "#/components/schemas/BacktestMetrics"
+          },
+          "benchmark": {
+            "$ref": "#/components/schemas/BacktestMetrics"
+          }
+        },
+        "type": "object",
+        "required": [
+          "strategy",
+          "benchmark"
+        ],
+        "title": "BacktestMetricsPair"
+      },
+      "BacktestParams": {
+        "properties": {
+          "monthly_amount": {
+            "type": "number",
+            "maximum": 1000000000.0,
+            "minimum": 0.0,
+            "title": "Monthly Amount",
+            "description": "dca: amount invested on the first trading day of each month",
+            "default": 0.0
+          },
+          "rebalance_frequency": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "quarterly",
+              "yearly"
+            ],
+            "title": "Rebalance Frequency",
+            "default": "quarterly"
+          },
+          "rsi_buy": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Rsi Buy",
+            "description": "rsi: buy when RSI(14) crosses below this level",
+            "default": 30.0
+          },
+          "rsi_sell": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Rsi Sell",
+            "description": "rsi: sell when RSI(14) crosses above this level",
+            "default": 70.0
+          },
+          "fast": {
+            "type": "integer",
+            "maximum": 400.0,
+            "minimum": 2.0,
+            "title": "Fast",
+            "description": "ma_cross: fast SMA window",
+            "default": 50
+          },
+          "slow": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 3.0,
+            "title": "Slow",
+            "description": "ma_cross: slow SMA window",
+            "default": 200
+          }
+        },
+        "type": "object",
+        "title": "BacktestParams"
+      },
+      "BacktestRequest": {
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "dca",
+              "rebalance",
+              "rsi",
+              "ma_cross"
+            ],
+            "title": "Strategy"
+          },
+          "tickers": {
+            "items": {
+              "$ref": "#/components/schemas/BacktestTicker"
+            },
+            "type": "array",
+            "maxItems": 15,
+            "minItems": 1,
+            "title": "Tickers"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "initial_capital": {
+            "type": "number",
+            "maximum": 1000000000.0,
+            "minimum": 0.0,
+            "title": "Initial Capital",
+            "default": 0.0
+          },
+          "base_currency": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$",
+            "title": "Base Currency",
+            "default": "USD"
+          },
+          "params": {
+            "$ref": "#/components/schemas/BacktestParams"
+          },
+          "fee_bps": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Fee Bps",
+            "description": "Fee per trade in basis points of traded notional",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "strategy",
+          "tickers",
+          "start_date",
+          "end_date"
+        ],
+        "title": "BacktestRequest"
+      },
+      "BacktestResponse": {
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "dca",
+              "rebalance",
+              "rsi",
+              "ma_cross"
+            ],
+            "title": "Strategy"
+          },
+          "base_currency": {
+            "type": "string",
+            "title": "Base Currency"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date",
+            "description": "First simulated trading day"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date",
+            "description": "Last simulated trading day"
+          },
+          "equity_curve": {
+            "items": {
+              "$ref": "#/components/schemas/EquityPoint"
+            },
+            "type": "array",
+            "title": "Equity Curve"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/BacktestMetricsPair"
+          },
+          "trades": {
+            "items": {
+              "$ref": "#/components/schemas/BacktestTrade"
+            },
+            "type": "array",
+            "title": "Trades",
+            "description": "Most recent 200 strategy trades"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "strategy",
+          "base_currency",
+          "start_date",
+          "end_date",
+          "equity_curve",
+          "metrics",
+          "trades",
+          "notes"
+        ],
+        "title": "BacktestResponse"
+      },
+      "BacktestTicker": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
+            "title": "Ticker"
+          },
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight",
+            "description": "Relative weight; weights are normalised to sum to 1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "weight"
+        ],
+        "title": "BacktestTicker"
+      },
+      "BacktestTrade": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "buy",
+              "sell"
+            ],
+            "title": "Side"
+          },
+          "quantity": {
+            "type": "number",
+            "title": "Quantity"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price",
+            "description": "Close in base currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "ticker",
+          "side",
+          "quantity",
+          "price"
+        ],
+        "title": "BacktestTrade"
+      },
       "BatchNewsRequest": {
         "properties": {
           "tickers": {
@@ -1899,6 +2439,36 @@
         ],
         "title": "CorrelationMatrix"
       },
+      "EquityPoint": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "strategy_value": {
+            "type": "number",
+            "title": "Strategy Value"
+          },
+          "benchmark_value": {
+            "type": "number",
+            "title": "Benchmark Value"
+          },
+          "invested": {
+            "type": "number",
+            "title": "Invested",
+            "description": "Cumulative external cash contributed up to this date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "strategy_value",
+          "benchmark_value",
+          "invested"
+        ],
+        "title": "EquityPoint"
+      },
       "EquityScreenResponse": {
         "properties": {
           "total": {
@@ -2025,6 +2595,44 @@
           "reason"
         ],
         "title": "ExcludedTicker"
+      },
+      "FinalDistribution": {
+        "properties": {
+          "p5": {
+            "type": "number",
+            "title": "P5"
+          },
+          "p25": {
+            "type": "number",
+            "title": "P25"
+          },
+          "p50": {
+            "type": "number",
+            "title": "P50"
+          },
+          "p75": {
+            "type": "number",
+            "title": "P75"
+          },
+          "p95": {
+            "type": "number",
+            "title": "P95"
+          },
+          "mean": {
+            "type": "number",
+            "title": "Mean"
+          }
+        },
+        "type": "object",
+        "required": [
+          "p5",
+          "p25",
+          "p50",
+          "p75",
+          "p95",
+          "mean"
+        ],
+        "title": "FinalDistribution"
       },
       "FinancialItem": {
         "properties": {
@@ -2672,6 +3280,203 @@
         "title": "MarketDataResponse",
         "description": "Schema for market data response"
       },
+      "MonteCarloRequest": {
+        "properties": {
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/PortfolioPositionInput"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Positions"
+          },
+          "base_currency": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$",
+            "title": "Base Currency",
+            "default": "USD"
+          },
+          "horizon_years": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Horizon Years",
+            "default": 1
+          },
+          "paths": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1000.0,
+            "title": "Paths",
+            "default": 5000
+          },
+          "monthly_contribution": {
+            "type": "number",
+            "maximum": 1000000000.0,
+            "minimum": 0.0,
+            "title": "Monthly Contribution",
+            "description": "Added every 21 trading days, in base currency",
+            "default": 0.0
+          },
+          "lookback": {
+            "type": "string",
+            "enum": [
+              "3y",
+              "5y",
+              "10y"
+            ],
+            "title": "Lookback",
+            "default": "5y"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 4294967295.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed",
+            "description": "RNG seed (default 42)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "positions"
+        ],
+        "title": "MonteCarloRequest"
+      },
+      "MonteCarloResponse": {
+        "properties": {
+          "start_value": {
+            "type": "number",
+            "title": "Start Value"
+          },
+          "total_contributions": {
+            "type": "number",
+            "title": "Total Contributions"
+          },
+          "percentiles": {
+            "items": {
+              "$ref": "#/components/schemas/PercentilePoint"
+            },
+            "type": "array",
+            "title": "Percentiles"
+          },
+          "final": {
+            "$ref": "#/components/schemas/FinalDistribution"
+          },
+          "prob_loss": {
+            "type": "number",
+            "title": "Prob Loss",
+            "description": "Share of paths ending below start value + total contributions"
+          },
+          "prob_drawdown_20": {
+            "type": "number",
+            "title": "Prob Drawdown 20",
+            "description": "Share of paths with max drawdown <= -20%"
+          },
+          "base_currency": {
+            "type": "string",
+            "title": "Base Currency"
+          },
+          "horizon_years": {
+            "type": "integer",
+            "title": "Horizon Years"
+          },
+          "paths": {
+            "type": "integer",
+            "title": "Paths"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed"
+          },
+          "lookback_used": {
+            "type": "string",
+            "title": "Lookback Used"
+          },
+          "observations": {
+            "type": "integer",
+            "title": "Observations"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioExcluded"
+            },
+            "type": "array",
+            "title": "Excluded",
+            "default": []
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_value",
+          "total_contributions",
+          "percentiles",
+          "final",
+          "prob_loss",
+          "prob_drawdown_20",
+          "base_currency",
+          "horizon_years",
+          "paths",
+          "seed",
+          "lookback_used",
+          "observations"
+        ],
+        "title": "MonteCarloResponse"
+      },
+      "MonteCarloSummary": {
+        "properties": {
+          "start_value": {
+            "type": "number",
+            "title": "Start Value"
+          },
+          "total_contributions": {
+            "type": "number",
+            "title": "Total Contributions"
+          },
+          "percentiles": {
+            "items": {
+              "$ref": "#/components/schemas/PercentilePoint"
+            },
+            "type": "array",
+            "title": "Percentiles"
+          },
+          "final": {
+            "$ref": "#/components/schemas/FinalDistribution"
+          },
+          "prob_loss": {
+            "type": "number",
+            "title": "Prob Loss",
+            "description": "Share of paths ending below start value + total contributions"
+          },
+          "prob_drawdown_20": {
+            "type": "number",
+            "title": "Prob Drawdown 20",
+            "description": "Share of paths with max drawdown <= -20%"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_value",
+          "total_contributions",
+          "percentiles",
+          "final",
+          "prob_loss",
+          "prob_drawdown_20"
+        ],
+        "title": "MonteCarloSummary"
+      },
       "NewsArticle": {
         "properties": {
           "id": {
@@ -2798,6 +3603,44 @@
         "title": "NewsArticle",
         "description": "Schema for news articles related to stocks"
       },
+      "PercentilePoint": {
+        "properties": {
+          "day": {
+            "type": "integer",
+            "title": "Day"
+          },
+          "p5": {
+            "type": "number",
+            "title": "P5"
+          },
+          "p25": {
+            "type": "number",
+            "title": "P25"
+          },
+          "p50": {
+            "type": "number",
+            "title": "P50"
+          },
+          "p75": {
+            "type": "number",
+            "title": "P75"
+          },
+          "p95": {
+            "type": "number",
+            "title": "P95"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "p5",
+          "p25",
+          "p50",
+          "p75",
+          "p95"
+        ],
+        "title": "PercentilePoint"
+      },
       "PortfolioPositionInput": {
         "properties": {
           "ticker": {
@@ -2808,9 +3651,10 @@
           },
           "quantity": {
             "type": "number",
+            "maximum": 1000000000.0,
             "exclusiveMinimum": 0.0,
             "title": "Quantity",
-            "description": "Number of shares/units held"
+            "description": "Number of shares/units held (max 1e9)"
           }
         },
         "type": "object",
@@ -3279,6 +4123,77 @@
         "title": "PriceData",
         "description": "Schema for stock price data"
       },
+      "RiskSnapshot": {
+        "properties": {
+          "volatility_annual": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volatility Annual"
+          },
+          "beta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beta"
+          },
+          "max_drawdown": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Drawdown"
+          },
+          "hhi": {
+            "type": "number",
+            "title": "Hhi"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hhi"
+        ],
+        "title": "RiskSnapshot"
+      },
+      "ScenarioExcluded": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "no_history",
+              "no_fx",
+              "unknown_currency",
+              "short_history",
+              "invalid_prices"
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "reason"
+        ],
+        "title": "ScenarioExcluded"
+      },
       "SearchResponse": {
         "properties": {
           "query": {
@@ -3694,6 +4609,204 @@
         ],
         "title": "StockInfo",
         "description": "Schema for comprehensive stock information"
+      },
+      "StressPosition": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "return": {
+            "type": "number",
+            "title": "Return",
+            "description": "Position return in the scenario (decimal, base currency)"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "historical",
+              "beta_proxy",
+              "shock"
+            ],
+            "title": "Method"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight",
+            "description": "Current weight in the portfolio (0-1)"
+          },
+          "beta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beta",
+            "description": "Beta (clamped to [0, 3]) used for beta_proxy/shock; null for 'historical' positions. Estimated from weekly (W-FRI) base-currency returns vs ^GSPC over the last 2y (>= 52 weekly observations), else 1.0"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "return",
+          "method",
+          "weight"
+        ],
+        "title": "StressPosition"
+      },
+      "StressRequest": {
+        "properties": {
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/PortfolioPositionInput"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Positions"
+          },
+          "base_currency": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$",
+            "title": "Base Currency",
+            "default": "USD"
+          },
+          "shocks": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Shocks",
+            "description": "Market shocks as decimals (-0.2 = -20%)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "positions"
+        ],
+        "title": "StressRequest"
+      },
+      "StressResponse": {
+        "properties": {
+          "base_currency": {
+            "type": "string",
+            "title": "Base Currency"
+          },
+          "current_value": {
+            "type": "number",
+            "title": "Current Value"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/StressScenario"
+            },
+            "type": "array",
+            "title": "Scenarios"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioExcluded"
+            },
+            "type": "array",
+            "title": "Excluded",
+            "default": []
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "base_currency",
+          "current_value",
+          "scenarios"
+        ],
+        "title": "StressResponse"
+      },
+      "StressScenario": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "historical",
+              "beta_proxy",
+              "shock"
+            ],
+            "title": "Method",
+            "description": "'historical' if every position has its own data; 'beta_proxy' if any position used beta x benchmark; 'shock' for market shocks"
+          },
+          "portfolio_return": {
+            "type": "number",
+            "title": "Portfolio Return"
+          },
+          "value_after": {
+            "type": "number",
+            "title": "Value After"
+          },
+          "pnl": {
+            "type": "number",
+            "title": "Pnl"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/StressPosition"
+            },
+            "type": "array",
+            "title": "Positions"
+          },
+          "benchmark_return": {
+            "type": "number",
+            "title": "Benchmark Return"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "method",
+          "portfolio_return",
+          "value_after",
+          "pnl",
+          "positions",
+          "benchmark_return"
+        ],
+        "title": "StressScenario"
       },
       "TechnicalLatest": {
         "properties": {
@@ -4215,6 +5328,203 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WhatIfChanges": {
+        "properties": {
+          "sell": {
+            "items": {
+              "$ref": "#/components/schemas/WhatIfTrade"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Sell"
+          },
+          "buy": {
+            "items": {
+              "$ref": "#/components/schemas/WhatIfTrade"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Buy"
+          },
+          "monthly_contribution": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Contribution",
+            "description": "Contribution of the modified portfolio (defaults to the current one)"
+          }
+        },
+        "type": "object",
+        "title": "WhatIfChanges"
+      },
+      "WhatIfDelta": {
+        "properties": {
+          "p50": {
+            "type": "number",
+            "title": "P50"
+          },
+          "p5": {
+            "type": "number",
+            "title": "P5"
+          },
+          "prob_loss": {
+            "type": "number",
+            "title": "Prob Loss"
+          },
+          "p50_return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Return",
+            "description": "Modified minus current of (final p50 / (start_value + total_contributions) - 1)"
+          },
+          "p5_return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P5 Return",
+            "description": "Modified minus current of (final p5 / (start_value + total_contributions) - 1)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "p50",
+          "p5",
+          "prob_loss"
+        ],
+        "title": "WhatIfDelta"
+      },
+      "WhatIfRequest": {
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/MonteCarloRequest"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/WhatIfChanges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current",
+          "changes"
+        ],
+        "title": "WhatIfRequest"
+      },
+      "WhatIfResponse": {
+        "properties": {
+          "base_currency": {
+            "type": "string",
+            "title": "Base Currency"
+          },
+          "horizon_years": {
+            "type": "integer",
+            "title": "Horizon Years"
+          },
+          "paths": {
+            "type": "integer",
+            "title": "Paths"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed"
+          },
+          "lookback_used": {
+            "type": "string",
+            "title": "Lookback Used"
+          },
+          "observations": {
+            "type": "integer",
+            "title": "Observations"
+          },
+          "current": {
+            "$ref": "#/components/schemas/MonteCarloSummary"
+          },
+          "modified": {
+            "$ref": "#/components/schemas/MonteCarloSummary"
+          },
+          "delta": {
+            "$ref": "#/components/schemas/WhatIfDelta"
+          },
+          "cash_from_sales": {
+            "type": "number",
+            "title": "Cash From Sales",
+            "description": "Proceeds of the sells (qty x last price, base currency). Kept as cash with 0 return in the modified portfolio (included in its start_value); buys are funded by new money",
+            "default": 0.0
+          },
+          "risk_current": {
+            "$ref": "#/components/schemas/RiskSnapshot"
+          },
+          "risk_modified": {
+            "$ref": "#/components/schemas/RiskSnapshot"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioExcluded"
+            },
+            "type": "array",
+            "title": "Excluded",
+            "default": []
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Educational information, not financial advice."
+          }
+        },
+        "type": "object",
+        "required": [
+          "base_currency",
+          "horizon_years",
+          "paths",
+          "seed",
+          "lookback_used",
+          "observations",
+          "current",
+          "modified",
+          "delta",
+          "risk_current",
+          "risk_modified"
+        ],
+        "title": "WhatIfResponse"
+      },
+      "WhatIfTrade": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9.^=\\-]{1,20}$",
+            "title": "Ticker"
+          },
+          "quantity": {
+            "type": "number",
+            "maximum": 1000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "quantity"
+        ],
+        "title": "WhatIfTrade"
       }
     },
     "securitySchemes": {

@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
+import { MAX_POSITIONS, invalidTickers, toPositions } from "@/lib/portfolioPositions";
 import { CorrelationHeatmap } from "./CorrelationHeatmap";
 import {
   NO_DATA,
@@ -26,8 +27,6 @@ import {
   fmtPct,
 } from "./riskFormat";
 
-const MAX_POSITIONS = 50;
-
 const EXCLUSION_REASON: Record<string, string> = {
   no_history: "no price history",
   no_fx: "no exchange rate",
@@ -39,36 +38,6 @@ interface Props {
   portfolioId?: string;
   holdings: PortfolioHolding[];
   currency?: string;
-}
-
-/** Same pattern the risk API validates; one bad symbol would otherwise reject the whole request. */
-const VALID_TICKER = /^[A-Za-z0-9.^=-]{1,20}$/;
-
-function invalidTickers(holdings: PortfolioHolding[]) {
-  const out = new Set<string>();
-  for (const h of holdings) {
-    const ticker = h.ticker?.trim().toUpperCase();
-    if (ticker && h.quantity > 0 && !VALID_TICKER.test(ticker)) out.add(ticker);
-  }
-  return [...out].sort();
-}
-
-/** Aggregate holdings by ticker; drop zero/negative quantities and unsupported symbols; cap at 50 largest. */
-function toPositions(holdings: PortfolioHolding[]) {
-  const byTicker = new Map<string, { quantity: number; value: number }>();
-  for (const h of holdings) {
-    const ticker = h.ticker?.trim().toUpperCase();
-    if (!ticker || !(h.quantity > 0) || !VALID_TICKER.test(ticker)) continue;
-    const prev = byTicker.get(ticker) ?? { quantity: 0, value: 0 };
-    prev.quantity += h.quantity;
-    prev.value += (h.current_price ?? 0) * h.quantity;
-    byTicker.set(ticker, prev);
-  }
-  return [...byTicker.entries()]
-    .sort((a, b) => b[1].value - a[1].value || a[0].localeCompare(b[0]))
-    .slice(0, MAX_POSITIONS)
-    .map(([ticker, v]) => ({ ticker, quantity: v.quantity }))
-    .sort((a, b) => a.ticker.localeCompare(b.ticker));
 }
 
 interface MetricProps {

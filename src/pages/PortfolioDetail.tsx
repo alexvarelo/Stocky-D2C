@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePortfolio, useDeletePortfolio } from "@/api/portfolio/portfolio";
 import { usePortfolioFollows } from "@/api/portfolio/usePortfolioFollows";
@@ -225,6 +225,17 @@ export const PortfolioDetail = () => {
               portfolioId={portfolioId}
               isLoading={isLoadingPrices}
             />
+
+            {/* Scenarios entry point */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl border border-border/50 p-4">
+              <div>
+                <p className="font-semibold">Scenarios</p>
+                <p className="text-sm text-muted-foreground">Stress tests, simulations and what-if comparisons for this portfolio.</p>
+              </div>
+              <Button asChild variant="outline" className="gap-2 shrink-0">
+                <Link to={`/portfolio/${portfolioId}/scenarios`}>Explore scenarios</Link>
+              </Button>
+            </div>
 
             {/* Risk */}
             <PortfolioRiskPanel
