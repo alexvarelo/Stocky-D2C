@@ -1,0 +1,33 @@
+{
+  "links": {
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "portfolios": "Portfolios",
+    "watchlists": "Watchlists",
+    "discover": "Discovery",
+    "strategies": "Strategies",
+    "learn": "Learn",
+    "academy": "Academy"
+  },
+  "mainNav": "Main navigation",
+  "user": "User",
+  "account": "Account",
+  "accountMenu": "Account menu",
+  "myProfile": "My Profile",
+  "settings": "Settings",
+  "signOut": "Sign out",
+  "appearance": "Appearance",
+  "expandSidebar": "Expand sidebar",
+  "collapseSidebar": "Collapse sidebar",
+  "toggleTheme": "Toggle theme",
+  "search": {
+    "button": "Search",
+    "placeholder": "Search stocks, ETFs, and more...",
+    "noResults": "No results found for \"{{query}}\"",
+    "instruments": "Instruments",
+    "quickAccess": "Quick Access",
+    "myPortfolios": "My Portfolios",
+    "myWatchlists": "My Watchlists",
+    "popular": "Popular Stocks"
+  }
+}

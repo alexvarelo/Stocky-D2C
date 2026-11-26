@@ -8,6 +8,10 @@ import { Term } from "@/components/glossary/Term";
 import { EducationalDisclaimer } from "@/components/compliance/EducationalDisclaimer";
 import { ExplainThis } from "@/components/explain/ExplainThis";
 import { cn } from "@/lib/utils";
+import { useTranslation, Trans } from "react-i18next";
+import i18n from "@/i18n";
+import { formatDate, formatDecimal } from "@/lib/formatters";
+import { getLocale } from "@/lib/locale";
 
 const TERM_BY_KEY: Record<string, string> = {
   vix: "vix",
@@ -16,37 +20,39 @@ const TERM_BY_KEY: Record<string, string> = {
   sp500: "sp500",
 };
 
-/** One-line description per indicator. Used when the API does not send `description` yet. */
-const DESCRIPTION_BY_KEY: Record<string, string> = {
-  vix: "Volatility the options market expects for the S&P 500 over the next 30 days.",
-  us10y: "Yield on 10-year US government bonds, a reference for borrowing costs.",
-  dxy: "Value of the US dollar against a basket of major currencies.",
-  sp500: "Index of 500 large US companies, a common gauge of the US stock market.",
-};
+/** Indicators with a local one-line description (dashboard:market.description.<key>). */
+const DESCRIBED_KEYS = new Set(["vix", "us10y", "dxy", "sp500"]);
 
 /** Optional fields the API may add (additive); read safely so this works before and after regenerating the client. */
 type IndicatorExtras = { description?: string | null; as_of?: string | null };
 
+/** Indicator name in the UI language; the API label (English) for any indicator we don't know. */
+function indicatorLabel(ind: MarketIndicator): string {
+  return DESCRIBED_KEYS.has(ind.key) ? i18n.t(`market.label.${ind.key}`, { ns: "dashboard" }) : ind.label;
+}
+
+/** Local description first so it follows the UI language; the API text (English) is the fallback. */
 function indicatorDescription(ind: MarketIndicator): string | null {
-  return (ind as MarketIndicator & IndicatorExtras).description ?? DESCRIPTION_BY_KEY[ind.key] ?? null;
+  if (DESCRIBED_KEYS.has(ind.key)) return i18n.t(`market.description.${ind.key}`, { ns: "dashboard" });
+  return (ind as MarketIndicator & IndicatorExtras).description ?? null;
 }
 
 export function formatIndicatorValue(ind: Pick<MarketIndicator, "value" | "unit">): string {
-  if (ind.value == null || Number.isNaN(ind.value)) return "N/A";
+  if (ind.value == null || Number.isNaN(ind.value)) return i18n.t("status.notAvailable", { ns: "common" });
   return ind.unit === "percent"
-    ? `${ind.value.toFixed(2)}%`
-    : ind.value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    ? `${formatDecimal(ind.value)}%`
+    : ind.value.toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 }
 
 function formatChange(ind: MarketIndicator): string | null {
   const c = ind.change_1d;
   if (c == null || Number.isNaN(c)) return null;
   const sign = c > 0 ? "+" : "";
-  return ind.unit === "percent" ? `${sign}${c.toFixed(2)} pp` : `${sign}${c.toFixed(2)}%`;
+  return ind.unit === "percent" ? `${sign}${formatDecimal(c)} pp` : `${sign}${formatDecimal(c)}%`;
 }
 
 const fmtPctDist = (v: number | null | undefined) =>
-  v == null ? "N/A" : `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
+  v == null ? i18n.t("status.notAvailable", { ns: "common" }) : `${v > 0 ? "+" : ""}${formatDecimal(v, 1)}%`;
 
 export function Sparkline({ values, className }: { values: number[]; className?: string }) {
   if (values.length < 2) return null;
@@ -77,7 +83,7 @@ export function PercentileBar({ value, label }: { value: number; label: string }
     <div className="space-y-1">
       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
         <span id={id}>
-          1-year <Term id="percentile">percentile</Term>
+          <Trans ns="dashboard" i18nKey="market.percentile1y" components={{ term: <Term id="percentile">{null}</Term> }} />
         </span>
         <span className="tabular-nums">{Math.round(pct)}</span>
       </div>
@@ -99,13 +105,15 @@ export function PercentileBar({ value, label }: { value: number; label: string }
 }
 
 function IndicatorCard({ ind, ctxAsOf }: { ind: MarketIndicator; ctxAsOf?: string | null }) {
+  const { t } = useTranslation("dashboard");
   const termId = TERM_BY_KEY[ind.key];
   const change = formatChange(ind);
   const value = formatIndicatorValue(ind);
   const sma = ind.extra;
   const description = indicatorDescription(ind);
   const asOf = (ind as MarketIndicator & IndicatorExtras).as_of;
-  const name = termId ? <Term id={termId}>{ind.label}</Term> : ind.label;
+  const label = indicatorLabel(ind);
+  const name = termId ? <Term id={termId}>{label}</Term> : label;
   return (
     <div className="flex min-w-0 flex-col gap-1.5 rounded-2xl border border-border/50 bg-card/50 p-2.5 sm:gap-2 sm:p-3">
       <div className="flex items-start justify-between gap-1">
@@ -136,14 +144,14 @@ function IndicatorCard({ ind, ctxAsOf }: { ind: MarketIndicator; ctxAsOf?: strin
       </div>
       {description && <p className="text-[11px] leading-snug text-muted-foreground">{description}</p>}
       {ind.sparkline && ind.sparkline.length > 1 && <Sparkline values={ind.sparkline} className="h-5 sm:h-7" />}
-      {ind.percentile_1y != null && <PercentileBar value={ind.percentile_1y} label={`${ind.label} 1-year percentile`} />}
+      {ind.percentile_1y != null && <PercentileBar value={ind.percentile_1y} label={t("market.percentileLabel", { label })} />}
       {sma && (sma.sma50_distance != null || sma.sma200_distance != null) && (
         <p className="text-[11px] text-muted-foreground tabular-nums">
           vs <Term id="sma">SMA</Term>50 {fmtPctDist(sma.sma50_distance)} · SMA200 {fmtPctDist(sma.sma200_distance)}
         </p>
       )}
       {ind.reading && <p className="hidden text-xs text-muted-foreground sm:block">{ind.reading}</p>}
-      {asOf && asOf !== ctxAsOf && <p className="text-[10px] text-muted-foreground">As of {asOf}</p>}
+      {asOf && asOf !== ctxAsOf && <p className="text-[10px] text-muted-foreground">{t("market.asOf", { date: formatDate(asOf) })}</p>}
     </div>
   );
 }
@@ -166,6 +174,7 @@ export function MarketContextPanel({ className }: { className?: string }) {
   const { data, isLoading, isError } = useMarketContextApiV1MarketContextGet({
     query: { staleTime: 15 * 60 * 1000 },
   });
+  const { t } = useTranslation("dashboard");
   const ctx = data?.data;
 
   if (isError || (!isLoading && (!ctx || ctx.indicators.length === 0))) return null;
@@ -176,9 +185,9 @@ export function MarketContextPanel({ className }: { className?: string }) {
         <div>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Gauge className="h-5 w-5 text-muted-foreground" aria-hidden />
-            Market context
+            {t("market.title")}
           </CardTitle>
-          {ctx?.as_of && <p className="mt-0.5 text-[11px] text-muted-foreground">As of {ctx.as_of}</p>}
+          {ctx?.as_of && <p className="mt-0.5 text-[11px] text-muted-foreground">{t("market.asOf", { date: formatDate(ctx.as_of) })}</p>}
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -195,7 +204,7 @@ export function MarketContextPanel({ className }: { className?: string }) {
               <div className="flex flex-col gap-2 rounded-2xl border border-border/50 bg-card/50 p-3 sm:max-w-sm">
                 <div className="flex items-start justify-between gap-1">
                   <p className="text-xs text-muted-foreground">
-                    <Term id="market-breadth">Market breadth</Term>: share above 200-day average
+                    <Trans ns="dashboard" i18nKey="market.breadth" components={{ term: <Term id="market-breadth">{null}</Term> }} />
                   </p>
                   <ExplainThis
                     className="-mr-1 -mt-1"
@@ -207,7 +216,7 @@ export function MarketContextPanel({ className }: { className?: string }) {
                 </div>
                 <span className="text-xl font-semibold tabular-nums">{ctx.breadth.pct_above_sma200.toFixed(0)}%</span>
                 {ctx.breadth.percentile_1y != null && (
-                  <PercentileBar value={ctx.breadth.percentile_1y} label="Market breadth 1-year percentile" />
+                  <PercentileBar value={ctx.breadth.percentile_1y} label={t("market.breadthPercentileLabel")} />
                 )}
               </div>
             )}

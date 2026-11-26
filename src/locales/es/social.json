@@ -1,0 +1,38 @@
+{
+  "create": {
+    "prompt": "¿Qué opinas?",
+    "placeholder": "Comparte tu opinión…",
+    "linkPortfolio": "Vincular una cartera (opcional)",
+    "selectPortfolio": "Elige una cartera",
+    "noPortfolio": "Sin cartera",
+    "private": "(Privada)",
+    "linkInstrument": "Vincular un valor (opcional)",
+    "searchInstruments": "Buscar valores…",
+    "searching": "Buscando…",
+    "noInstruments": "No se han encontrado valores",
+    "removeInstrument": "Quitar valor",
+    "characters": "{{count, number}}/{{max, number}} caracteres",
+    "posting": "Publicando…",
+    "post": "Publicar",
+    "toast": {
+      "signedOut": "Inicia sesión para publicar",
+      "successTitle": "Publicado",
+      "success": "Tu publicación ya está visible",
+      "error": "No se ha podido publicar"
+    }
+  },
+  "post": {
+    "authRequired": "Inicia sesión",
+    "signInToLike": "Inicia sesión para dar me gusta",
+    "aiTitle": "Escrito por IA. No es asesoramiento de inversión.",
+    "aiGenerated": "Generado por IA",
+    "moreOptions": "Más opciones",
+    "report": "Denunciar publicación",
+    "comments_one": "{{count}} comentario",
+    "comments_other": "{{count}} comentarios",
+    "like_one": "Me gusta ({{count}} me gusta)",
+    "like_other": "Me gusta ({{count}} me gusta)",
+    "unlike_one": "Quitar me gusta ({{count}} me gusta)",
+    "unlike_other": "Quitar me gusta ({{count}} me gusta)"
+  }
+}

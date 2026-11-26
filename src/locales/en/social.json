@@ -1,0 +1,38 @@
+{
+  "create": {
+    "prompt": "What are your thoughts?",
+    "placeholder": "Share your thoughts…",
+    "linkPortfolio": "Link to portfolio (optional)",
+    "selectPortfolio": "Select a portfolio",
+    "noPortfolio": "No portfolio",
+    "private": "(Private)",
+    "linkInstrument": "Link to instrument (optional)",
+    "searchInstruments": "Search instruments…",
+    "searching": "Searching…",
+    "noInstruments": "No instruments found",
+    "removeInstrument": "Remove instrument",
+    "characters": "{{count, number}}/{{max, number}} characters",
+    "posting": "Posting…",
+    "post": "Post",
+    "toast": {
+      "signedOut": "You must be signed in to post",
+      "successTitle": "Posted",
+      "success": "Your post has been published",
+      "error": "Couldn't publish your post"
+    }
+  },
+  "post": {
+    "authRequired": "Sign-in required",
+    "signInToLike": "Sign in to like posts",
+    "aiTitle": "Written by AI. Not investment advice.",
+    "aiGenerated": "AI-generated",
+    "moreOptions": "More options",
+    "report": "Report post",
+    "comments_one": "{{count}} comment",
+    "comments_other": "{{count}} comments",
+    "like_one": "Like ({{count}} like)",
+    "like_other": "Like ({{count}} likes)",
+    "unlike_one": "Unlike ({{count}} like)",
+    "unlike_other": "Unlike ({{count}} likes)"
+  }
+}

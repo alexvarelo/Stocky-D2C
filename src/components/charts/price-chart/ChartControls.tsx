@@ -6,6 +6,7 @@ import { StockSearch } from '@/components/stock/StockSearch';
 import { TimeRange, ChartMode } from './types';
 import { CompanyLogo } from '@/components/stock/CompanyLogo';
 import { usePriceFlash, priceFlashClass } from '@/hooks/usePriceFlash';
+import { getLocale } from "@/lib/locale";
 
 interface ChartControlsProps {
     ticker: string;
@@ -59,7 +60,7 @@ export const ChartControls = ({
                     {hasData && (
                         <div className="flex items-center gap-2 mt-1">
                             <span className={`text-2xl font-bold rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
-                                {new Intl.NumberFormat('en-US', {
+                                {new Intl.NumberFormat(getLocale(), {
                                     style: 'currency',
                                     currency: currency || 'USD',
                                     minimumFractionDigits: 2,

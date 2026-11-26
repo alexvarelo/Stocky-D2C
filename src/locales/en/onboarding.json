@@ -1,0 +1,38 @@
+{
+  "welcome": {
+    "title": "Welcome to Stocky,",
+    "subtitle": "Let's set up your profile — it takes less than a minute and gets you straight to the market.",
+    "cta": "Let's get started"
+  },
+  "identity": {
+    "title": "Tell us about you",
+    "subtitle": "This is how the community will find and recognize you.",
+    "terms": "I'm 18 or older and I accept the <terms>Terms</terms> and <privacy>Privacy Policy</privacy>. I understand Stockfolio doesn't give investment advice."
+  },
+  "fields": {
+    "fullName": "Full name",
+    "username": "Username",
+    "avatarUrl": "Avatar URL (optional)",
+    "bio": "Short bio (optional)"
+  },
+  "validation": {
+    "usernameMin_one": "Username must be at least {{count}} character",
+    "usernameMin_other": "Username must be at least {{count}} characters",
+    "fullNameRequired": "Full name is required",
+    "terms": "Please accept the Terms and Privacy Policy to continue"
+  },
+  "personalize": {
+    "title": "Make it yours",
+    "subtitle": "Optional — add a photo and a short bio, or skip for now.",
+    "finish": "Finish",
+    "skip": "Skip for now"
+  },
+  "done": {
+    "title": "You're all set, {{name}}",
+    "subtitle": "Taking you to your portfolio..."
+  },
+  "toast": {
+    "errorTitle": "Something went wrong",
+    "errorDescription": "Failed to save your profile. Please try again."
+  }
+}

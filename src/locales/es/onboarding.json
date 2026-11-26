@@ -1,0 +1,38 @@
+{
+  "welcome": {
+    "title": "Te damos la bienvenida a Stocky,",
+    "subtitle": "Vamos a configurar tu perfil: te llevará menos de un minuto y entrarás directo al mercado.",
+    "cta": "Empezar"
+  },
+  "identity": {
+    "title": "Cuéntanos sobre ti",
+    "subtitle": "Así es como la comunidad te encontrará y te reconocerá.",
+    "terms": "Soy mayor de 18 años y acepto los <terms>Términos</terms> y la <privacy>Política de privacidad</privacy>. Entiendo que Stockfolio no ofrece asesoramiento de inversión."
+  },
+  "fields": {
+    "fullName": "Nombre completo",
+    "username": "Nombre de usuario",
+    "avatarUrl": "URL del avatar (opcional)",
+    "bio": "Biografía breve (opcional)"
+  },
+  "validation": {
+    "usernameMin_one": "El nombre de usuario debe tener al menos {{count}} carácter",
+    "usernameMin_other": "El nombre de usuario debe tener al menos {{count}} caracteres",
+    "fullNameRequired": "El nombre completo es obligatorio",
+    "terms": "Acepta los Términos y la Política de privacidad para continuar"
+  },
+  "personalize": {
+    "title": "Hazlo tuyo",
+    "subtitle": "Opcional: añade una foto y una biografía breve, o sáltalo por ahora.",
+    "finish": "Terminar",
+    "skip": "Saltar por ahora"
+  },
+  "done": {
+    "title": "Todo listo, {{name}}",
+    "subtitle": "Te llevamos a tu cartera..."
+  },
+  "toast": {
+    "errorTitle": "Algo ha ido mal",
+    "errorDescription": "No se pudo guardar tu perfil. Inténtalo de nuevo."
+  }
+}

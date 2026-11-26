@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -23,12 +24,17 @@ export function DeleteConfirmationDialog({
   isOpen,
   onOpenChange,
   onConfirm,
-  title = "Delete Portfolio",
-  description = "Are you sure you want to delete this portfolio? This action cannot be undone.",
-  confirmText = "Delete",
-  cancelText = "Cancel",
+  title,
+  description,
+  confirmText,
+  cancelText,
   children,
 }: DeleteConfirmationDialogProps) {
+  const { t } = useTranslation('portfolio');
+  title ??= t('delete.title');
+  description ??= t('delete.description');
+  confirmText ??= t('common:actions.delete');
+  cancelText ??= t('common:actions.cancel');
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>

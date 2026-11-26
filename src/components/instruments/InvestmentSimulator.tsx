@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -16,6 +16,7 @@ import {
 import { useGetHistoricalDataApiV1StockTickerHistoryGet } from "@/api/stock/stock";
 import type { HistoricalDataPoint, HistoricalDataResponse } from "@/api/financialDataApi.schemas";
 import { SimpleLineChart } from "@/components/charts/SimpleLineChart";
+import { getLocale } from "@/lib/locale";
 
 interface InvestmentSimulatorProps {
   ticker: string;
@@ -87,7 +88,7 @@ export function InvestmentSimulator({ ticker, currentPrice, currency }: Investme
   }, [historicalData, investmentAmount, currentPrice]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(getLocale(), {
       style: 'currency',
       currency: currency || 'USD',
       minimumFractionDigits: 2,

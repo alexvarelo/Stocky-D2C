@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -22,24 +23,28 @@ import {
   GraduationCap,
   PanelLeftClose,
   PanelLeftOpen,
+  Settings,
 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { LanguageMenuSub } from '@/components/i18n/LanguageSelect';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/portfolios', label: 'Portfolios', icon: Briefcase },
-  { href: '/watchlists', label: 'Watchlists', icon: Star },
-  { href: '/discover', label: 'Discovery', icon: Compass },
-  { href: '/strategies', label: 'Strategies', icon: LineChart },
-  { href: '/learn', label: 'Learn', icon: GraduationCap },
-];
+  { href: '/', key: 'dashboard', icon: LayoutDashboard },
+  { href: '/portfolios', key: 'portfolios', icon: Briefcase },
+  { href: '/watchlists', key: 'watchlists', icon: Star },
+  { href: '/discover', key: 'discover', icon: Compass },
+  { href: '/strategies', key: 'strategies', icon: LineChart },
+  { href: '/learn', key: 'learn', icon: GraduationCap },
+] as const;
 
 export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { userProfile, signOut } = useAuth();
   const queryClient = useQueryClient();
+  const { t } = useTranslation('navigation');
   const [collapsed, setCollapsed] = useState(
     () => localStorage.getItem('sidenav-collapsed') === '1'
   );
@@ -71,7 +76,7 @@ export const Navbar = () => {
           )}
         >
           <Avatar className="h-7 w-7 shrink-0">
-            <AvatarImage src={userProfile?.avatar_url} alt={userProfile?.full_name || 'User'} />
+            <AvatarImage src={userProfile?.avatar_url} alt={userProfile?.full_name || t('user')} />
             <AvatarFallback className="text-xs">
               {userProfile?.full_name
                 ? userProfile.full_name.charAt(0).toUpperCase()
@@ -81,7 +86,7 @@ export const Navbar = () => {
           {!collapsed && (
             <div className="flex-1 min-w-0 text-left">
               <p className="text-[13px] font-medium text-foreground truncate leading-tight">
-                {userProfile?.full_name || 'Account'}
+                {userProfile?.full_name || t('account')}
               </p>
               <p className="text-[11px] text-muted-foreground truncate leading-tight">
                 {userProfile?.email}
@@ -96,11 +101,17 @@ export const Navbar = () => {
           disabled={!userProfile?.id}
         >
           <User className="mr-2 h-4 w-4" />
-          <span>My Profile</span>
+          <span>{t('myProfile')}</span>
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/settings')}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>{t('settings')}</span>
+        </DropdownMenuItem>
+        <LanguageMenuSub />
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign out</span>
+          <span>{t('signOut')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -127,7 +138,8 @@ export const Navbar = () => {
           <button
             onClick={toggleCollapsed}
             className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={collapsed ? t('expandSidebar') : t('collapseSidebar')}
+            aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
           >
             {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
           </button>
@@ -142,8 +154,9 @@ export const Navbar = () => {
 
         {/* Nav links */}
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.map(({ href, key, icon: Icon }) => {
             const active = isActive(href);
+            const label = t(`links.${key}`);
             return (
               <Link
                 key={href}
@@ -167,7 +180,7 @@ export const Navbar = () => {
         {/* Bottom: theme + profile */}
         <div className="px-3 py-3 border-t border-border space-y-1">
           <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between px-1')}>
-            {!collapsed && <span className="text-[11px] font-medium text-muted-foreground">Appearance</span>}
+            {!collapsed && <span className="text-[11px] font-medium text-muted-foreground">{t('appearance')}</span>}
             <ThemeToggle />
           </div>
           {profileMenu}
@@ -186,9 +199,9 @@ export const Navbar = () => {
         {userProfile?.id && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button>
+              <button aria-label={t('accountMenu')}>
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={userProfile.avatar_url} alt={userProfile.full_name || 'User'} />
+                  <AvatarImage src={userProfile.avatar_url} alt={userProfile.full_name || t('user')} />
                   <AvatarFallback className="text-xs">
                     {userProfile.full_name
                       ? userProfile.full_name.charAt(0).toUpperCase()
@@ -200,19 +213,25 @@ export const Navbar = () => {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => navigate('/learn')}>
                 <GraduationCap className="mr-2 h-4 w-4" />
-                <span>Learn</span>
+                <span>{t('links.learn')}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate('/strategies')}>
                 <LineChart className="mr-2 h-4 w-4" />
-                <span>Strategies</span>
+                <span>{t('links.strategies')}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate(`/user/${userProfile.id}`)}>
                 <User className="mr-2 h-4 w-4" />
-                <span>My Profile</span>
+                <span>{t('myProfile')}</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>{t('settings')}</span>
+              </DropdownMenuItem>
+              <LanguageMenuSub />
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Sign out</span>
+                <span>{t('signOut')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { parseISO } from "date-fns";
+import { useTranslation } from "react-i18next";
+import { formatDate, formatDecimal } from "@/lib/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, ChevronDown, RefreshCw, ShieldAlert } from "lucide-react";
 import { portfolioRiskApiV1PortfolioRiskPost } from "@/api/risk/risk";
@@ -17,8 +19,10 @@ import { MAX_POSITIONS, invalidTickers, toPositions } from "@/lib/portfolioPosit
 import { CorrelationHeatmap } from "./CorrelationHeatmap";
 import {
   NO_DATA,
-  NO_DATA_HINT,
+  getNoDataHint,
   PERIOD_OPTIONS,
+  periodLabel,
+  periodLong as getPeriodLong,
   describeBeta,
   describeConcentration,
   describeDrawdown,
@@ -29,12 +33,6 @@ import {
   fmtPct,
 } from "./riskFormat";
 
-const EXCLUSION_REASON: Record<string, string> = {
-  no_history: "no price history",
-  no_fx: "no exchange rate",
-  unknown_currency: "unknown currency",
-  limit: "over position limit",
-};
 
 interface Props {
   portfolioId?: string;
@@ -64,10 +62,10 @@ function MetricCard({ label, value, reading, isNull, tooltip, name }: MetricProp
           />
         )}
       </div>
-      <div className="text-xl font-semibold tabular-nums" title={isNull ? NO_DATA_HINT : undefined}>
+      <div className="text-xl font-semibold tabular-nums" title={isNull ? getNoDataHint() : undefined}>
         {value}
       </div>
-      <div className="text-xs text-muted-foreground min-h-[1rem]">{isNull ? NO_DATA_HINT : reading}</div>
+      <div className="text-xs text-muted-foreground min-h-[1rem]">{isNull ? getNoDataHint() : reading}</div>
     </div>
   );
 }
@@ -106,6 +104,7 @@ function SummaryFigure({ label, value }: { label: string; value: string }) {
 }
 
 export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
+  const { t } = useTranslation("risk");
   const [period, setPeriod] = useState<PortfolioRiskRequestPeriod>("1y");
   // Collapsed by default so holdings stay near the top; remembered per browser.
   const [open, setOpen] = useState<boolean>(readOpen);
@@ -143,15 +142,15 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
     retry: 1,
   });
 
-  const periodLong = PERIOD_OPTIONS.find((p) => p.value === period)?.long ?? period;
+  const periodLong = getPeriodLong(period);
 
   const summary = data && !isError && positions.length > 0 && (
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <SummaryFigure label="Beta vs S&P 500" value={fmtNum(data.beta)} />
-      <SummaryFigure label="Volatility" value={fmtPct(data.volatility_annual)} />
-      <SummaryFigure label="Max drawdown" value={fmtPct(data.max_drawdown)} />
+      <SummaryFigure label={t("metrics.beta")} value={fmtNum(data.beta)} />
+      <SummaryFigure label={t("metrics.volatility")} value={fmtPct(data.volatility_annual)} />
+      <SummaryFigure label={t("metrics.maxDrawdown")} value={fmtPct(data.max_drawdown)} />
       <SummaryFigure
-        label="Largest position"
+        label={t("metrics.largestPosition")}
         value={data.largest_position ? `${data.largest_position.ticker} ${fmtPct(data.largest_position.weight)}` : NO_DATA}
       />
     </dl>
@@ -164,11 +163,11 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
         <div>
           <CardTitle className="flex items-center gap-2 text-lg">
             <ShieldAlert className="h-5 w-5 text-muted-foreground" aria-hidden />
-            Risk
+            {t("title")}
           </CardTitle>
           {data?.as_of && (
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              As of {parseISO(data.as_of).toLocaleDateString()}
+              {t("asOf", { date: formatDate(parseISO(data.as_of).toISOString()) })}
             </p>
           )}
         </div>
@@ -180,18 +179,18 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
               variant="outline"
               value={period}
               onValueChange={(v) => v && setPeriod(v as PortfolioRiskRequestPeriod)}
-              aria-label="Risk period"
+              aria-label={t("periodLabel")}
             >
               {PERIOD_OPTIONS.map((p) => (
                 <ToggleGroupItem key={p.value} value={p.value} className="px-3">
-                  {p.label}
+                  {periodLabel(p.value)}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
           )}
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
-              {open ? "Hide details" : "Show details"}
+              {open ? t("hideDetails") : t("showDetails")}
               <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
             </Button>
           </CollapsibleTrigger>
@@ -200,11 +199,11 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
       <CardContent className="space-y-5">
         {!open && (
           positions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Add holdings to this portfolio to see its risk metrics.</p>
+            <p className="text-sm text-muted-foreground">{t("empty")}</p>
           ) : isLoading ? (
             <Skeleton className="h-12 rounded-xl" />
           ) : isError || !data ? (
-            <p className="text-sm text-muted-foreground">Couldn't load risk metrics. Open the details to retry.</p>
+            <p className="text-sm text-muted-foreground">{t("errorCollapsed")}</p>
           ) : (
             summary
           )
@@ -212,82 +211,82 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
         <CollapsibleContent className="space-y-5">
         {positions.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            Add holdings to this portfolio to see its risk metrics.
+            {t("empty")}
           </p>
         ) : isLoading ? (
           <RiskSkeleton />
         ) : isError || !data ? (
           <div className="flex flex-col items-center gap-3 py-6 text-center">
             <AlertTriangle className="h-6 w-6 text-destructive" aria-hidden />
-            <p className="text-sm text-muted-foreground">Couldn't load risk metrics.</p>
+            <p className="text-sm text-muted-foreground">{t("error")}</p>
             <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-              Retry
+              {t("common:actions.retry")}
             </Button>
           </div>
         ) : (
           <div className={isFetching ? "opacity-60 transition-opacity space-y-5" : "space-y-5"}>
             {totalPositions > MAX_POSITIONS && (
               <p className="text-xs text-muted-foreground">
-                Showing risk for the {MAX_POSITIONS} largest positions.
+                {t("maxPositions", { count: MAX_POSITIONS })}
               </p>
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <MetricCard
                 name="beta vs the S&P 500"
-                label={<Term id="beta">Beta vs S&amp;P 500</Term>}
+                label={<Term id="beta">{t("metrics.beta")}</Term>}
                 value={fmtNum(data.beta)}
                 isNull={data.beta == null}
                 reading={describeBeta(data.beta)}
               />
               <MetricCard
                 name="annualised volatility"
-                label={<Term id="volatility">Volatility</Term>}
+                label={<Term id="volatility">{t("metrics.volatility")}</Term>}
                 value={fmtPct(data.volatility_annual)}
                 isNull={data.volatility_annual == null}
                 reading={describeVolatility(data.volatility_annual)}
               />
               <MetricCard
                 name="maximum drawdown"
-                label={<Term id="max-drawdown">Max drawdown</Term>}
+                label={<Term id="max-drawdown">{t("metrics.maxDrawdown")}</Term>}
                 value={fmtPct(data.max_drawdown)}
                 isNull={data.max_drawdown == null}
                 reading={describeDrawdown(data.max_drawdown)}
               />
               <MetricCard
                 name="Sharpe ratio"
-                label={<Term id="sharpe-ratio">Sharpe ratio</Term>}
+                label={<Term id="sharpe-ratio">{t("metrics.sharpe")}</Term>}
                 value={fmtNum(data.sharpe_ratio)}
                 isNull={data.sharpe_ratio == null}
                 reading={describeSharpe(data.sharpe_ratio)}
-                tooltip="Calculated with a 0% risk-free rate"
+                tooltip={t("sharpeTooltip")}
               />
               <MetricCard
                 name="annualised return"
-                label={<Term id="annual-return">Annual return</Term>}
+                label={<Term id="annual-return">{t("metrics.annualReturn")}</Term>}
                 value={fmtPct(data.annual_return)}
                 isNull={data.annual_return == null}
                 reading={describeReturn(data.annual_return)}
               />
               <MetricCard
                 name="largest position weight"
-                label={<Term id="diversification">Largest position</Term>}
+                label={<Term id="diversification">{t("metrics.largestPosition")}</Term>}
                 value={data.largest_position ? `${data.largest_position.ticker} ${fmtPct(data.largest_position.weight)}` : NO_DATA}
-                reading={data.largest_position ? "Share of portfolio value in the top holding" : null}
+                reading={data.largest_position ? t("largestReading") : null}
                 isNull={!data.largest_position}
               />
               <MetricCard
                 name="concentration (HHI)"
-                label={<Term id="concentration-hhi">Concentration (HHI)</Term>}
-                value={Number.isFinite(data.hhi) ? data.hhi.toFixed(3) : NO_DATA}
+                label={<Term id="concentration-hhi">{t("metrics.hhi")}</Term>}
+                value={Number.isFinite(data.hhi) ? formatDecimal(data.hhi, 3) : NO_DATA}
                 reading={describeConcentration(data)}
               />
               <MetricCard
                 name="effective number of positions"
-                label={<Term id="effective-positions">Effective positions</Term>}
-                value={data.effective_positions == null ? NO_DATA : data.effective_positions.toFixed(1)}
+                label={<Term id="effective-positions">{t("metrics.effectivePositions")}</Term>}
+                value={data.effective_positions == null ? NO_DATA : formatDecimal(data.effective_positions, 1)}
                 isNull={data.effective_positions == null}
-                reading={`Out of ${data.weights.length} holding${data.weights.length === 1 ? "" : "s"}`}
+                reading={t("outOfHoldings", { count: data.weights.length })}
               />
             </div>
 
@@ -297,12 +296,12 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
               <p className="text-xs text-muted-foreground flex gap-2 items-start rounded-xl bg-muted/50 p-3">
                 <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
                 <span>
-                  Excluded:{" "}
+                  {t("excluded")}{" "}
                   {[
                     ...(data.excluded && data.excluded.length > 0
-                      ? data.excluded.map((e) => `${e.ticker} (${EXCLUSION_REASON[e.reason] ?? "unavailable"})`)
+                      ? data.excluded.map((e) => `${e.ticker} (${t(`exclusion.${e.reason}`, { defaultValue: t("exclusion.unavailable") })})`)
                       : data.missing_tickers),
-                    ...skipped.map((t) => `${t} (unsupported symbol)`),
+                    ...skipped.map((ticker) => `${ticker} (${t("exclusion.unsupported")})`),
                   ].join(", ")}
                   .
                 </span>
@@ -314,7 +313,7 @@ export function PortfolioRiskPanel({ portfolioId, holdings, currency }: Props) {
 
         <div className="space-y-1 pt-1 border-t border-border/50">
           <p className="text-xs text-muted-foreground pt-3">
-            Based on today's holdings held over the last {periodLong}; past behaviour does not predict future results.
+            {t("basedOn", { period: periodLong })}
           </p>
           <EducationalDisclaimer />
         </div>

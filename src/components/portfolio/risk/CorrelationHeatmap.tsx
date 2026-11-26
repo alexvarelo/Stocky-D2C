@@ -2,10 +2,12 @@ import { useMemo } from "react";
 import type { PortfolioRiskResponse } from "@/api/financialDataApi.schemas";
 import { Term } from "@/components/glossary/Term";
 import { correlationColor, fmtNum } from "./riskFormat";
+import { useTranslation } from "react-i18next";
 
 const MAX_TICKERS = 12;
 
 export function CorrelationHeatmap({ data }: { data: PortfolioRiskResponse }) {
+  const { t } = useTranslation("risk");
   const { tickers, matrix, truncated } = useMemo(() => {
     const all = data.correlation.tickers;
     const weightOf = new Map(data.weights.map((w) => [w.ticker, w.weight]));
@@ -25,14 +27,14 @@ export function CorrelationHeatmap({ data }: { data: PortfolioRiskResponse }) {
   return (
     <div className="space-y-2">
       <h4 className="text-sm font-medium">
-        <Term id="correlation">Correlation</Term>
+        <Term id="correlation">{t("metrics.correlation")}</Term>
       </h4>
       <div className="overflow-x-auto">
         <div
           className="grid gap-0.5 text-[10px] sm:text-xs min-w-fit"
           style={{ gridTemplateColumns: `minmax(2.5rem, auto) repeat(${tickers.length}, minmax(1.75rem, 1fr))` }}
           role="table"
-          aria-label="Correlation matrix between holdings"
+          aria-label={t("correlationMatrix")}
         >
           <div />
           {tickers.map((t) => (

@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { format } from '@/lib/dateFormat';
 import { ArrowUpRight, Trash2, Loader2, Search, Pencil, GitCompare } from 'lucide-react';
 import { useState } from 'react';
 import { AddToWatchlist } from '@/components/watchlist/AddToWatchlist';

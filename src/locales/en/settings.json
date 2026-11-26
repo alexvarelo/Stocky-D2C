@@ -1,0 +1,35 @@
+{
+  "title": "Settings",
+  "subtitle": "Manage your account settings and preferences",
+  "tabs": {
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "account": "Account",
+    "notifications": "Notifications"
+  },
+  "avatar": {
+    "title": "Profile Picture",
+    "description": "Choose an avatar to represent yourself on Stocky",
+    "preview": "Preview"
+  },
+  "profile": {
+    "title": "Profile Information",
+    "description": "Update your profile information and personal details",
+    "fullName": "Full Name",
+    "username": "Username",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us a little bit about yourself",
+    "bioHint": "You can use markdown and mention other users with @",
+    "website": "Website",
+    "submit": "Update Profile"
+  },
+  "validation": {
+    "nameMin": "Name must be at least 2 characters.",
+    "usernameMin": "Username must be at least 2 characters."
+  },
+  "toast": {
+    "updated": "Profile updated",
+    "updatedDescription": "Your profile has been updated successfully.",
+    "error": "Failed to update profile. Please try again."
+  }
+}

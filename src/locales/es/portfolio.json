@@ -1,0 +1,176 @@
+{
+  "list": {
+    "title": "Carteras",
+    "subtitle": "Gestiona y sigue tus carteras de inversión",
+    "new": "Nueva cartera",
+    "tabs": {
+      "mine": "Mis carteras",
+      "following": "Siguiendo"
+    },
+    "empty": {
+      "title": "Aún no tienes carteras",
+      "description": "Crea tu primera cartera para empezar",
+      "cta": "Crear cartera"
+    },
+    "emptyFollowing": {
+      "title": "No sigues ninguna cartera",
+      "description": "Descubre y sigue carteras públicas para verlas aquí",
+      "cta": "Descubrir carteras"
+    }
+  },
+  "visibility": {
+    "public": "Pública",
+    "private": "Privada"
+  },
+  "card": {
+    "toast": {
+      "unfollowed": "Has dejado de seguir la cartera",
+      "following": "Sigues la cartera",
+      "unfollowedDescription": "Has dejado de seguir {{name}}",
+      "followingDescription": "Ahora sigues {{name}}",
+      "followError": "No se pudo actualizar el seguimiento"
+    },
+    "today": "hoy",
+    "onDate": "el {{date}}",
+    "follow": "Seguir {{name}}",
+    "unfollow": "Dejar de seguir {{name}}",
+    "followers": "Seguidores",
+    "value": "Valor de la cartera",
+    "totalReturn": "Rentabilidad total",
+    "unpriced": "Sin precio actual para {{tickers}}. Valorado al último precio conocido o al coste.",
+    "holdings": "Posiciones",
+    "assets_one": "{{count}} activo",
+    "assets_other": "{{count}} activos",
+    "more": "+{{count}} más",
+    "noHoldings": "Aún no hay posiciones",
+    "pricesAsOf": "Precios a {{date}}",
+    "created": "Creada el {{date}}",
+    "details": "Detalles"
+  },
+  "detail": {
+    "toast": {
+      "deleted": "Cartera eliminada",
+      "deletedDescription": "Tu cartera se ha eliminado correctamente.",
+      "deleteError": "No se pudo eliminar la cartera. Inténtalo de nuevo."
+    },
+    "notFound": {
+      "back": "Volver a Carteras",
+      "title": "Cartera no encontrada",
+      "description": "La cartera que buscas no existe o no tienes permiso para verla.",
+      "cta": "Ver mis carteras"
+    },
+    "scenarios": {
+      "title": "Escenarios",
+      "description": "Pruebas de estrés, simulaciones y comparaciones hipotéticas para esta cartera.",
+      "cta": "Explorar escenarios"
+    },
+    "hero": {
+      "unfollow": "Dejar de seguir",
+      "follow": "Seguir",
+      "aiInsights": "Análisis IA",
+      "moreActions": "Más acciones",
+      "edit": "Editar cartera",
+      "export": "Exportar recibo",
+      "livePrice": "Precio en directo",
+      "followers_one": "{{count}} seguidor",
+      "followers_other": "{{count}} seguidores",
+      "allTime": "Desde el inicio",
+      "today": "Hoy"
+    },
+    "topMovers": "Mayores movimientos (24 h)",
+    "noData": "No hay datos disponibles",
+    "allocation": "Distribución",
+    "assets": "Activos",
+    "noHoldingsData": "No hay datos de posiciones",
+    "others": "Otros",
+    "evolution": "Evolución"
+  },
+  "holdings": {
+    "open": "Abrir {{ticker}}",
+    "avg": "Medio: {{price}}",
+    "today": "{{change}} hoy",
+    "ofPortfolio": "{{pct}} % de la cartera",
+    "columns": {
+      "asset": "Activo",
+      "price": "Precio",
+      "value": "Valor",
+      "today": "Hoy",
+      "return": "Rentabilidad",
+      "allocation": "Peso"
+    },
+    "empty": "Esta cartera todavía no tiene posiciones.",
+    "basis": {
+      "value": "% del valor",
+      "invested": "% de lo invertido"
+    }
+  },
+  "metrics": {
+    "invested": "Total invertido",
+    "investedSub": "capital invertido",
+    "best": "Mejor posición",
+    "worst": "Peor posición",
+    "largest": "Mayor posición",
+    "avg": "Posición media",
+    "avgSub": "por posición"
+  },
+  "transactions": {
+    "title": "Operaciones",
+    "sharesAt_one": "{{count, number}} acción a {{price}}",
+    "sharesAt_other": "{{count, number}} acciones a {{price}}",
+    "types": {
+      "BUY": "Compra",
+      "SELL": "Venta"
+    },
+    "why": "Motivo: {{notes}}",
+    "columns": {
+      "date": "Fecha",
+      "type": "Tipo",
+      "stock": "Valor",
+      "shares": "Acciones",
+      "price": "Precio",
+      "total": "Total"
+    },
+    "empty": "Todavía no se ha registrado ninguna operación en esta cartera.",
+    "records_one": "{{count}} registro",
+    "records_other": "{{count}} registros"
+  },
+  "delete": {
+    "title": "Eliminar cartera",
+    "description": "¿Seguro que quieres eliminar esta cartera? Esta acción no se puede deshacer."
+  },
+  "awards": {
+    "title": "Logros",
+    "subtitle": "Hitos que ha alcanzado tu cartera.",
+    "unlockedCount": "{{count}}/{{total}} conseguidos",
+    "unlocked": "CONSEGUIDO",
+    "locked": "BLOQUEADO",
+    "progress": "Progreso",
+    "completed": "Completado",
+    "hits_one": "{{count}} vez",
+    "hits_other": "{{count}} veces",
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días",
+    "assets_one": "{{count}} activo",
+    "assets_other": "{{count}} activos",
+    "bullseye": {
+      "title": "En el blanco",
+      "description": "Ha alcanzado su objetivo mensual 3 veces"
+    },
+    "club100": {
+      "title": "Club del 100 %",
+      "description": "Ha superado una rentabilidad total del 100 %"
+    },
+    "onFire": {
+      "title": "Imparable",
+      "description": "7 días seguidos abriendo la app"
+    },
+    "diversified": {
+      "title": "Diversificada",
+      "description": "Tiene 5 o más activos distintos"
+    },
+    "disciplined": {
+      "title": "Constante",
+      "description": "Revisada 30 días seguidos"
+    }
+  }
+}

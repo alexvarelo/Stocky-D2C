@@ -30,6 +30,7 @@ import { KeyMetrics } from "@/components/portfolio/portfolioDetails/KeyMetrics";
 import { PortfolioAwards } from "@/components/portfolio/portfolioDetails/PortfolioAwards";
 import { PortfolioRiskPanel } from "@/components/portfolio/risk/PortfolioRiskPanel";
 import { ExportPortfolioDialog } from "@/components/portfolio/portfolioDetails/ExportPortfolioDialog";
+import { useTranslation } from "react-i18next";
 
 // Add custom animation keyframes for the spinning gradient
 const style = document.createElement('style');
@@ -49,6 +50,7 @@ export const PortfolioDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation('portfolio');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [aiSummaryOpen, setAISummaryOpen] = useState(false);
@@ -119,15 +121,15 @@ export const PortfolioDetail = () => {
     try {
       await toggleFollow();
       toast({
-        title: isFollowing ? 'Unfollowed' : 'Following',
+        title: isFollowing ? t('card.toast.unfollowed') : t('card.toast.following'),
         description: isFollowing
-          ? `You unfollowed ${portfolio.name}`
-          : `You are now following ${portfolio.name}`,
+          ? t('card.toast.unfollowedDescription', { name: portfolio.name })
+          : t('card.toast.followingDescription', { name: portfolio.name }),
       });
     } catch {
       toast({
-        title: 'Error',
-        description: 'Failed to update follow status. Please try again.',
+        title: t('common:status.error'),
+        description: t('card.toast.followError'),
         variant: 'destructive',
       });
     }
@@ -140,14 +142,14 @@ export const PortfolioDetail = () => {
       await deletePortfolio(portfolioId);
       queryClient.invalidateQueries({ queryKey: ["investment-theses"] });
       toast({
-        title: "Portfolio deleted",
-        description: "Your portfolio has been successfully deleted.",
+        title: t('detail.toast.deleted'),
+        description: t('detail.toast.deletedDescription'),
       });
       navigate("/portfolios");
     } catch {
       toast({
-        title: "Error",
-        description: "Failed to delete portfolio. Please try again.",
+        title: t('common:status.error'),
+        description: t('detail.toast.deleteError'),
         variant: "destructive",
       });
     }
@@ -162,16 +164,15 @@ export const PortfolioDetail = () => {
       <div className="mx-2 sm:mx-1 p-4 sm:p-0">
         <Button variant="outline" onClick={() => navigate(-1)} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Portfolios
+          {t('detail.notFound.back')}
         </Button>
         <div className="text-center py-12">
-          <h2 className="text-xl font-semibold mb-2">Portfolio not found</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('detail.notFound.title')}</h2>
           <p className="text-muted-foreground mb-6">
-            The portfolio you're looking for doesn't exist or you don't have
-            permission to view it.
+            {t('detail.notFound.description')}
           </p>
           <Button onClick={() => navigate("/portfolios")}>
-            View My Portfolios
+            {t('detail.notFound.cta')}
           </Button>
         </div>
       </div>
@@ -247,11 +248,11 @@ export const PortfolioDetail = () => {
             {/* Scenarios entry point */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl border border-border/50 p-4">
               <div>
-                <p className="font-semibold">Scenarios</p>
-                <p className="text-sm text-muted-foreground">Stress tests, simulations and what-if comparisons for this portfolio.</p>
+                <p className="font-semibold">{t('detail.scenarios.title')}</p>
+                <p className="text-sm text-muted-foreground">{t('detail.scenarios.description')}</p>
               </div>
               <Button asChild variant="outline" className="gap-2 shrink-0">
-                <Link to={`/portfolio/${portfolioId}/scenarios`}>Explore scenarios</Link>
+                <Link to={`/portfolio/${portfolioId}/scenarios`}>{t('detail.scenarios.cta')}</Link>
               </Button>
             </div>
 

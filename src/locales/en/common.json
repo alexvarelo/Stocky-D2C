@@ -1,0 +1,53 @@
+{
+  "status": {
+    "loading": "Loading",
+    "error": "Error",
+    "notAvailable": "N/A",
+    "saving": "Saving…"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "continue": "Continue",
+    "retry": "Try again",
+    "viewAll": "View all",
+    "create": "Create",
+    "share": "Share",
+    "export": "Export"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "opensNewTab": "(opens in a new tab)"
+  },
+  "chat": {
+    "openAssistant": "Open Stocky, the AI assistant"
+  },
+  "language": {
+    "label": "Language",
+    "description": "Choose the language for Stocky. Numbers, dates and currencies follow it too."
+  },
+  "compliance": {
+    "educational": "Educational information, not financial advice.",
+    "aiGenerated": "AI-generated"
+  },
+  "footer": {
+    "marketData": "Market data from Yahoo Finance, may be delayed",
+    "api": "API for developers",
+    "notice": "Stockfolio provides information only, not investment advice. Investing involves risk, including loss of capital.",
+    "legal": "Legal",
+    "links": {
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "disclaimer": "Not investment advice"
+    }
+  },
+  "units": {
+    "shares_one": "{{count, number}} share",
+    "shares_other": "{{count, number}} shares"
+  }
+}

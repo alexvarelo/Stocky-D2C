@@ -2,6 +2,7 @@ import { forwardRef, useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/formatters";
 import { motion, AnimatePresence } from "framer-motion";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { getLocale } from "@/lib/locale";
 
 const mono = "'Courier New', 'Courier', monospace";
 
@@ -216,7 +217,7 @@ export const PortfolioReceipt = forwardRef<HTMLDivElement, PortfolioReceiptProps
                     }}
                   >
                     {createdAt && (
-                      <div>{new Date(createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }).toUpperCase()}</div>
+                      <div>{new Date(createdAt).toLocaleDateString(getLocale(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase()}</div>
                     )}
                     <div>{holdings.length} HOLDING{holdings.length !== 1 ? "S" : ""}</div>
                   </motion.div>
@@ -327,9 +328,9 @@ export const PortfolioReceipt = forwardRef<HTMLDivElement, PortfolioReceiptProps
                       marginTop: 6,
                       letterSpacing: 0.5,
                     }}>
-                      {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }).toUpperCase()}
+                      {new Date().toLocaleDateString(getLocale(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase()}
                       {"  "}
-                      {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {new Date().toLocaleTimeString(getLocale(), { hour: "2-digit", minute: "2-digit" })}
                     </div>
                   </motion.div>
 

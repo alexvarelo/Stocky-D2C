@@ -3,9 +3,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useCustomerHoldings } from '@/api/portfolio/useCustomerHoldings';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatDecimal } from '@/lib/formatters';
 import { PortfolioHolding } from '@/types/portfolio';
 import { CompanyLogo } from '@/components/stock/CompanyLogo';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = [
   '#4F46E5', '#7C3AED', '#DB2777', '#E11D48', '#F59E0B',
@@ -22,13 +23,14 @@ interface ChartEntry {
 }
 
 const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: ChartEntry }[] }) => {
+  const { t } = useTranslation('dashboard');
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
       <div className="bg-card p-3 rounded-lg shadow-lg border border-border">
         <p className="font-semibold">{data.name}</p>
-        <p className="text-sm">Value: {formatCurrency(data.value)}</p>
-        <p className="text-sm">Shares: {data.quantity}</p>
+        <p className="text-sm">{t('donut.value', { value: formatCurrency(data.value) })}</p>
+        <p className="text-sm">{t('donut.shares', { count: data.quantity })}</p>
       </div>
     );
   }
@@ -37,6 +39,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payl
 
 export const HoldingsDonutChart = () => {
   const { data: holdings, isLoading, error } = useCustomerHoldings({ includeMarketData: false });
+  const { t } = useTranslation('dashboard');
 
   // Generate a consistent color for each symbol
   const getColorForSymbol = (symbol: string) => {
@@ -76,7 +79,7 @@ export const HoldingsDonutChart = () => {
   if (error) {
     return (
       <Card className="w-full h-96 flex items-center justify-center">
-        <p className="text-red-500">Error loading holdings data</p>
+        <p className="text-red-500">{t('donut.error')}</p>
       </Card>
     );
   }
@@ -84,7 +87,7 @@ export const HoldingsDonutChart = () => {
   if (!chartData || chartData.length === 0) {
     return (
       <Card className="w-full h-96 flex items-center justify-center">
-        <p className="text-muted-foreground">No holdings data available</p>
+        <p className="text-muted-foreground">{t('donut.empty')}</p>
       </Card>
     );
   }
@@ -99,7 +102,7 @@ export const HoldingsDonutChart = () => {
                 <div className="text-2xl font-bold text-gray-900">
                   {formatCurrency(chartData.reduce((sum, item) => sum + item.value, 0))}
                 </div>
-                <div className="text-sm text-gray-500">Total Value</div>
+                <div className="text-sm text-gray-500">{t('donut.total')}</div>
               </div>
             </div>
             <ResponsiveContainer width="100%" height="100%">
@@ -133,7 +136,7 @@ export const HoldingsDonutChart = () => {
           <div className="hidden md:flex flex-col justify-center space-y-3 pl-4 py-4 overflow-y-auto max-h-full">
             {chartData.map((entry: ChartEntry, index: number) => {
               const color = entry.color || COLORS[index % COLORS.length];
-              const percentage = ((entry.value / chartData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1);
+              const percentage = ((entry.value / chartData.reduce((sum, item) => sum + item.value, 0)) * 100);
               
               return (
                 <div key={`legend-${index}`} className="flex items-center space-x-2 text-sm">
@@ -143,7 +146,7 @@ export const HoldingsDonutChart = () => {
                   />
                   <CompanyLogo ticker={entry.name} size={16} />
                   <span className="font-medium text-gray-900 truncate">{entry.name}</span>
-                  <span className="text-gray-500 ml-auto">{percentage}%</span>
+                  <span className="text-gray-500 ml-auto">{formatDecimal(percentage, 1)}%</span>
                 </div>
               );
             })}

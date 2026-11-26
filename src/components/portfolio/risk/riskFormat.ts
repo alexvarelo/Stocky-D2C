@@ -1,54 +1,62 @@
 import type { PortfolioRiskResponse } from "@/api/financialDataApi.schemas";
+import i18n from "@/i18n";
+import { formatDecimal } from "@/lib/formatters";
+
+const tr = (key: string, options?: Record<string, unknown>) => i18n.t(key, { ns: "risk", ...options });
 
 export const NO_DATA = "—";
-export const NO_DATA_HINT = "Not enough history";
+/** Read at render time so it follows the UI language. */
+export const getNoDataHint = () => tr("noDataHint");
 
 export const fmtPct = (v: number | null | undefined): string =>
-  v == null || !Number.isFinite(v) ? NO_DATA : `${(v * 100).toFixed(1)}%`;
+  v == null || !Number.isFinite(v) ? NO_DATA : `${formatDecimal(v * 100, 1)}%`;
 
 export const fmtNum = (v: number | null | undefined): string =>
-  v == null || !Number.isFinite(v) ? NO_DATA : v.toFixed(2);
+  v == null || !Number.isFinite(v) ? NO_DATA : formatDecimal(v, 2);
 
 /** Neutral, purely descriptive one-liners. */
 export function describeBeta(v: number | null | undefined): string | null {
   if (v == null) return null;
-  if (Math.abs(v - 1) < 0.1) return "Has moved roughly in line with the market";
-  if (v < 0) return "Has tended to move opposite to the market";
-  if (v < 1) return `Has moved ~${v.toFixed(1)}× the market, less than the index`;
-  return `Has moved ~${v.toFixed(1)}× the market, more than the index`;
+  if (Math.abs(v - 1) < 0.1) return tr("describe.betaInLine");
+  if (v < 0) return tr("describe.betaOpposite");
+  return tr(v < 1 ? "describe.betaLess" : "describe.betaMore", { beta: formatDecimal(v, 1) });
 }
 
 export function describeVolatility(v: number | null | undefined): string | null {
   if (v == null) return null;
-  return `Typical yearly swing of about ±${(v * 100).toFixed(0)}%`;
+  return tr("describe.volatility", { pct: formatDecimal(v * 100, 0) });
 }
 
 export function describeDrawdown(v: number | null | undefined): string | null {
   if (v == null) return null;
-  return `Largest peak-to-trough fall was ${(Math.abs(v) * 100).toFixed(0)}%`;
+  return tr("describe.drawdown", { pct: formatDecimal(Math.abs(v) * 100, 0) });
 }
 
 export function describeSharpe(v: number | null | undefined): string | null {
   if (v == null) return null;
-  return `Return per unit of volatility (risk-free rate 0%): ${v.toFixed(2)}`;
+  return tr("describe.sharpe", { value: formatDecimal(v, 2) });
 }
 
 export function describeReturn(v: number | null | undefined): string | null {
   if (v == null) return null;
-  return v >= 0 ? "Annualised gain over the period" : "Annualised loss over the period";
+  return tr(v >= 0 ? "describe.returnGain" : "describe.returnLoss");
 }
 
 export function describeConcentration(r: PortfolioRiskResponse): string | null {
   if (r.effective_positions == null) return null;
-  return `Behaves like ~${r.effective_positions.toFixed(1)} equally weighted positions`;
+  return tr("describe.concentration", { count: formatDecimal(r.effective_positions, 1) });
 }
 
+/** `label` and `long` are keys in the risk namespace (periods.*). */
 export const PERIOD_OPTIONS = [
-  { value: "6mo", label: "6M", long: "6 months" },
-  { value: "1y", label: "1Y", long: "year" },
-  { value: "3y", label: "3Y", long: "3 years" },
-  { value: "5y", label: "5Y", long: "5 years" },
+  { value: "6mo", label: "6M", long: "6mo" },
+  { value: "1y", label: "1Y", long: "1y" },
+  { value: "3y", label: "3Y", long: "3y" },
+  { value: "5y", label: "5Y", long: "5y" },
 ] as const;
+
+export const periodLabel = (value: string) => tr(`periods.short.${value}`);
+export const periodLong = (value: string) => tr(`periods.long.${value}`);
 
 /** Diverging colour for a correlation in [-1, 1] (HSL; works in light and dark). */
 export function correlationColor(v: number | null): string {

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +25,7 @@ import {
   type StockNote,
 } from "@/hooks/useStockNotes";
 import { ThesisSection } from "@/components/thesis/ThesisSection";
+import { getLocale } from "@/lib/locale";
 
 const MDEditor = lazy(() => import("@uiw/react-md-editor"));
 const MarkdownPreview = lazy(() =>
@@ -71,7 +72,7 @@ function NoteEditor({
           value.length >= NOTE_MAX_CHARS * 0.9 ? "text-xs text-amber-600 dark:text-amber-400" : "text-xs text-muted-foreground"
         }
       >
-        {value.length.toLocaleString()} / {NOTE_MAX_CHARS.toLocaleString()}
+        {value.length.toLocaleString(getLocale())} / {NOTE_MAX_CHARS.toLocaleString(getLocale())}
         {value.length >= NOTE_MAX_CHARS && " · limit reached"}
       </p>
       <div className="flex justify-end gap-2">

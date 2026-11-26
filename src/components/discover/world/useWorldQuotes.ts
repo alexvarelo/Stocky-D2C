@@ -3,6 +3,7 @@ import { useQueries } from "@tanstack/react-query";
 import type { PriceData } from "@/api/financialDataApi.schemas";
 import { getMultipleStockPricesApiV1StockTickersPricesGet } from "@/api/stock/stock";
 import { WORLD_COMPANIES, type RegionId, type WorldCompany } from "./companies";
+import { getLocale } from "@/lib/locale";
 
 export interface WorldQuote extends WorldCompany {
   price: number | null;
@@ -95,7 +96,7 @@ export function formatMoney(value: number | null | undefined, currency = "USD"):
   const code = minor ? minor.code : currency;
   const digits = Math.abs(amount) >= 10_000 ? 0 : 2;
   try {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(getLocale(), {
       style: "currency",
       currency: code,
       minimumFractionDigits: digits,
@@ -123,7 +124,7 @@ export function formatMarketCap(value: number | null | undefined, currency = "US
   for (const [size, suffix] of units) {
     if (value >= size) return `${(value / size).toFixed(value / size >= 100 ? 0 : 2)}${suffix} ${code}`;
   }
-  return `${Math.round(value).toLocaleString("en-US")} ${code}`;
+  return `${Math.round(value).toLocaleString(getLocale())} ${code}`;
 }
 
 /** Semantic colours from the design system, as raw values for canvas/SVG. */

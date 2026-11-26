@@ -1,0 +1,64 @@
+{
+  "noDataHint": "Histórico insuficiente",
+  "describe": {
+    "betaInLine": "Se ha movido más o menos en línea con el mercado",
+    "betaOpposite": "Ha tendido a moverse en sentido contrario al mercado",
+    "betaLess": "Se ha movido ~{{beta}}× el mercado, menos que el índice",
+    "betaMore": "Se ha movido ~{{beta}}× el mercado, más que el índice",
+    "volatility": "Oscilación anual típica de aproximadamente ±{{pct}} %",
+    "drawdown": "La mayor caída de máximo a mínimo fue del {{pct}} %",
+    "sharpe": "Rentabilidad por unidad de volatilidad (tipo sin riesgo 0 %): {{value}}",
+    "returnGain": "Ganancia anualizada en el periodo",
+    "returnLoss": "Pérdida anualizada en el periodo",
+    "concentration": "Se comporta como ~{{count}} posiciones con el mismo peso"
+  },
+  "periods": {
+    "short": {
+      "6mo": "6 M",
+      "1y": "1 A",
+      "3y": "3 A",
+      "5y": "5 A"
+    },
+    "long": {
+      "6mo": "los últimos 6 meses",
+      "1y": "el último año",
+      "3y": "los últimos 3 años",
+      "5y": "los últimos 5 años"
+    }
+  },
+  "title": "Riesgo",
+  "asOf": "A {{date}}",
+  "periodLabel": "Periodo de riesgo",
+  "hideDetails": "Ocultar detalles",
+  "showDetails": "Ver detalles",
+  "empty": "Añade posiciones a esta cartera para ver sus métricas de riesgo.",
+  "errorCollapsed": "No se pudieron cargar las métricas de riesgo. Abre los detalles para reintentar.",
+  "error": "No se pudieron cargar las métricas de riesgo.",
+  "maxPositions": "Se muestra el riesgo de las {{count}} mayores posiciones.",
+  "metrics": {
+    "beta": "Beta frente al S&P 500",
+    "volatility": "Volatilidad",
+    "maxDrawdown": "Caída máxima",
+    "largestPosition": "Mayor posición",
+    "sharpe": "Ratio de Sharpe",
+    "annualReturn": "Rentabilidad anual",
+    "hhi": "Concentración (HHI)",
+    "effectivePositions": "Posiciones efectivas",
+    "correlation": "Correlación"
+  },
+  "sharpeTooltip": "Calculado con un tipo sin riesgo del 0 %",
+  "largestReading": "Parte del valor de la cartera en la mayor posición",
+  "outOfHoldings_one": "De {{count}} posición",
+  "outOfHoldings_other": "De {{count}} posiciones",
+  "excluded": "Excluidos:",
+  "exclusion": {
+    "no_history": "sin histórico de precios",
+    "no_fx": "sin tipo de cambio",
+    "unknown_currency": "divisa desconocida",
+    "limit": "supera el límite de posiciones",
+    "unavailable": "no disponible",
+    "unsupported": "símbolo no compatible"
+  },
+  "basedOn": "Basado en las posiciones actuales mantenidas durante {{period}}; el comportamiento pasado no predice resultados futuros.",
+  "correlationMatrix": "Matriz de correlación entre posiciones"
+}

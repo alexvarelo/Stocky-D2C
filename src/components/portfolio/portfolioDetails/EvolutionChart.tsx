@@ -4,6 +4,7 @@ import { PortfolioPerformanceChart } from "../PortfolioPerformanceChart";
 import { usePortfolioPerformance } from "@/api/portfolio/usePortfolioPerformance";
 import { usePortfolioValueHistory } from "@/api/portfolio/usePortfolioValueHistory";
 import type { PortfolioHolding } from "@/api/portfolio/portfolio";
+import { useTranslation } from "react-i18next";
 
 
 interface EvolutionChartProps {
@@ -18,6 +19,7 @@ interface EvolutionChartProps {
 const MIN_HISTORY_POINTS = 5;
 
 export const EvolutionChart = ({ holdings, portfolioId, className = "", isLoading: isParentLoading }: EvolutionChartProps) => {
+  const { t } = useTranslation('portfolio');
   const { data: history, isLoading: isHistoryLoading } = usePortfolioValueHistory(portfolioId);
 
   const hasStoredHistory = !!history && history.length >= MIN_HISTORY_POINTS;
@@ -41,7 +43,7 @@ export const EvolutionChart = ({ holdings, portfolioId, className = "", isLoadin
     return (
       <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
         <CardHeader className="pb-2 px-0">
-          <CardTitle className="text-lg font-medium">Evolution</CardTitle>
+          <CardTitle className="text-lg font-medium">{t('detail.evolution')}</CardTitle>
         </CardHeader>
         <CardContent className="flex-1 p-0">
           <div className="h-[300px] md:h-[400px] w-full bg-card/50 border border-border/50 rounded-3xl p-4 md:p-6 shadow-sm flex items-end gap-2">
@@ -57,7 +59,7 @@ export const EvolutionChart = ({ holdings, portfolioId, className = "", isLoadin
   return (
     <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
       <CardHeader className="pb-2 px-0">
-        <CardTitle className="text-lg font-medium">Evolution</CardTitle>
+        <CardTitle className="text-lg font-medium">{t('detail.evolution')}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 p-0">
         <div className="h-[300px] md:h-[400px] w-full bg-card/50 border border-border/50 rounded-3xl overflow-hidden md:p-4 p-2 shadow-sm">

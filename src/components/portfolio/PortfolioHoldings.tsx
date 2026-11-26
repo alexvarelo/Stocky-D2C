@@ -25,6 +25,7 @@ import { usePriceFlash, priceFlashClass } from "@/hooks/usePriceFlash";
 import { ArrowUp, ArrowDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PositionThesisButton } from "@/components/thesis/PositionThesisButton";
+import { useTranslation } from "react-i18next";
 
 interface PortfolioHoldingsProps {
   holdings: PortfolioHolding[];
@@ -99,6 +100,7 @@ const HoldingRow = ({
   isLoadingPrices: boolean;
   portfolioId?: string;
 }) => {
+  const { t } = useTranslation('portfolio');
   const { holding, marketValue, pnl, pnlPercentage, todayChangePercent, allocation } = row;
   const flash = usePriceFlash(isLive ? holding.current_price : undefined);
   const isTodayPositive = todayChangePercent >= 0;
@@ -117,7 +119,7 @@ const HoldingRow = ({
               {holding.ticker}
             </span>
             <span className="text-xs text-muted-foreground">
-              {holding.quantity.toLocaleString()} shares
+              {t('common:units.shares', { count: holding.quantity })}
             </span>
           </div>
         </Link>
@@ -131,16 +133,16 @@ const HoldingRow = ({
           <div className="flex flex-col items-end">
             <span className="inline-flex items-center gap-1.5">
               <span className={`rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
-                {holding.current_price ? formatCurrency(holding.current_price, holding.currency) : "N/A"}
+                {holding.current_price ? formatCurrency(holding.current_price, holding.currency) : t('common:status.notAvailable')}
               </span>
               {isLive && (
-                <span className="relative flex h-1.5 w-1.5" title="Live price">
+                <span className="relative flex h-1.5 w-1.5" title={t('detail.hero.livePrice')}>
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
               )}
             </span>
-            <span className="text-xs text-muted-foreground">Avg: {formatCurrency(holding.average_price, holding.currency)}</span>
+            <span className="text-xs text-muted-foreground">{t('holdings.avg', { price: formatCurrency(holding.average_price, holding.currency) })}</span>
           </div>
         )}
       </TableCell>
@@ -214,6 +216,7 @@ const HoldingCard = ({
   isLoadingPrices: boolean;
   portfolioId?: string;
 }) => {
+  const { t } = useTranslation('portfolio');
   const { holding, marketValue, pnl, pnlPercentage, todayChangePercent, allocation } = row;
   const flash = usePriceFlash(isLive ? holding.current_price : undefined);
   const isTodayPositive = todayChangePercent >= 0;
@@ -224,7 +227,7 @@ const HoldingCard = ({
       {/* Stretched link: covers the whole card; the thesis button sits above it. */}
       <Link
         to={`/instrument/${holding.ticker}`}
-        aria-label={`Open ${holding.ticker}`}
+        aria-label={t('holdings.open', { ticker: holding.ticker })}
         className="absolute inset-0 z-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       />
       <div className="pointer-events-none relative flex items-center justify-between gap-3">
@@ -233,7 +236,7 @@ const HoldingCard = ({
           <div className="flex flex-col min-w-0">
             <span className="font-semibold text-sm">{holding.ticker}</span>
             <span className="text-xs text-muted-foreground">
-              {holding.quantity.toLocaleString()} shares
+              {t('common:units.shares', { count: holding.quantity })}
             </span>
           </div>
         </div>
@@ -250,7 +253,7 @@ const HoldingCard = ({
             <span className="font-semibold text-sm">{formatCurrency(marketValue, holding.currency)}</span>
           )}
           <span className={`text-xs font-medium ${isTodayPositive ? "text-success" : "text-danger"}`}>
-            {isTodayPositive ? "+" : ""}{formatPercentage(todayChangePercent)} today
+            {isTodayPositive ? "+" : ""}{t('holdings.today', { change: formatPercentage(todayChangePercent) })}
           </span>
         </div>
         </div>
@@ -263,10 +266,10 @@ const HoldingCard = ({
           ) : (
             <>
               <span className={`rounded px-1 -mx-1 transition-colors duration-700 ${priceFlashClass(flash)}`}>
-                {holding.current_price ? formatCurrency(holding.current_price, holding.currency) : "N/A"}
+                {holding.current_price ? formatCurrency(holding.current_price, holding.currency) : t('common:status.notAvailable')}
               </span>
               {isLive && (
-                <span className="relative flex h-1.5 w-1.5" title="Live price">
+                <span className="relative flex h-1.5 w-1.5" title={t('detail.hero.livePrice')}>
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
@@ -294,18 +297,20 @@ const HoldingCard = ({
           />
         </div>
         <span className="text-muted-foreground text-xs font-medium">
-          {Math.round(allocation)}% of portfolio
+          {t('holdings.ofPortfolio', { pct: Math.round(allocation) })}
         </span>
       </div>
     </div>
   );
 };
 
-const HoldingsSkeleton = () => (
+const HoldingsSkeleton = () => {
+  const { t } = useTranslation('portfolio');
+  return (
   <Card className="flex flex-col border-none shadow-none bg-transparent">
     <CardHeader className="pb-2 px-0">
       <div className="flex items-center justify-between">
-        <CardTitle className="text-lg font-medium">Holdings</CardTitle>
+        <CardTitle className="text-lg font-medium">{t('card.holdings')}</CardTitle>
         <Skeleton className="h-4 w-20" />
       </div>
     </CardHeader>
@@ -334,12 +339,12 @@ const HoldingsSkeleton = () => (
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="hover:bg-transparent border-b border-border/50">
-              <TableHead className="w-[250px] pl-6 h-12 font-medium">Asset</TableHead>
-              <TableHead className="text-right h-12 font-medium">Price</TableHead>
-              <TableHead className="text-right h-12 font-medium">Value</TableHead>
-              <TableHead className="text-right h-12 font-medium">Today</TableHead>
-              <TableHead className="text-right h-12 font-medium">Return</TableHead>
-              <TableHead className="text-right w-[150px] pr-6 h-12 font-medium">Allocation</TableHead>
+              <TableHead className="w-[250px] pl-6 h-12 font-medium">{t('holdings.columns.asset')}</TableHead>
+              <TableHead className="text-right h-12 font-medium">{t('holdings.columns.price')}</TableHead>
+              <TableHead className="text-right h-12 font-medium">{t('holdings.columns.value')}</TableHead>
+              <TableHead className="text-right h-12 font-medium">{t('holdings.columns.today')}</TableHead>
+              <TableHead className="text-right h-12 font-medium">{t('holdings.columns.return')}</TableHead>
+              <TableHead className="text-right w-[150px] pr-6 h-12 font-medium">{t('holdings.columns.allocation')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -384,7 +389,8 @@ const HoldingsSkeleton = () => (
       </div>
     </CardContent>
   </Card>
-);
+  );
+};
 
 export const PortfolioHoldings = ({
   holdings,
@@ -393,6 +399,7 @@ export const PortfolioHoldings = ({
   livePrices = {},
   portfolioId,
 }: PortfolioHoldingsProps) => {
+  const { t } = useTranslation("portfolio");
   const [sortColumn, setSortColumn] = useState<SortColumn>("allocation");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [allocationBasis, setAllocationBasis] = useState<AllocationBasis>("value");
@@ -464,9 +471,9 @@ export const PortfolioHoldings = ({
     return (
       <Card className="border-none shadow-none bg-transparent">
         <CardHeader className="px-0">
-          <CardTitle>Holdings</CardTitle>
+          <CardTitle>{t('card.holdings')}</CardTitle>
           <CardDescription>
-            This portfolio doesn't have any holdings yet.
+            {t('holdings.empty')}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -477,7 +484,7 @@ export const PortfolioHoldings = ({
     <Card className="flex flex-col border-none shadow-none bg-transparent">
       <CardHeader className="pb-2 px-0">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <CardTitle className="text-lg font-medium">Holdings</CardTitle>
+          <CardTitle className="text-lg font-medium">{t('card.holdings')}</CardTitle>
           <div className="flex items-center gap-3">
             <div className="flex items-center rounded-full border border-border/50 bg-muted/30 p-0.5 text-xs">
               <button
@@ -488,7 +495,7 @@ export const PortfolioHoldings = ({
                   allocationBasis === "value" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
                 )}
               >
-                % of value
+                {t('holdings.basis.value')}
               </button>
               <button
                 type="button"
@@ -498,11 +505,11 @@ export const PortfolioHoldings = ({
                   allocationBasis === "invested" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
                 )}
               >
-                % of invested
+                {t('holdings.basis.invested')}
               </button>
             </div>
             <CardDescription className="text-xs">
-              {holdings.length} {holdings.length === 1 ? "asset" : "assets"}
+              {t('card.assets', { count: holdings.length })}
             </CardDescription>
           </div>
         </div>
@@ -529,12 +536,12 @@ export const PortfolioHoldings = ({
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow className="hover:bg-transparent border-b border-border/50">
-                <SortableHead column="asset" label="Asset" align="left" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} className="w-[250px] pl-6" />
-                <SortableHead column="price" label="Price" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
-                <SortableHead column="value" label="Value" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
-                <SortableHead column="today" label="Today" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
-                <SortableHead column="return" label="Return" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
-                <SortableHead column="allocation" label="Allocation" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} className="w-[150px] pr-6" />
+                <SortableHead column="asset" label={t('holdings.columns.asset')} align="left" activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} className="w-[250px] pl-6" />
+                <SortableHead column="price" label={t('holdings.columns.price')} activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
+                <SortableHead column="value" label={t('holdings.columns.value')} activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
+                <SortableHead column="today" label={t('holdings.columns.today')} activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
+                <SortableHead column="return" label={t('holdings.columns.return')} activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} />
+                <SortableHead column="allocation" label={t('holdings.columns.allocation')} activeColumn={sortColumn} direction={sortDirection} onSort={handleSort} className="w-[150px] pr-6" />
               </TableRow>
             </TableHeader>
             <TableBody>

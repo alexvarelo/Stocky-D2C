@@ -16,6 +16,7 @@ import {
   moveColor,
   type WorldQuote,
 } from "./useWorldQuotes";
+import { getLocale } from "@/lib/locale";
 
 interface DiscoverHeroProps {
   quotes: WorldQuote[];
@@ -134,7 +135,7 @@ export function DiscoverHero({
               </span>
               {updatedAt > 0 && (
                 <span className="text-sm text-white/50">
-                  Updated {new Date(updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  Updated {new Date(updatedAt).toLocaleTimeString(getLocale(), { hour: "2-digit", minute: "2-digit" })}
                 </span>
               )}
             </>

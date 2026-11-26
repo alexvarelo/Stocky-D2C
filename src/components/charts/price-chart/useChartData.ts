@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useGetHistoricalDataApiV1StockTickerHistoryGet } from '@/api/stock/stock';
-import { format, sub } from 'date-fns';
+import { sub } from 'date-fns';
+import { format } from '@/lib/dateFormat';
 import { TimeRange, ChartMode, ChartDataPoint } from './types';
 
 interface UseChartDataProps {

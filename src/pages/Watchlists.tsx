@@ -24,7 +24,7 @@ import {
   useDeleteWatchlist,
 } from "@/api/watchlist/useWatchlists";
 import { useAuth } from "@/lib/auth";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { Badge } from "@/components/ui/badge";
 import { DeleteConfirmationDialog } from "@/components/portfolio/delete/DeleteConfirmationDialog";
 import { CreateWatchlistDialog } from "@/components/watchlist/CreateWatchlistDialog";

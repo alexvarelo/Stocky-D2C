@@ -1,17 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import {
-  format,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  addDays,
-  addMonths,
-  subMonths,
-  isSameDay,
-  isSameMonth,
-  isToday as isTodayFns
-} from 'date-fns';
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, addMonths, subMonths, isSameDay, isSameMonth, isToday as isTodayFns } from 'date-fns';
+import { format } from '@/lib/dateFormat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +22,8 @@ import {
   X
 } from 'lucide-react';
 import { useActivityEvents, type EventType } from '@/hooks/useActivityEvents';
+import { useTranslation } from 'react-i18next';
+import { getLocale } from '@/lib/locale';
 
 // Re-export types from useActivityEvents
 export type { EventType } from '@/hooks/useActivityEvents';
@@ -92,7 +83,15 @@ interface ActivityCalendarProps {
   userId: string;
 }
 
+// Monday-first narrow weekday names in the active locale (e.g. L M X J V S D in Spanish).
+const weekdayInitials = () => {
+  const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const fmt = new Intl.DateTimeFormat(getLocale(), { weekday: 'narrow' });
+  return Array.from({ length: 7 }, (_, i) => fmt.format(addDays(monday, i)));
+};
+
 export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) => {
+  const { t } = useTranslation('dashboard');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(null);
   const { data: events = [], isLoading } = useActivityEvents(userId);
@@ -153,7 +152,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
 
               {selectedEvent.description && (
                 <div className="text-sm">
-                  <p className="font-medium mb-1">Details:</p>
+                  <p className="font-medium mb-1">{t('activity.details')}</p>
                   <p className="text-muted-foreground">{selectedEvent.description}</p>
                 </div>
               )}
@@ -166,7 +165,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
                   onClick={() => window.open(selectedEvent.link, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
-                  View Details
+                  {t('activity.viewDetails')}
                 </Button>
               )}
             </div>
@@ -177,7 +176,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
       <Card className="flex flex-col shadow-sm border-border/50">
         <CardHeader className="p-4 pb-0">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-medium">
+            <h3 className="text-base font-medium capitalize">
               {format(currentDate, 'MMMM yyyy')}
             </h3>
             <div className="flex items-center space-x-2">
@@ -186,6 +185,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
                 size="sm"
                 onClick={() => setCurrentDate(subMonths(currentDate, 1))}
                 className="h-8 w-8 p-0"
+                aria-label={t('activity.previousMonth')}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -195,13 +195,14 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
                 onClick={() => setCurrentDate(new Date())}
                 className="h-8 text-xs"
               >
-                Today
+                {t('activity.today')}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentDate(addMonths(currentDate, 1))}
                 className="h-8 w-8 p-0"
+                aria-label={t('activity.nextMonth')}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -211,7 +212,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
         <CardContent className="p-3 sm:p-4 flex-1 overflow-hidden">
           <div className="flex flex-col h-full">
             <div className="grid grid-cols-7 gap-px text-center text-[10px] sm:text-xs font-semibold text-muted-foreground mb-2">
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+              {weekdayInitials().map((day, i) => (
                 <div key={i} className="py-1">
                   {day}
                 </div>
@@ -262,7 +263,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
                           })}
                           {dayEvents.length > 3 && (
                             <div className="text-[9px] text-muted-foreground/70 pl-1 font-medium">
-                              +{dayEvents.length - 3} more
+                              {t('activity.more', { count: dayEvents.length - 3 })}
                             </div>
                           )}
                         </div>
@@ -282,7 +283,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ userId }) =>
                 style={{ backgroundColor: style.borderColor }}
               />
               <span className="text-[10px] sm:text-xs font-medium text-muted-foreground capitalize">
-                {type}
+                {t(`activity.types.${type}`)}
               </span>
             </div>
           ))}

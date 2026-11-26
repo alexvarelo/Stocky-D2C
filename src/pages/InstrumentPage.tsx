@@ -45,6 +45,7 @@ import {
   MoneyDisplay,
   PercentageDisplay, FormattedNumber
 } from "@/components/formatters";
+import { getLocale } from "@/lib/locale";
 
 // Extended CompanyInfo with additional properties
 interface ExtendedCompanyInfo extends CompanyInfo {
@@ -281,7 +282,7 @@ export function InstrumentPage() {
                           Employees
                         </h3>
                         <p>
-                          {additionalData.fullTimeEmployees?.toLocaleString() ||
+                          {additionalData.fullTimeEmployees?.toLocaleString(getLocale()) ||
                             "N/A"}
                         </p>
                       </div>

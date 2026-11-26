@@ -22,6 +22,7 @@ import { useAuth } from "@/lib/auth";
 import { useWatchlists } from '@/api/watchlist/useWatchlists';
 import { useRecentPortfolios } from '@/hooks/useRecentPortfolios';
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { useTranslation } from 'react-i18next';
 
 /**
  * SearchButtonWithDialog
@@ -33,6 +34,7 @@ import { CompanyLogo } from "@/components/stock/CompanyLogo";
 export function SearchButtonWithDialog() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation('navigation');
   const [commandOpen, setCommandOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedQuery = useDebounce(searchQuery, 300);
@@ -110,8 +112,8 @@ export function SearchButtonWithDialog() {
         )}
       >
         <Search className="mr-2 h-4 w-4 shrink-0" />
-        <span className="hidden lg:inline-flex">Search...</span>
-        <span className="inline-flex lg:hidden">Search</span>
+        <span className="hidden lg:inline-flex">{t('search.button')}…</span>
+        <span className="inline-flex lg:hidden">{t('search.button')}</span>
         <div className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 sm:flex">
           <kbd className="inline-flex items-center justify-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 h-5 min-w-[20px]">
             <span className="text-xs">⌘</span>
@@ -146,7 +148,7 @@ export function SearchButtonWithDialog() {
               debounced request — a timing bug, not a rendering one. */}
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search stocks, ETFs, and more..."
+              placeholder={t('search.placeholder')}
               value={searchQuery}
               onValueChange={setSearchQuery}
               className="border-b-0 pb-2"
@@ -161,9 +163,9 @@ export function SearchButtonWithDialog() {
                     ))}
                   </div>
                 ) : searchResults.length === 0 ? (
-                  <CommandEmpty>No results found for "{searchQuery}"</CommandEmpty>
+                  <CommandEmpty>{t('search.noResults', { query: searchQuery })}</CommandEmpty>
                 ) : (
-                  <CommandGroup heading="Instruments">
+                  <CommandGroup heading={t('search.instruments')}>
                     {searchResults.map((result) => (
                       <CommandItem
                         key={result.ticker}
@@ -207,7 +209,7 @@ export function SearchButtonWithDialog() {
                   {/* Quick Access */}
                   {user && (
                     <>
-                      <CommandGroup heading="Quick Access">
+                      <CommandGroup heading={t('search.quickAccess')}>
                         <CommandItem
                           onSelect={() => {
                             navigate('/portfolios');
@@ -216,7 +218,7 @@ export function SearchButtonWithDialog() {
                           className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors rounded-md px-2 py-1.5"
                         >
                           <Briefcase className="h-4 w-4 text-muted-foreground" />
-                          <span>My Portfolios</span>
+                          <span>{t('search.myPortfolios')}</span>
                         </CommandItem>
                         <CommandItem
                           onSelect={() => {
@@ -226,7 +228,7 @@ export function SearchButtonWithDialog() {
                           className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors rounded-md px-2 py-1.5"
                         >
                           <List className="h-4 w-4 text-yellow-500" />
-                          <span>My Watchlists</span>
+                          <span>{t('search.myWatchlists')}</span>
                         </CommandItem>
                       </CommandGroup>
                       <CommandSeparator />
@@ -234,7 +236,7 @@ export function SearchButtonWithDialog() {
                   )}
 
                   {/* Popular Stocks */}
-                  <CommandGroup heading="Popular Stocks">
+                  <CommandGroup heading={t('search.popular')}>
                     {isLoadingPopular ? (
                       <div className="p-2 space-y-2">
                         {[...Array(5)].map((_, i) => (

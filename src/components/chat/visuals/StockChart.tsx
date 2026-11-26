@@ -8,6 +8,7 @@ import {
     XAxis,
     YAxis,
 } from "recharts";
+import { getLocale } from "@/lib/locale";
 
 export interface StockChartProps {
     symbol: string;
@@ -71,7 +72,7 @@ export function StockChart({ symbol, data, currency = "USD" }: StockChartProps) 
                                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-lg">
                                             <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">{label}</p>
                                             <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                                {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(payload[0].value as number)}
+                                                {new Intl.NumberFormat(getLocale(), { style: 'currency', currency }).format(payload[0].value as number)}
                                             </p>
                                         </div>
                                     );

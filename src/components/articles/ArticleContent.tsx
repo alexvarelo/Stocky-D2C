@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { CalendarIcon, User, Clock, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import type { Article } from "@/api/articles/useArticles";
 import { TypingAnimation } from "../ui/typing-animation";
 import { CompanyLogo } from "@/components/stock/CompanyLogo";
+import { getLocale } from "@/lib/locale";
 
 interface ArticleContentProps {
   article: Article;
@@ -145,7 +146,7 @@ export function ArticleContent({ article }: ArticleContentProps) {
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="text-sm text-muted-foreground">
-            {article.view_count.toLocaleString()} views
+            {article.view_count.toLocaleString(getLocale())} views
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" className="text-muted-foreground">

@@ -6,6 +6,7 @@ import { useCustomerHoldings } from "@/api/portfolio/useCustomerHoldings";
 import { formatCurrency } from "@/lib/utils";
 import { formatPercentage } from "@/lib/formatters";
 import { useTypewriterRotation } from "@/hooks/useTypewriterRotation";
+import { useTranslation } from "react-i18next";
 
 interface Phrase {
     text: string;
@@ -16,6 +17,7 @@ interface Phrase {
 export const WealthInsight = () => {
     const { data: holdings, isLoading } = useCustomerHoldings({ includeMarketData: true });
     const prefersReducedMotion = useReducedMotion();
+    const { t } = useTranslation('dashboard');
 
     const phrases = useMemo<Phrase[]>(() => {
         if (!holdings || holdings.length === 0) return [];
@@ -30,27 +32,27 @@ export const WealthInsight = () => {
 
         if (topGainer && (topGainer.dailyChangePercent || 0) > 0) {
             list.push({
-                text: `Today your biggest performer is ${topGainer.symbol}, up ${formatPercentage(topGainer.dailyChangePercent || 0)}`,
+                text: t('insight.topGainer', { symbol: topGainer.symbol, change: formatPercentage(topGainer.dailyChangePercent || 0) }),
                 symbol: topGainer.symbol,
             });
         }
         if (topLoser && (topLoser.dailyChangePercent || 0) < 0 && topLoser.symbol !== topGainer?.symbol) {
             list.push({
-                text: `Your biggest mover today is ${topLoser.symbol}, down ${formatPercentage(Math.abs(topLoser.dailyChangePercent || 0))}`,
+                text: t('insight.topLoser', { symbol: topLoser.symbol, change: formatPercentage(Math.abs(topLoser.dailyChangePercent || 0)) }),
                 symbol: topLoser.symbol,
             });
         }
         if (largest?.currentValue) {
             list.push({
-                text: `Your largest holding is ${largest.symbol}, worth ${formatCurrency(largest.currentValue)}`,
+                text: t('insight.largest', { symbol: largest.symbol, value: formatCurrency(largest.currentValue) }),
                 symbol: largest.symbol,
             });
         }
 
-        return list.length > 0 ? list : [{ text: `You hold ${holdings.length} asset${holdings.length === 1 ? "" : "s"} right now` }];
-    }, [holdings]);
+        return list.length > 0 ? list : [{ text: t('insight.assetCount', { count: holdings.length }) }];
+    }, [holdings, t]);
 
-    const fallback = useMemo<Phrase[]>(() => [{ text: "Tracking your portfolio in real time" }], []);
+    const fallback = useMemo<Phrase[]>(() => [{ text: t('insight.fallback') }], [t]);
     const activePhrases = phrases.length > 0 ? phrases : fallback;
 
     const { text, isTyping, phraseIndex } = useTypewriterRotation(

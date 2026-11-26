@@ -1,0 +1,64 @@
+{
+  "noDataHint": "Not enough history",
+  "describe": {
+    "betaInLine": "Has moved roughly in line with the market",
+    "betaOpposite": "Has tended to move opposite to the market",
+    "betaLess": "Has moved ~{{beta}}× the market, less than the index",
+    "betaMore": "Has moved ~{{beta}}× the market, more than the index",
+    "volatility": "Typical yearly swing of about ±{{pct}}%",
+    "drawdown": "Largest peak-to-trough fall was {{pct}}%",
+    "sharpe": "Return per unit of volatility (risk-free rate 0%): {{value}}",
+    "returnGain": "Annualised gain over the period",
+    "returnLoss": "Annualised loss over the period",
+    "concentration": "Behaves like ~{{count}} equally weighted positions"
+  },
+  "periods": {
+    "short": {
+      "6mo": "6M",
+      "1y": "1Y",
+      "3y": "3Y",
+      "5y": "5Y"
+    },
+    "long": {
+      "6mo": "last 6 months",
+      "1y": "last year",
+      "3y": "last 3 years",
+      "5y": "last 5 years"
+    }
+  },
+  "title": "Risk",
+  "asOf": "As of {{date}}",
+  "periodLabel": "Risk period",
+  "hideDetails": "Hide details",
+  "showDetails": "Show details",
+  "empty": "Add holdings to this portfolio to see its risk metrics.",
+  "errorCollapsed": "Couldn't load risk metrics. Open the details to retry.",
+  "error": "Couldn't load risk metrics.",
+  "maxPositions": "Showing risk for the {{count}} largest positions.",
+  "metrics": {
+    "beta": "Beta vs S&P 500",
+    "volatility": "Volatility",
+    "maxDrawdown": "Max drawdown",
+    "largestPosition": "Largest position",
+    "sharpe": "Sharpe ratio",
+    "annualReturn": "Annual return",
+    "hhi": "Concentration (HHI)",
+    "effectivePositions": "Effective positions",
+    "correlation": "Correlation"
+  },
+  "sharpeTooltip": "Calculated with a 0% risk-free rate",
+  "largestReading": "Share of portfolio value in the top holding",
+  "outOfHoldings_one": "Out of {{count}} holding",
+  "outOfHoldings_other": "Out of {{count}} holdings",
+  "excluded": "Excluded:",
+  "exclusion": {
+    "no_history": "no price history",
+    "no_fx": "no exchange rate",
+    "unknown_currency": "unknown currency",
+    "limit": "over position limit",
+    "unavailable": "unavailable",
+    "unsupported": "unsupported symbol"
+  },
+  "basedOn": "Based on today's holdings held over the {{period}}; past behaviour does not predict future results.",
+  "correlationMatrix": "Correlation matrix between holdings"
+}

@@ -5,6 +5,7 @@ import { PortfolioHolding } from "@/api/portfolio/portfolio";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
 import { Trophy, TrendingDown, PieChart, DollarSign, Wallet } from "lucide-react";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
+import { useTranslation } from "react-i18next";
 
 interface KeyMetricsProps {
     holdings: PortfolioHolding[];
@@ -14,6 +15,7 @@ interface KeyMetricsProps {
 }
 
 export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading }: KeyMetricsProps) => {
+    const { t } = useTranslation('portfolio');
     const totalValue = holdings.reduce((sum, h) => sum + holdingMarketValue(h), 0);
     const avgPosition = holdings.length > 0 ? totalValue / holdings.length : 0;
     // Hooks must run unconditionally, so these are computed before the loading/empty early returns.
@@ -55,16 +57,18 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
 
     const metrics = [
         {
-            label: "Total Invested",
+            key: "invested",
+            label: t("metrics.invested"),
             value: formatCurrency(animatedTotalInvested),
-            subValue: "capital deployed",
+            subValue: t("metrics.investedSub"),
             icon: Wallet,
             color: "text-blue-500",
             bg: "bg-blue-500/10",
             isPositive: true
         },
         {
-            label: "Best Performer",
+            key: "best",
+            label: t("metrics.best"),
             value: bestPerformer?.ticker,
             subValue: formatPercentage(bestPerformer?.change_percent || 0),
             icon: Trophy,
@@ -73,7 +77,8 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
             isPositive: (bestPerformer?.change_percent || 0) >= 0
         },
         {
-            label: "Worst Performer",
+            key: "worst",
+            label: t("metrics.worst"),
             value: worstPerformer?.ticker,
             subValue: formatPercentage(worstPerformer?.change_percent || 0),
             icon: TrendingDown,
@@ -82,7 +87,8 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
             isPositive: (worstPerformer?.change_percent || 0) >= 0
         },
         {
-            label: "Largest Position",
+            key: "largest",
+            label: t("metrics.largest"),
             value: largestHolding?.ticker,
             subValue: formatPercentage(totalValue > 0 ? ((largestHolding ? holdingMarketValue(largestHolding) : 0) / totalValue) * 100 : 0),
             icon: PieChart,
@@ -91,9 +97,10 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
             isPositive: true
         },
         {
-            label: "Avg. Position",
+            key: "avg",
+            label: t("metrics.avg"),
             value: formatCurrency(animatedAvgPosition),
-            subValue: "per holding",
+            subValue: t("metrics.avgSub"),
             icon: DollarSign,
             color: "text-emerald-500",
             bg: "bg-emerald-500/10",
@@ -114,7 +121,7 @@ export const KeyMetrics = ({ holdings, totalInvested, className = "", isLoading 
                         <div>
                             <p className="text-xs font-medium text-muted-foreground mb-1">{metric.label}</p>
                             <p className="text-lg font-bold tracking-tight tabular-nums truncate">{metric.value}</p>
-                            <p className={`text-xs font-medium mt-1 ${metric.label === "Worst Performer" || metric.label === "Best Performer" ?
+                            <p className={`text-xs font-medium mt-1 ${metric.key === "worst" || metric.key === "best" ?
                                 (metric.isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400") :
                                 "text-muted-foreground"
                                 }`}>

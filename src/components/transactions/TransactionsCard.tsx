@@ -14,7 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
+import { format } from "@/lib/dateFormat";
+import { useTranslation } from "react-i18next";
+import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
@@ -27,7 +29,9 @@ interface TransactionsCardProps {
   showHeader?: boolean;
 }
 
-const TransactionCard = ({ transaction }: { transaction: Transaction }) => (
+const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
+  const { t } = useTranslation('portfolio');
+  return (
   <div className="rounded-2xl border border-border/50 bg-card/50 p-4">
     <div className="flex items-center justify-between gap-3">
       <Link
@@ -38,7 +42,7 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => (
         <div className="flex flex-col min-w-0">
           <span className="font-semibold text-sm">{transaction.ticker}</span>
           <span className="text-xs text-muted-foreground">
-            {format(new Date(transaction.transaction_date), "MM/dd/yyyy")}
+            {format(new Date(transaction.transaction_date), "P")}
           </span>
         </div>
       </Link>
@@ -51,23 +55,24 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => (
         ) : (
           <ArrowUpRight className="h-3 w-3" />
         )}
-        <span className="capitalize">{transaction.transaction_type.toLowerCase()}</span>
+        <span>{t(`transactions.types.${transaction.transaction_type}`)}</span>
       </div>
     </div>
 
     <div className="mt-3 flex items-center justify-between text-xs">
       <span className="text-muted-foreground">
-        {transaction.quantity.toLocaleString()} shares @ ${transaction.price_per_share.toFixed(2)}
+        {t('transactions.sharesAt', { count: transaction.quantity, price: formatCurrency(transaction.price_per_share) })}
       </span>
       <span className="font-semibold text-sm text-foreground">
-        ${(transaction.quantity * transaction.price_per_share).toFixed(2)}
+        {formatCurrency(transaction.quantity * transaction.price_per_share)}
       </span>
     </div>
     {transaction.notes?.trim() && (
-      <p className="mt-2 text-xs italic text-muted-foreground break-words">Why: {transaction.notes}</p>
+      <p className="mt-2 text-xs italic text-muted-foreground break-words">{t('transactions.why', { notes: transaction.notes })}</p>
     )}
   </div>
-);
+  );
+};
 
 const TransactionRowSkeleton = () => (
   <TableRow className="hover:bg-transparent border-b border-border/50 last:border-0">
@@ -100,13 +105,14 @@ export function TransactionsCard({
   isLoading = false,
   showHeader = true,
 }: TransactionsCardProps) {
+  const { t } = useTranslation('portfolio');
   // Show loading state
   if (isLoading) {
     return (
       <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
         {showHeader && (
           <CardHeader className="pb-2 px-0">
-            <CardTitle className="text-lg font-medium">Transactions</CardTitle>
+            <CardTitle className="text-lg font-medium">{t('transactions.title')}</CardTitle>
           </CardHeader>
         )}
         <CardContent className="p-0">
@@ -137,12 +143,12 @@ export function TransactionsCard({
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow className="hover:bg-transparent border-b border-border/50">
-                  <TableHead className="w-[120px] pl-6 h-12 font-medium">Date</TableHead>
-                  <TableHead className="h-12 font-medium">Type</TableHead>
-                  <TableHead className="w-[200px] h-12 font-medium">Stock</TableHead>
-                  <TableHead className="text-right h-12 font-medium">Shares</TableHead>
-                  <TableHead className="text-right h-12 font-medium">Price</TableHead>
-                  <TableHead className="text-right pr-6 h-12 font-medium">Total</TableHead>
+                  <TableHead className="w-[120px] pl-6 h-12 font-medium">{t('transactions.columns.date')}</TableHead>
+                  <TableHead className="h-12 font-medium">{t('transactions.columns.type')}</TableHead>
+                  <TableHead className="w-[200px] h-12 font-medium">{t('transactions.columns.stock')}</TableHead>
+                  <TableHead className="text-right h-12 font-medium">{t('transactions.columns.shares')}</TableHead>
+                  <TableHead className="text-right h-12 font-medium">{t('transactions.columns.price')}</TableHead>
+                  <TableHead className="text-right pr-6 h-12 font-medium">{t('transactions.columns.total')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -163,12 +169,12 @@ export function TransactionsCard({
       <Card className={`flex flex-col border-none shadow-none bg-transparent ${className}`}>
         {showHeader && (
           <CardHeader className="pb-2 px-0">
-            <CardTitle className="text-lg font-medium">Transactions</CardTitle>
+            <CardTitle className="text-lg font-medium">{t('transactions.title')}</CardTitle>
           </CardHeader>
         )}
         <CardContent className="p-0">
           <div className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground text-sm bg-card/50 rounded-3xl border border-border/50 p-8">
-            <p>No transactions have been recorded for this portfolio yet.</p>
+            <p>{t('transactions.empty')}</p>
           </div>
         </CardContent>
       </Card>
@@ -180,9 +186,9 @@ export function TransactionsCard({
       {showHeader && (
         <CardHeader className="pb-2 px-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-medium">Transactions</CardTitle>
+            <CardTitle className="text-lg font-medium">{t('transactions.title')}</CardTitle>
             <CardDescription className="text-xs mr-4">
-              {transactions.length} record{transactions.length !== 1 ? "s" : ""}
+              {t('transactions.records', { count: transactions.length })}
             </CardDescription>
           </div>
         </CardHeader>
@@ -200,19 +206,19 @@ export function TransactionsCard({
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow className="hover:bg-transparent border-b border-border/50">
-                <TableHead className="w-[120px] pl-6 h-12 font-medium">Date</TableHead>
-                <TableHead className="h-12 font-medium">Type</TableHead>
-                <TableHead className="w-[200px] h-12 font-medium">Stock</TableHead>
-                <TableHead className="text-right h-12 font-medium">Shares</TableHead>
-                <TableHead className="text-right h-12 font-medium">Price</TableHead>
-                <TableHead className="text-right pr-6 h-12 font-medium">Total</TableHead>
+                <TableHead className="w-[120px] pl-6 h-12 font-medium">{t('transactions.columns.date')}</TableHead>
+                <TableHead className="h-12 font-medium">{t('transactions.columns.type')}</TableHead>
+                <TableHead className="w-[200px] h-12 font-medium">{t('transactions.columns.stock')}</TableHead>
+                <TableHead className="text-right h-12 font-medium">{t('transactions.columns.shares')}</TableHead>
+                <TableHead className="text-right h-12 font-medium">{t('transactions.columns.price')}</TableHead>
+                <TableHead className="text-right pr-6 h-12 font-medium">{t('transactions.columns.total')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transactions.map((transaction) => (
                 <TableRow key={transaction.id} className="hover:bg-muted/30 border-b border-border/50 last:border-0 transition-colors">
                   <TableCell className="pl-6 py-4 text-sm text-muted-foreground">
-                    {format(new Date(transaction.transaction_date), "MM/dd/yyyy")}
+                    {format(new Date(transaction.transaction_date), "P")}
                   </TableCell>
                   <TableCell>
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${transaction.transaction_type === "BUY"
@@ -225,7 +231,7 @@ export function TransactionsCard({
                         <ArrowUpRight className="h-3 w-3" />
                       )}
                       <span className="capitalize">
-                        {transaction.transaction_type.toLowerCase()}
+                        {t(`transactions.types.${transaction.transaction_type}`)}
                       </span>
                     </div>
                   </TableCell>
@@ -244,15 +250,15 @@ export function TransactionsCard({
                     )}
                   </TableCell>
                   <TableCell className="text-right text-muted-foreground">
-                    {transaction.quantity.toLocaleString()}
+                    {formatNumber(transaction.quantity)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end">
-                      <span className="font-medium">${transaction.price_per_share.toFixed(2)}</span>
+                      <span className="font-medium">{formatCurrency(transaction.price_per_share)}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right font-semibold pr-6">
-                    ${(transaction.quantity * transaction.price_per_share).toFixed(2)}
+                    {formatCurrency(transaction.quantity * transaction.price_per_share)}
                   </TableCell>
                 </TableRow>
               ))}

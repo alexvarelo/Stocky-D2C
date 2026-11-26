@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 import { AwardIcon, AwardIconDefs, type AwardIconId } from "./AwardIcons";
+import { useTranslation } from "react-i18next";
+import { formatDecimal } from "@/lib/formatters";
 
 interface PortfolioAwardsProps {
     returnPercentage: number;
@@ -33,57 +35,58 @@ export const PortfolioAwards = ({
     reviewStreakDays = 0,
     className = ""
 }: PortfolioAwardsProps) => {
+    const { t } = useTranslation("portfolio");
 
     const awards: Award[] = [
         {
             id: "bullseye",
             iconId: "bullseye",
-            title: "Bullseye",
-            description: "Reached its monthly goal 3 times",
+            title: t("awards.bullseye.title"),
+            description: t("awards.bullseye.description"),
             isUnlocked: monthlyGoalHits >= 3,
             progress: Math.min(100, Math.max(0, (monthlyGoalHits / 3) * 100)),
-            targetValue: "3 hits",
-            currentValue: `${monthlyGoalHits} hits`
+            targetValue: t("awards.hits", { count: 3 }),
+            currentValue: t("awards.hits", { count: monthlyGoalHits })
         },
         {
             id: "club100",
             iconId: "club100",
-            title: "100% Club",
-            description: "Achieved a total return of over 100%",
+            title: t("awards.club100.title"),
+            description: t("awards.club100.description"),
             isUnlocked: returnPercentage >= 100,
             progress: Math.min(100, Math.max(0, (returnPercentage / 100) * 100)),
             targetValue: "100%",
-            currentValue: `${returnPercentage.toFixed(1)}%`
+            currentValue: `${formatDecimal(returnPercentage, 1)}%`
         },
         {
             id: "onFire",
             iconId: "onFire",
-            title: "On Fire",
-            description: "7-day streak opening the app",
+            title: t("awards.onFire.title"),
+            description: t("awards.onFire.description"),
             isUnlocked: loginStreakDays >= 7,
             progress: Math.min(100, Math.max(0, (loginStreakDays / 7) * 100)),
-            targetValue: "7 days",
-            currentValue: `${loginStreakDays} days`
+            targetValue: t("awards.days", { count: 7 }),
+            currentValue: t("awards.days", { count: loginStreakDays })
         },
         {
             id: "diversified",
             iconId: "diversified",
-            title: "Diversified",
-            description: "Holds 5 or more different assets",
+            title: t("awards.diversified.title"),
+            description: t("awards.diversified.description"),
             isUnlocked: holdingsCount >= 5,
             progress: Math.min(100, Math.max(0, (holdingsCount / 5) * 100)),
-            targetValue: "5 assets",
-            currentValue: `${holdingsCount} assets`
+            targetValue: t("awards.assets", { count: 5 }),
+            currentValue: t("awards.assets", { count: holdingsCount })
         },
         {
             id: "disciplined",
             iconId: "disciplined",
-            title: "Disciplined",
-            description: "Reviewed its portfolio 30 days in a row",
+            title: t("awards.disciplined.title"),
+            description: t("awards.disciplined.description"),
             isUnlocked: reviewStreakDays >= 30,
             progress: Math.min(100, Math.max(0, (reviewStreakDays / 30) * 100)),
-            targetValue: "30 days",
-            currentValue: `${reviewStreakDays} days`
+            targetValue: t("awards.days", { count: 30 }),
+            currentValue: t("awards.days", { count: reviewStreakDays })
         }
     ];
 
@@ -98,11 +101,11 @@ export const PortfolioAwards = ({
             <AwardIconDefs />
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Awards & Achievements</h2>
-                    <p className="text-sm text-muted-foreground">Milestones unlocked by your portfolio.</p>
+                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight">{t("awards.title")}</h2>
+                    <p className="text-sm text-muted-foreground">{t("awards.subtitle")}</p>
                 </div>
                 <div className="self-start sm:self-auto px-3 py-1 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-semibold border border-primary/20">
-                    {awards.filter(a => a.isUnlocked).length}/{awards.length} Unlocked
+                    {t("awards.unlockedCount", { count: awards.filter(a => a.isUnlocked).length, total: awards.length })}
                 </div>
             </div>
 
@@ -128,11 +131,11 @@ export const PortfolioAwards = ({
 
                                 {award.isUnlocked ? (
                                     <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full bg-[#3FB6F0]/10 text-[#1C8CC7] text-[10px] sm:text-xs font-bold border border-[#3FB6F0]/20">
-                                        UNLOCKED
+                                        {t("awards.unlocked")}
                                     </div>
                                 ) : (
                                     <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full bg-muted/50 text-muted-foreground text-[10px] sm:text-xs font-bold border border-white/5 flex items-center gap-1">
-                                        <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> LOCKED
+                                        <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> {t("awards.locked")}
                                     </div>
                                 )}
                             </div>
@@ -150,9 +153,9 @@ export const PortfolioAwards = ({
                         {/* Progress Bar */}
                         <div className="relative z-10 space-y-2 mt-auto">
                             <div className="flex justify-between text-xs font-medium">
-                                <span className="text-muted-foreground">Progress</span>
+                                <span className="text-muted-foreground">{t("awards.progress")}</span>
                                 <span className={award.isUnlocked ? "text-[#1C8CC7]" : "text-muted-foreground"}>
-                                    {award.isUnlocked ? "Completed" : `${award.currentValue} / ${award.targetValue}`}
+                                    {award.isUnlocked ? t("awards.completed") : `${award.currentValue} / ${award.targetValue}`}
                                 </span>
                             </div>
                             <div className="h-1.5 bg-black/20 rounded-full overflow-hidden">

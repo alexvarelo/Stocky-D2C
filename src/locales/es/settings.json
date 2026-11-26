@@ -1,0 +1,35 @@
+{
+  "title": "Ajustes",
+  "subtitle": "Gestiona los ajustes y las preferencias de tu cuenta",
+  "tabs": {
+    "profile": "Perfil",
+    "preferences": "Preferencias",
+    "account": "Cuenta",
+    "notifications": "Notificaciones"
+  },
+  "avatar": {
+    "title": "Foto de perfil",
+    "description": "Elige un avatar que te represente en Stocky",
+    "preview": "Vista previa"
+  },
+  "profile": {
+    "title": "Información del perfil",
+    "description": "Actualiza la información de tu perfil y tus datos personales",
+    "fullName": "Nombre completo",
+    "username": "Nombre de usuario",
+    "bio": "Biografía",
+    "bioPlaceholder": "Cuéntanos un poco sobre ti",
+    "bioHint": "Puedes usar markdown y mencionar a otros usuarios con @",
+    "website": "Sitio web",
+    "submit": "Actualizar perfil"
+  },
+  "validation": {
+    "nameMin": "El nombre debe tener al menos 2 caracteres.",
+    "usernameMin": "El nombre de usuario debe tener al menos 2 caracteres."
+  },
+  "toast": {
+    "updated": "Perfil actualizado",
+    "updatedDescription": "Tu perfil se ha actualizado correctamente.",
+    "error": "No se pudo actualizar el perfil. Inténtalo de nuevo."
+  }
+}

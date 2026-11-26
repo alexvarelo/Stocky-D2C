@@ -8,7 +8,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatCurrency } from "@/lib/formatters";
+import { formatCurrency, formatDecimal, formatDate } from "@/lib/formatters";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { usePriceFlash, priceFlashClass } from "@/hooks/usePriceFlash";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
@@ -64,6 +65,7 @@ export const PortfolioHero = ({
     isLoadingPrices = false,
     isLive = false,
 }: PortfolioHeroProps) => {
+    const { t } = useTranslation('portfolio');
     const isPositive = totalReturn >= 0;
     const isTodayPositive = todayChange >= 0;
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -131,7 +133,7 @@ export const PortfolioHero = ({
                         className="h-8 w-8 -ml-2 text-muted-foreground hover:text-foreground transition-colors sm:h-9 sm:w-auto sm:px-3"
                     >
                         <ArrowLeft className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Back</span>
+                        <span className="hidden sm:inline">{t('common:actions.back')}</span>
                     </Button>
 
                     <div className="flex items-center gap-1.5 sm:gap-2">
@@ -147,12 +149,12 @@ export const PortfolioHero = ({
                                 {isFollowing ? (
                                     <>
                                         <UserMinus className="h-4 w-4" />
-                                        Unfollow
+                                        {t('detail.hero.unfollow')}
                                     </>
                                 ) : (
                                     <>
                                         <UserPlus className="h-4 w-4" />
-                                        Follow
+                                        {t('detail.hero.follow')}
                                     </>
                                 )}
                             </Button>
@@ -165,30 +167,30 @@ export const PortfolioHero = ({
                             className="hidden sm:flex gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors"
                         >
                             <Sparkles className="h-4 w-4" />
-                            AI Insights
+                            {t('detail.hero.aiInsights')}
                         </Button>
 
                         {isOwner && (
                             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" aria-label={t('detail.hero.moreActions')}>
                                         <MoreHorizontal className="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-40">
                                     <DropdownMenuItem onClick={handleEdit}>
                                         <Edit className="mr-2 h-4 w-4" />
-                                        Edit Portfolio
+                                        {t('detail.hero.edit')}
                                     </DropdownMenuItem>
                                     {onExport && (
                                         <DropdownMenuItem onClick={() => { setDropdownOpen(false); onExport(); }}>
                                             <Download className="mr-2 h-4 w-4" />
-                                            Export Receipt
+                                            {t('detail.hero.export')}
                                         </DropdownMenuItem>
                                     )}
                                     <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
                                         <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete
+                                        {t('common:actions.delete')}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -235,19 +237,19 @@ export const PortfolioHero = ({
                                             ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
                                             : 'bg-slate-500/10 text-slate-600 border-slate-500/20 dark:text-slate-400'}
                                     `}>
-                                        {isPublic ? 'Public' : 'Private'}
+                                        {isPublic ? t('visibility.public') : t('visibility.private')}
                                     </div>
                                 )}
                                 {followersCount !== undefined && (
                                     <>
                                         <div className="w-1 h-1 rounded-full bg-border" />
-                                        <div>{followersCount} {followersCount === 1 ? 'follower' : 'followers'}</div>
+                                        <div>{t('detail.hero.followers', { count: followersCount })}</div>
                                     </>
                                 )}
                                 {createdAt && (
                                     <>
                                         <div className="w-1 h-1 rounded-full bg-border" />
-                                        <div>Created {new Date(createdAt).toLocaleDateString()}</div>
+                                        <div>{t('card.created', { date: formatDate(createdAt) })}</div>
                                     </>
                                 )}
                             </motion.div>
@@ -271,7 +273,7 @@ export const PortfolioHero = ({
                                 {isLive && !isLoadingPrices && (
                                     <span
                                         className="relative flex h-2 w-2 ml-1"
-                                        title="Live price"
+                                        title={t('detail.hero.livePrice')}
                                     >
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -296,9 +298,9 @@ export const PortfolioHero = ({
                                             </span>
                                             <span className="text-muted-foreground/50">|</span>
                                             <span className={`font-semibold tabular-nums ${isPositive ? "text-success" : "text-danger"}`}>
-                                                {isPositive ? "+" : ""}{returnPercentage.toFixed(2)}%
+                                                {isPositive ? "+" : ""}{formatDecimal(returnPercentage)}%
                                             </span>
-                                            <span className="text-muted-foreground">All time</span>
+                                            <span className="text-muted-foreground">{t('detail.hero.allTime')}</span>
                                         </div>
                                     )}
                                 </motion.div>
@@ -318,9 +320,9 @@ export const PortfolioHero = ({
                                             </span>
                                             <span className="text-muted-foreground/50">|</span>
                                             <span className={`font-medium tabular-nums ${isTodayPositive ? "text-success" : "text-danger"}`}>
-                                                {isTodayPositive ? "+" : ""}{todayChangePercent.toFixed(2)}%
+                                                {isTodayPositive ? "+" : ""}{formatDecimal(todayChangePercent)}%
                                             </span>
-                                            <span>Today</span>
+                                            <span>{t('detail.hero.today')}</span>
                                         </div>
                                     )}
                                 </motion.div>
@@ -349,9 +351,9 @@ export const PortfolioHero = ({
                             </span>
                             <span className="text-muted-foreground/50">|</span>
                             <span className={`font-semibold tabular-nums ${isPositive ? "text-success" : "text-danger"}`}>
-                                {isPositive ? "+" : ""}{returnPercentage.toFixed(2)}%
+                                {isPositive ? "+" : ""}{formatDecimal(returnPercentage)}%
                             </span>
-                            <span className="text-muted-foreground">All time</span>
+                            <span className="text-muted-foreground">{t('detail.hero.allTime')}</span>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground/90">
@@ -361,9 +363,9 @@ export const PortfolioHero = ({
                             </span>
                             <span className="text-muted-foreground/50">|</span>
                             <span className={`font-medium tabular-nums ${isTodayPositive ? "text-success" : "text-danger"}`}>
-                                {isTodayPositive ? "+" : ""}{todayChangePercent.toFixed(2)}%
+                                {isTodayPositive ? "+" : ""}{formatDecimal(todayChangePercent)}%
                             </span>
-                            <span>Today</span>
+                            <span>{t('detail.hero.today')}</span>
                         </div>
                     </div>
 
@@ -381,19 +383,19 @@ export const PortfolioHero = ({
                                     ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
                                     : 'bg-slate-500/10 text-slate-600 border-slate-500/20 dark:text-slate-400'}
                             `}>
-                                {isPublic ? 'Public' : 'Private'}
+                                {isPublic ? t('visibility.public') : t('visibility.private')}
                             </div>
                         )}
                         {followersCount !== undefined && (
                             <>
                                 <div className="w-1 h-1 rounded-full bg-border" />
-                                <div>{followersCount} {followersCount === 1 ? 'follower' : 'followers'}</div>
+                                <div>{t('detail.hero.followers', { count: followersCount })}</div>
                             </>
                         )}
                         {createdAt && (
                             <>
                                 <div className="w-1 h-1 rounded-full bg-border" />
-                                <div>Created {new Date(createdAt).toLocaleDateString()}</div>
+                                <div>{t('card.created', { date: formatDate(createdAt) })}</div>
                             </>
                         )}
                     </motion.div>

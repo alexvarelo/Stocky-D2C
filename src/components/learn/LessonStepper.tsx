@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Check, CheckCircle2, ListOrdered,
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Term } from "@/components/glossary/Term";
-import { EducationalDisclaimer, EDUCATIONAL_DISCLAIMER_TEXT } from "@/components/compliance/EducationalDisclaimer";
+import { EducationalDisclaimer, getEducationalDisclaimerText } from "@/components/compliance/EducationalDisclaimer";
 import { ExplainThis, buildExplainPrompt } from "@/components/explain/ExplainThis";
 import { useStockyChatActions } from "@/contexts/StockyChatContext";
 import { getGlossaryEntry } from "@/content/glossary";
@@ -243,7 +243,7 @@ export function LessonStepper({ lesson, track, index: lessonIndex, siblings, don
             <span className="text-sm font-semibold tabular-nums">
               Step {current + 1} of {steps.length}
             </span>
-            <span className="text-[11px] text-muted-foreground">{EDUCATIONAL_DISCLAIMER_TEXT} · Use ← → to move</span>
+            <span className="text-[11px] text-muted-foreground">{getEducationalDisclaimerText()} · Use ← → to move</span>
           </div>
 
           {isLast ? (

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
+import { format } from "@/lib/dateFormat";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,7 @@ import {
   type ThesisHorizon,
   type ThesisStatus,
 } from "@/hooks/useInvestmentTheses";
+import { getLocale } from "@/lib/locale";
 
 const NONE = "none";
 
@@ -101,7 +103,7 @@ export function ThesisForm({ ticker, thesis, portfolioId, lockPortfolio = false,
             whyBought.length >= THESIS_MAX_WHY * 0.9 ? "text-xs text-amber-600 dark:text-amber-400" : "text-xs text-muted-foreground"
           }
         >
-          {whyBought.length.toLocaleString()} / {THESIS_MAX_WHY.toLocaleString()}
+          {whyBought.length.toLocaleString(getLocale())} / {THESIS_MAX_WHY.toLocaleString(getLocale())}
           {whyBought.length >= THESIS_MAX_WHY && " · limit reached"}
         </p>
       </div>
