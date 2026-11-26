@@ -27,5 +27,54 @@
     "title_other": "{{count}} theses are ready for review",
     "dismiss": "Dismiss reminder",
     "due": "due {{date}}"
+  },
+  "market": {
+    "title": "Market context",
+    "asOf": "As of {{date}}",
+    "percentile1y": "1-year <term>percentile</term>",
+    "percentileLabel": "{{label}} 1-year percentile",
+    "breadth": "<term>Market breadth</term>: share above 200-day average",
+    "breadthPercentileLabel": "Market breadth 1-year percentile",
+    "description": {
+      "vix": "Volatility the options market expects for the S&P 500 over the next 30 days.",
+      "us10y": "Yield on 10-year US government bonds, a reference for borrowing costs.",
+      "dxy": "Value of the US dollar against a basket of major currencies.",
+      "sp500": "Index of 500 large US companies, a common gauge of the US stock market."
+    },
+    "label": {
+      "vix": "VIX (volatility index)",
+      "us10y": "US 10-year Treasury yield",
+      "dxy": "US Dollar index",
+      "sp500": "S&P 500"
+    }
+  },
+  "donut": {
+    "value": "Value: {{value}}",
+    "shares": "Shares: {{count, number}}",
+    "total": "Total value",
+    "error": "Couldn't load your holdings",
+    "empty": "No holdings yet"
+  },
+  "activity": {
+    "today": "Today",
+    "details": "Details:",
+    "viewDetails": "View details",
+    "more": "+{{count}} more",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "types": {
+      "post": "Post",
+      "portfolio": "Portfolio",
+      "transaction": "Transaction",
+      "watchlist": "Watchlist"
+    },
+    "events": {
+      "post": "Created a new post",
+      "portfolio": "Created portfolio: {{name}}",
+      "bought": "Bought {{count, number}} {{ticker}}",
+      "sold": "Sold {{count, number}} {{ticker}}",
+      "stock": "stock",
+      "price": "Price: {{price}}"
+    }
   }
 }

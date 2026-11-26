@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ReportContentDialog } from './ReportContentDialog';
+import { useTranslation } from 'react-i18next';
 
 type User = {
   id: string;
@@ -55,6 +56,7 @@ export const PostCard = ({
 }: PostCardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation("social");
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(post.has_liked);
   const [likeCount, setLikeCount] = useState(post.likes_count || 0);
@@ -95,8 +97,8 @@ export const PostCard = ({
     
     if (!user?.id) {
       toast({
-        title: 'Authentication required',
-        description: 'Please sign in to like posts',
+        title: t('post.authRequired'),
+        description: t('post.signInToLike'),
         variant: 'destructive',
       });
       return;
@@ -204,23 +206,23 @@ export const PostCard = ({
             {post.is_ai_generated && (
               <span
                 className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                title="Written by AI. Not investment advice."
+                title={t('post.aiTitle')}
               >
                 <Sparkles className="h-3 w-3" aria-hidden="true" />
-                AI-generated
+                {t('post.aiGenerated')}
               </span>
             )}
             {user?.id !== post.user_id && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" aria-label="More options">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" aria-label={t('post.moreOptions')}>
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onSelect={() => setReportOpen(true)}>
                     <Flag className="mr-2 h-4 w-4" aria-hidden="true" />
-                    Report post
+                    {t('post.report')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -253,7 +255,7 @@ export const PostCard = ({
               size="sm" 
               className="flex items-center gap-1 group px-2"
               onClick={handleCommentClick}
-              aria-label={`Comments (${postData.comments_count})`}
+              aria-label={t('post.comments', { count: postData.comments_count })}
               aria-expanded={showComments}
             >
               <MessageCircle className="h-4 w-4 group-hover:text-blue-500" />
@@ -267,7 +269,7 @@ export const PostCard = ({
               size="sm" 
               className={`flex items-center gap-1 group px-2 ${isLiked ? 'text-red-500' : ''}`}
               onClick={handleLike}
-              aria-label={isLiked ? `Unlike (${likeCount} likes)` : `Like (${likeCount} likes)`}
+              aria-label={t(isLiked ? 'post.unlike' : 'post.like', { count: likeCount })}
               aria-pressed={!!isLiked}
             >
               <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''} group-hover:text-red-500`} />
@@ -291,7 +293,7 @@ export const PostCard = ({
             >
               <Share2 className="h-4 w-4 group-hover:text-green-500" />
               <span className="text-sm group-hover:text-green-500">
-                Share
+                {t('common:actions.share')}
               </span>
             </Button>
           </div>

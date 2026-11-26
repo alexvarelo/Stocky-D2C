@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import i18n from "@/i18n";
+import { formatCurrency } from "@/lib/formatters";
+
+const tr = (key: string, options?: Record<string, unknown>) =>
+  i18n.t(key, { ns: "dashboard", ...options });
 
 export type EventType = "post" | "portfolio" | "transaction" | "watchlist";
 
@@ -46,7 +51,8 @@ interface WatchlistItem {
 
 export const useActivityEvents = (userId?: string) => {
   return useQuery({
-    queryKey: ["activity-events", userId] as const,
+    // Titles are built in the UI language, so the language is part of the key.
+    queryKey: ["activity-events", userId, i18n.resolvedLanguage] as const,
     queryFn: async ({ queryKey }): Promise<ActivityEvent[]> => {
       const [, userId] = queryKey;
       if (!userId) return [];
@@ -94,7 +100,7 @@ export const useActivityEvents = (userId?: string) => {
         // Transform posts to ActivityEvent format
         const postEvents: ActivityEvent[] = posts.map((post) => ({
           id: `post-${post.id}`,
-          title: "Created a new post",
+          title: tr("activity.events.post"),
           type: "post" as const,
           date: new Date(post.created_at),
           description:
@@ -107,7 +113,7 @@ export const useActivityEvents = (userId?: string) => {
         const portfolioEvents: ActivityEvent[] = portfolios.map(
           (portfolio) => ({
             id: `portfolio-${portfolio.id}`,
-            title: `Created portfolio: ${portfolio.name}`,
+            title: tr("activity.events.portfolio", { name: portfolio.name }),
             type: "portfolio" as const,
             date: new Date(portfolio.created_at),
             link: `/portfolio/${portfolio.id}`,
@@ -117,13 +123,14 @@ export const useActivityEvents = (userId?: string) => {
         // Transform transactions to ActivityEvent format
         const transactionEvents: ActivityEvent[] = transactions.map((tx) => ({
           id: `tx-${tx.id}`,
-          title: `${tx.transaction_type === "BUY" ? "Bought" : "Sold"} ${
-            tx.quantity
-          } ${tx.ticker || "stock"}`,
+          title: tr(tx.transaction_type === "BUY" ? "activity.events.bought" : "activity.events.sold", {
+            count: tx.quantity,
+            ticker: tx.ticker || tr("activity.events.stock"),
+          }),
           type: "transaction" as const,
           date: new Date(tx.created_at),
           description: tx.price_per_share
-            ? `Price: $${tx.price_per_share.toFixed(2)}`
+            ? tr("activity.events.price", { price: formatCurrency(tx.price_per_share) })
             : undefined,
           link: tx.portfolio_id ? `/portfolio/${tx.portfolio_id}` : undefined,
         }));

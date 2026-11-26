@@ -130,10 +130,47 @@
       "price": "Precio",
       "total": "Total"
     },
-    "empty": "Todavía no se ha registrado ninguna operación en esta cartera."
+    "empty": "Todavía no se ha registrado ninguna operación en esta cartera.",
+    "records_one": "{{count}} registro",
+    "records_other": "{{count}} registros"
   },
   "delete": {
     "title": "Eliminar cartera",
     "description": "¿Seguro que quieres eliminar esta cartera? Esta acción no se puede deshacer."
+  },
+  "awards": {
+    "title": "Logros",
+    "subtitle": "Hitos que ha alcanzado tu cartera.",
+    "unlockedCount": "{{count}}/{{total}} conseguidos",
+    "unlocked": "CONSEGUIDO",
+    "locked": "BLOQUEADO",
+    "progress": "Progreso",
+    "completed": "Completado",
+    "hits_one": "{{count}} vez",
+    "hits_other": "{{count}} veces",
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días",
+    "assets_one": "{{count}} activo",
+    "assets_other": "{{count}} activos",
+    "bullseye": {
+      "title": "En el blanco",
+      "description": "Ha alcanzado su objetivo mensual 3 veces"
+    },
+    "club100": {
+      "title": "Club del 100 %",
+      "description": "Ha superado una rentabilidad total del 100 %"
+    },
+    "onFire": {
+      "title": "Imparable",
+      "description": "7 días seguidos abriendo la app"
+    },
+    "diversified": {
+      "title": "Diversificada",
+      "description": "Tiene 5 o más activos distintos"
+    },
+    "disciplined": {
+      "title": "Constante",
+      "description": "Revisada 30 días seguidos"
+    }
   }
 }

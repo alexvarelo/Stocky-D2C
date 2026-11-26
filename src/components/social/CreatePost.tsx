@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { CompanyLogo } from '@/components/stock/CompanyLogo';
+import { useTranslation } from 'react-i18next';
 
 type FormValues = {
   content: string;
@@ -38,6 +39,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
   const { data: portfolios = [], isLoading: isLoadingPortfolios } = usePortfolios(user?.id);
   const { mutate: createPost, isPending: isSubmitting } = useCreatePost();
   const { toast } = useToast();
+  const { t } = useTranslation('social');
   
   const { 
     handleSubmit, 
@@ -73,8 +75,8 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
   const onSubmit = (data: FormValues) => {
     if (!user?.id) {
       toast({
-        title: 'Error',
-        description: 'You must be logged in to create a post',
+        title: t('common:status.error'),
+        description: t('create.toast.signedOut'),
         variant: 'destructive',
       });
       return;
@@ -94,15 +96,15 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
         reset();
         setIsExpanded(false);
         toast({
-          title: 'Success',
-          description: 'Your post has been published',
+          title: t('create.toast.successTitle'),
+          description: t('create.toast.success'),
         });
         onPostCreated?.();
       },
       onError: (error) => {
         toast({
-          title: 'Error',
-          description: error.message || 'Failed to create post',
+          title: t('common:status.error'),
+          description: error.message || t('create.toast.error'),
           variant: 'destructive',
         });
       }
@@ -120,7 +122,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
         onClick={() => setIsExpanded(true)}
       >
         <div className="flex-1 text-muted-foreground ml-1">
-          What are your thoughts?
+          {t('create.prompt')}
         </div>
         <MessageSquare className="h-5 w-5 text-muted-foreground" />
       </div>
@@ -135,25 +137,25 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
           <MarkdownEditor
             value={content}
             onChange={handleContentChange}
-            placeholder="Share your thoughts..."
+            placeholder={t('create.placeholder')}
             className="min-h-[120px]"
           />
           
           {/* Link to Portfolio */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Link to portfolio (optional)</Label>
+            <Label className="text-sm font-medium">{t('create.linkPortfolio')}</Label>
             <Select 
               value={selectedPortfolioId || 'none'}
               onValueChange={(value) => setValue('portfolioId', value === 'none' ? undefined : value)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a portfolio" />
+                <SelectValue placeholder={t('create.selectPortfolio')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">No portfolio</SelectItem>
+                <SelectItem value="none">{t('create.noPortfolio')}</SelectItem>
                 {portfolios.map((portfolio) => (
                   <SelectItem key={portfolio.id} value={portfolio.id}>
-                    {portfolio.name} {!portfolio.is_public && '(Private)'}
+                    {portfolio.name} {!portfolio.is_public && t('create.private')}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -162,7 +164,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
           
           {/* Link to Instrument */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Link to instrument (optional)</Label>
+            <Label className="text-sm font-medium">{t('create.linkInstrument')}</Label>
             {watch('ticker') ? (
               <div className="flex items-center gap-2">
                 <div className="px-3 py-1.5 text-sm rounded-md bg-accent flex items-center gap-1.5">
@@ -171,6 +173,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
                   <button
                     type="button"
                     onClick={handleRemoveInstrument}
+                    aria-label={t('create.removeInstrument')}
                     className="ml-2 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -182,7 +185,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search instruments..."
+                  placeholder={t('create.searchInstruments')}
                   className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -195,7 +198,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
               <div className="relative">
                 {isSearching ? (
                   <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
-                    <div className="p-2 text-sm text-muted-foreground">Searching...</div>
+                    <div className="p-2 text-sm text-muted-foreground">{t('create.searching')}</div>
                   </div>
                 ) : searchResults && searchResults.length > 0 && searchQuery.length >= 2 ? (
                   <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
@@ -217,7 +220,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
                   </div>
                 ) : searchQuery.length >= 2 ? (
                   <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
-                    <div className="p-2 text-sm text-muted-foreground">No instruments found</div>
+                    <div className="p-2 text-sm text-muted-foreground">{t('create.noInstruments')}</div>
                   </div>
                 ) : null}
               </div>
@@ -233,7 +236,7 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
         
         <div className="flex justify-between items-center pt-2">
           <div className="text-sm text-muted-foreground">
-            {content.length}/1000 characters
+            {t('create.characters', { count: content.length, max: 1000 })}
           </div>
           <div className="flex items-center gap-2">
             <Button 
@@ -245,14 +248,14 @@ export const CreatePost = ({ onPostCreated, className }: CreatePostProps) => {
                 setIsExpanded(false);
               }}
             >
-              Cancel
+              {t('common:actions.cancel')}
             </Button>
             <Button 
               type="submit" 
               disabled={isSubmitting || !content.trim()}
               size="sm"
             >
-              {isSubmitting ? 'Posting...' : 'Post'}
+              {isSubmitting ? t('create.posting') : t('create.post')}
             </Button>
           </div>
         </div>

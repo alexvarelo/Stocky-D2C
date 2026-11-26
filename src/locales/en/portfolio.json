@@ -130,10 +130,47 @@
       "price": "Price",
       "total": "Total"
     },
-    "empty": "No transactions have been recorded for this portfolio yet."
+    "empty": "No transactions have been recorded for this portfolio yet.",
+    "records_one": "{{count}} record",
+    "records_other": "{{count}} records"
   },
   "delete": {
     "title": "Delete Portfolio",
     "description": "Are you sure you want to delete this portfolio? This action cannot be undone."
+  },
+  "awards": {
+    "title": "Awards & achievements",
+    "subtitle": "Milestones unlocked by your portfolio.",
+    "unlockedCount": "{{count}}/{{total}} unlocked",
+    "unlocked": "UNLOCKED",
+    "locked": "LOCKED",
+    "progress": "Progress",
+    "completed": "Completed",
+    "hits_one": "{{count}} hit",
+    "hits_other": "{{count}} hits",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "assets_one": "{{count}} asset",
+    "assets_other": "{{count}} assets",
+    "bullseye": {
+      "title": "Bullseye",
+      "description": "Reached its monthly goal 3 times"
+    },
+    "club100": {
+      "title": "100% Club",
+      "description": "Achieved a total return of over 100%"
+    },
+    "onFire": {
+      "title": "On Fire",
+      "description": "7-day streak opening the app"
+    },
+    "diversified": {
+      "title": "Diversified",
+      "description": "Holds 5 or more different assets"
+    },
+    "disciplined": {
+      "title": "Disciplined",
+      "description": "Reviewed its portfolio 30 days in a row"
+    }
   }
 }

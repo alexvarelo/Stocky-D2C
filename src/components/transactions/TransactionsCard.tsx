@@ -188,7 +188,7 @@ export function TransactionsCard({
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-medium">{t('transactions.title')}</CardTitle>
             <CardDescription className="text-xs mr-4">
-              {transactions.length} record{transactions.length !== 1 ? "s" : ""}
+              {t('transactions.records', { count: transactions.length })}
             </CardDescription>
           </div>
         </CardHeader>
